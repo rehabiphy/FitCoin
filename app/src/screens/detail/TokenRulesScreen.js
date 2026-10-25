@@ -7,18 +7,18 @@ import Card from '../../components/Card';
 import IconBubble from '../../components/IconBubble';
 import Icon from '../../components/Icon';
 import CoinIcon from '../../components/CoinIcon';
-import { wallet } from '../../data/mock';
+import { useSteps } from '../../context/StepsContext';
 import { colors, type, TOKEN } from '../../theme';
 
-const SECTIONS = [
+const sections = dailyCap => [
   {
     icon: 'Coins',
     color: colors.gold,
     title: 'How FIT is issued',
     points: [
       'FIT is credited only after activities are verified on our servers.',
-      'Each activity has its own rate and daily maximum.',
-      'Streaks and challenges add bonus FIT on top of base rewards.',
+      `Each activity has its own rate and daily maximum (e.g. 6 ${TOKEN} per 1,000 steps, up to 60 a day).`,
+      `Every 7th day in a row you’re active earns a 50 ${TOKEN} streak bonus; challenges pay their prize when completed.`,
     ],
   },
   {
@@ -26,7 +26,7 @@ const SECTIONS = [
     color: colors.cyan,
     title: 'Earning limits',
     points: [
-      `Daily cap: ${wallet.dailyCap} ${TOKEN} across all activities.`,
+      `Daily cap: ${dailyCap} ${TOKEN} across all activities.`,
       `Referral cap: 20 rewarded referrals per month.`,
       'Unusual activity may be held for review before credit.',
     ],
@@ -88,6 +88,8 @@ function Section({ s, index }) {
 }
 
 export default function TokenRulesScreen() {
+  const { wallet } = useSteps();
+  const SECTIONS = sections(wallet.dailyCap);
   return (
     <Screen scroll edges={['top', 'bottom']} header={<Header title="Token & reward rules" />} contentContainerStyle={styles.content}>
       <Animated.View entering={FadeInDown.duration(450)} style={styles.intro}>

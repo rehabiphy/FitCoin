@@ -13,25 +13,17 @@ import PressableScale from '../../components/PressableScale';
 import SectionHeader from '../../components/SectionHeader';
 import TransactionRow from '../../components/TransactionRow';
 import { TAB_BAR_SPACE } from '../../components/TabBar';
-import { transactions, wallet } from '../../data/mock';
+import { useSteps } from '../../context/StepsContext';
+import useApi from '../../hooks/useApi';
+import { transactionsApi } from '../../api/engagementApi';
+import { txView } from '../../utils/format';
 import { colors, gradients, radius, type, TOKEN } from '../../theme';
 
 const FILTERS = ['All', 'Earned', 'Redeemed', 'Other'];
+// Chip label -> server filter group
+export const TX_GROUPS = { All: undefined, Earned: 'earned', Redeemed: 'redeemed', Other: 'other' };
 
-export function filterTx(list, f) {
-  if (f === 'Earned') {
-    return list.filter(t => t.type === 'earn');
-  }
-  if (f === 'Redeemed') {
-    return list.filter(t => t.type === 'redeem');
-  }
-  if (f === 'Other') {
-    return list.filter(t => t.type === 'fee' || t.type === 'expire');
-  }
-  return list;
-}
-
-function WalletCard() {
+function WalletCard({ wallet }) {
   return (
     <GradientView colors={gradients.wallet} style={styles.card}>
       <View style={styles.ring1} />
@@ -48,11 +40,13 @@ function WalletCard() {
         <AnimatedNumber value={wallet.balance} decimals={2} style={styles.balance} />
         <Text style={styles.unit}>{TOKEN}</Text>
       </View>
-      <Text style={styles.approx}>≈ ₹{(wallet.balance * 0.5).toFixed(2)} in marketplace value</Text>
+      <Text style={styles.approx}>≈ ₹{(wallet.inrValue ?? wallet.balance * 0.5).toFixed(2)} in marketplace value</Text>
       <View style={styles.cardFoot}>
         <View>
           <Text style={styles.footLabel}>Pending</Text>
-          <Text style={styles.footValue}>{wallet.pending} {TOKEN}</Text>
+          <Text style={styles.footValue}>
+            {wallet.pending} {TOKEN}
+          </Text>
         </View>
         <View style={styles.footDivider} />
         <View>
@@ -66,7 +60,12 @@ function WalletCard() {
 
 export default function WalletScreen({ navigation }) {
   const [filter, setFilter] = useState('All');
-  const list = filterTx(transactions, filter).slice(0, 6);
+  const { wallet, reloadWallet } = useSteps();
+  const { data, loading } = useApi(() => {
+    reloadWallet();
+    return transactionsApi.list({ limit: 6, group: TX_GROUPS[filter] });
+  }, [filter, reloadWallet]);
+  const list = (data?.items || []).map(txView);
 
   const actions = [
     { label: 'Refer', icon: 'Users', color: colors.mint, onPress: () => navigation.navigate('Referral') },
@@ -84,7 +83,7 @@ export default function WalletScreen({ navigation }) {
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(80).duration(600)}>
-        <WalletCard />
+        <WalletCard wallet={wallet} />
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(160).duration(600)} style={styles.actions}>
@@ -96,20 +95,35 @@ export default function WalletScreen({ navigation }) {
         ))}
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(220).duration(600)}>
-        <Card style={styles.expiry}>
-          <IconBubble icon="Hourglass" color={colors.orange} size={42} />
-          <View style={styles.flex}>
-            <Text style={type.bodyStrong}>
-              {wallet.expiringSoon} {TOKEN} expiring soon
-            </Text>
-            <Text style={type.caption}>Use them before {wallet.expiryDate}</Text>
-          </View>
-          <PressableScale style={styles.useBtn} onPress={() => navigation.navigate('Marketplace')}>
-            <Text style={styles.useText}>Use now</Text>
-          </PressableScale>
-        </Card>
-      </Animated.View>
+      {wallet.expiringSoon > 0 ? (
+        <Animated.View entering={FadeInDown.delay(220).duration(600)}>
+          <Card style={styles.expiry}>
+            <IconBubble icon="Hourglass" color={colors.orange} size={42} />
+            <View style={styles.flex}>
+              <Text style={type.bodyStrong}>
+                {wallet.expiringSoon} {TOKEN} expiring soon
+              </Text>
+              <Text style={type.caption}>
+                Use them before {new Date(wallet.expiryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </Text>
+            </View>
+            <PressableScale style={styles.useBtn} onPress={() => navigation.navigate('Marketplace')}>
+              <Text style={styles.useText}>Use now</Text>
+            </PressableScale>
+          </Card>
+        </Animated.View>
+      ) : (
+        <Animated.View entering={FadeInDown.delay(220).duration(600)}>
+          <Card style={styles.expiry} onPress={() => navigation.navigate('Marketplace')}>
+            <IconBubble icon="Gift" color={colors.gold} size={42} />
+            <View style={styles.flex}>
+              <Text style={type.bodyStrong}>Spend your {TOKEN}</Text>
+              <Text style={type.caption}>Vouchers, fitness passes and more in the marketplace</Text>
+            </View>
+            <Icon name="ChevronRight" size={18} color={colors.textMuted} />
+          </Card>
+        </Animated.View>
+      )}
 
       <Animated.View entering={FadeInDown.delay(260).duration(600)}>
         <Card style={styles.soon}>
@@ -137,7 +151,7 @@ export default function WalletScreen({ navigation }) {
             <TransactionRow tx={tx} onPress={() => navigation.navigate('TransactionDetail', { id: tx.id })} />
           </Animated.View>
         ))}
-        {list.length === 0 ? (
+        {list.length === 0 && !loading ? (
           <View style={styles.empty}>
             <CoinIcon size={32} />
             <Text style={type.body}>No transactions yet</Text>

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as users from '../controllers/user.controller.js';
+import { stats } from '../controllers/community.controller.js';
 import { requireAuth } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import { authLimiter } from '../middlewares/rateLimit.middleware.js';
@@ -10,6 +11,7 @@ const router = Router();
 router.use(requireAuth);
 
 router.get('/me', users.getProfile);
+router.get('/me/stats', stats);
 router.patch('/me', validate(updateProfileSchema), users.updateProfile);
 router.patch('/me/password', authLimiter, validate(changePasswordSchema), users.changePassword);
 

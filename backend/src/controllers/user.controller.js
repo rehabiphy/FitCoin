@@ -9,7 +9,10 @@ export async function getProfile(req, res) {
 
 /** PATCH /users/me */
 export async function updateProfile(req, res) {
-  const { name, phone, avatar } = req.body;
+  const { name, phone, avatar, stepGoal } = req.body;
+  if (stepGoal !== undefined) {
+    req.user.stepGoal = stepGoal;
+  }
   if (name !== undefined) {
     req.user.name = name;
   }

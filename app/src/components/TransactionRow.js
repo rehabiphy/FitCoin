@@ -25,7 +25,7 @@ export function StatusPill({ status }) {
 }
 
 export function txColor(tx) {
-  if (tx.type === 'earn') {
+  if (tx.type === 'earn' || tx.type === 'bonus') {
     return colors.mint;
   }
   if (tx.type === 'redeem') {

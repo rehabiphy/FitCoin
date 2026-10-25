@@ -27,7 +27,26 @@ export async function requireAuth(req, res, next) {
   }
 
   req.user = user;
+  req.tzOffset = resolveTzOffset(req, user);
   next();
+}
+
+/**
+ * The phone's offset from UTC in minutes (IST = 330), from the `X-Tz-Offset`
+ * header the app sends, falling back to the last value we saw for this user.
+ */
+function resolveTzOffset(req, user) {
+  const raw = req.get('x-tz-offset') ?? req.query?.tzOffset;
+  const parsed = Number.parseInt(raw, 10);
+  if (Number.isInteger(parsed) && parsed >= -720 && parsed <= 840) {
+    if (parsed !== user.tzOffset) {
+      // Remember it for work done outside a request (referrals, badges); no need to wait
+      User.updateOne({ _id: user._id }, { tzOffset: parsed }).catch(() => {});
+      user.tzOffset = parsed;
+    }
+    return parsed;
+  }
+  return user.tzOffset || 0;
 }
 
 /** Restricts a route to the given roles. Use after requireAuth. */

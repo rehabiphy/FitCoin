@@ -21,7 +21,8 @@ function Bar({ value, max, index, highlight, height }) {
 
 /** Animated weekly bar chart. Last item is highlighted as "today". */
 export default function BarChart({ data, height = 110, highlightIndex = data.length - 1 }) {
-  const max = Math.max(...data.map(d => d.value)) * 1.1;
+  // At least 1 so an all-zero week doesn't divide by zero
+  const max = Math.max(1, ...data.map(d => d.value)) * 1.1;
   return (
     <View>
       <View style={[styles.row, { height }]}>

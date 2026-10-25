@@ -24,6 +24,18 @@ const userSchema = new mongoose.Schema(
     referralCode: { type: String, unique: true, sparse: true },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
+    stepGoal: { type: Number, min: 1000, max: 50000, default: 10000 },
+    // Last known phone offset from UTC in minutes (IST = 330), for work done outside a request
+    tzOffset: { type: Number, default: 0 },
+    // Kept up to date as rewards land, so leaderboards can show streaks without recomputing
+    currentStreak: { type: Number, default: 0 },
+    lastActiveDate: { type: String },
+    bestStreak: { type: Number, default: 0 },
+    // Set once the referral reward for this user (as the invited friend) has been paid or ruled out
+    referralRewardedAt: { type: Date },
+    referralStatus: { type: String, enum: ['pending', 'rewarded', 'capped'], default: undefined },
+    // Short lock so two redemptions can't spend the same balance at once
+    walletLockUntil: { type: Date, select: false },
     // Bumped to invalidate every outstanding token for this user (e.g. password change)
     tokenVersion: { type: Number, default: 0, select: false },
     lastLoginAt: { type: Date },
@@ -60,6 +72,7 @@ userSchema.methods.toPublicJSON = function toPublicJSON() {
     referralCode: this.referralCode,
     authProviders: this.authProviders,
     role: this.role,
+    stepGoal: this.stepGoal ?? 10000,
     createdAt: this.createdAt,
   };
 };

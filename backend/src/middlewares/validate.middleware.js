@@ -1,8 +1,7 @@
 import ApiError from '../utils/ApiError.js';
 
-/** Validates and replaces `req.body` with the parsed result of a zod schema. Unknown keys are stripped. */
-export const validate = schema => (req, res, next) => {
-  const result = schema.safeParse(req.body ?? {});
+function parse(schema, input) {
+  const result = schema.safeParse(input ?? {});
   if (!result.success) {
     const details = result.error.issues.map(issue => ({
       field: issue.path.join('.'),
@@ -10,6 +9,17 @@ export const validate = schema => (req, res, next) => {
     }));
     throw ApiError.badRequest(details[0]?.message || 'Invalid input', 'VALIDATION_ERROR', details);
   }
-  req.body = result.data;
+  return result.data;
+}
+
+/** Validates and replaces `req.body` with the parsed result of a zod schema. Unknown keys are stripped. */
+export const validate = schema => (req, res, next) => {
+  req.body = parse(schema, req.body);
+  next();
+};
+
+/** Validates the query string. Express 5's `req.query` is read-only, so the result goes on `req.validatedQuery`. */
+export const validateQuery = schema => (req, res, next) => {
+  req.validatedQuery = parse(schema, req.query);
   next();
 };

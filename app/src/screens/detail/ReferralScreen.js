@@ -4,7 +4,7 @@ import Animated, { FadeInDown, FadeOut, ZoomIn } from 'react-native-reanimated';
 import Screen from '../../components/Screen';
 import Header from '../../components/Header';
 import Card from '../../components/Card';
-import Avatar from '../../components/Avatar';
+import Avatar, { initialsOf } from '../../components/Avatar';
 import GradientView from '../../components/GradientFill';
 import GradientButton from '../../components/GradientButton';
 import PressableScale from '../../components/PressableScale';
@@ -12,28 +12,40 @@ import Icon from '../../components/Icon';
 import IconBubble from '../../components/IconBubble';
 import CoinIcon from '../../components/CoinIcon';
 import { StatusPill } from '../../components/TransactionRow';
-import { referrals, user } from '../../data/mock';
+import { useAuth } from '../../context/AuthContext';
+import useApi from '../../hooks/useApi';
+import { referralsApi } from '../../api/engagementApi';
+import { avatarColor } from '../../utils/format';
 import { colors, gradients, radius, type, TOKEN } from '../../theme';
 
-const STEPS = [
-  { icon: 'Share2', title: 'Share your code', body: 'Send your invite link to friends.' },
-  { icon: 'User', title: 'Friend signs up', body: 'They verify their phone number.' },
-  { icon: 'Activity', title: '3 active days', body: 'They complete 3 verified activity days.' },
-  { icon: 'Coins', title: 'You both earn', body: `You get 100 ${TOKEN}, they get 50 ${TOKEN}.` },
-];
-
 export default function ReferralScreen() {
-  const [copied, setCopied] = useState(false);
+  const { user } = useAuth();
+  const { data } = useApi(() => referralsApi.get(), []);
+  const [sent, setSent] = useState(false);
+  const code = data?.code || user?.referralCode || '';
+  const rules = data?.rules || { referrerReward: 100, refereeReward: 50, activeDaysRequired: 3, maxRewardedPerMonth: 20 };
+  const stats = data?.stats || { invited: 0, rewarded: 0, earned: 0 };
+  const referrals = data?.referrals || [];
 
-  const copy = () => {
-    // Hook up @react-native-clipboard/clipboard here when needed.
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1600);
+  const STEPS = [
+    { icon: 'Share2', title: 'Share your code', body: 'Send your invite code to friends.' },
+    { icon: 'User', title: 'Friend signs up', body: 'They enter your code when creating their account.' },
+    { icon: 'Activity', title: `${rules.activeDaysRequired} active days`, body: `They earn FIT on ${rules.activeDaysRequired} different days.` },
+    { icon: 'Coins', title: 'You both earn', body: `You get ${rules.referrerReward} ${TOKEN}, they get ${rules.refereeReward} ${TOKEN}.` },
+  ];
+
+  // Sends just the code (React Native has no built-in clipboard)
+  const sendCode = async () => {
+    const result = await Share.share({ message: code });
+    if (result.action === Share.sharedAction) {
+      setSent(true);
+      setTimeout(() => setSent(false), 1600);
+    }
   };
 
   const share = () =>
     Share.share({
-      message: `Join me on Fitcoin and earn rewards for staying active! Use my code ${user.referralCode} to get 50 FIT.`,
+      message: `Join me on Fitcoin and earn rewards for staying active! Use my code ${code} when you sign up to get ${rules.refereeReward} FIT.`,
     });
 
   return (
@@ -44,24 +56,28 @@ export default function ReferralScreen() {
           <View style={styles.heroIcons}>
             <IconBubble icon="Gift" color="#062A22" size={60} radius={20} style={styles.heroBubble} />
           </View>
-          <Text style={styles.heroTitle}>Invite friends,{'\n'}earn 100 {TOKEN} each</Text>
-          <Text style={styles.heroSub}>Up to 20 rewarded referrals per month</Text>
+          <Text style={styles.heroTitle}>
+            Invite friends,{'\n'}earn {rules.referrerReward} {TOKEN} each
+          </Text>
+          <Text style={styles.heroSub}>Up to {rules.maxRewardedPerMonth} rewarded referrals per month</Text>
         </GradientView>
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(100).duration(500)}>
         <Text style={[type.label, styles.label]}>Your referral code</Text>
-        <PressableScale onPress={copy} style={styles.code}>
-          <Text style={styles.codeText}>{user.referralCode}</Text>
-          {copied ? (
+        <PressableScale onPress={sendCode} style={styles.code}>
+          <Text selectable style={styles.codeText}>
+            {code}
+          </Text>
+          {sent ? (
             <Animated.View entering={ZoomIn} exiting={FadeOut} style={styles.copied}>
               <Icon name="Check" size={14} color={colors.bg} strokeWidth={3} />
-              <Text style={styles.copiedText}>Copied</Text>
+              <Text style={styles.copiedText}>Sent</Text>
             </Animated.View>
           ) : (
             <View style={styles.copyBtn}>
-              <Icon name="Copy" size={16} color={colors.mint} />
-              <Text style={styles.copyText}>Copy</Text>
+              <Icon name="Send" size={16} color={colors.mint} />
+              <Text style={styles.copyText}>Send</Text>
             </View>
           )}
         </PressableScale>
@@ -70,17 +86,17 @@ export default function ReferralScreen() {
 
       <Animated.View entering={FadeInDown.delay(160).duration(500)} style={styles.stats}>
         <Card style={styles.stat}>
-          <Text style={styles.statValue}>4</Text>
+          <Text style={styles.statValue}>{stats.invited}</Text>
           <Text style={type.caption}>Invited</Text>
         </Card>
         <Card style={styles.stat}>
-          <Text style={styles.statValue}>3</Text>
+          <Text style={styles.statValue}>{stats.rewarded}</Text>
           <Text style={type.caption}>Rewarded</Text>
         </Card>
         <Card style={styles.stat}>
           <View style={styles.earnRow}>
             <CoinIcon size={16} />
-            <Text style={styles.statValue}>300</Text>
+            <Text style={styles.statValue}>{stats.earned}</Text>
           </View>
           <Text style={type.caption}>Earned</Text>
         </Card>
@@ -107,9 +123,12 @@ export default function ReferralScreen() {
       <Animated.View entering={FadeInDown.delay(280).duration(500)}>
         <Card style={styles.section}>
           <Text style={type.h3}>Your referrals</Text>
+          {referrals.length === 0 ? (
+            <Text style={[type.caption, styles.none]}>No friends have joined with your code yet.</Text>
+          ) : null}
           {referrals.map(f => (
             <View key={f.id} style={styles.friend}>
-              <Avatar initials={f.avatar} size={40} color={f.color} />
+              <Avatar initials={initialsOf(f.name)} size={40} color={avatarColor(f.id)} />
               <View style={styles.flex}>
                 <Text style={type.bodyStrong}>{f.name}</Text>
                 <Text style={type.caption}>{f.note}</Text>
@@ -123,7 +142,7 @@ export default function ReferralScreen() {
       <View style={styles.fine}>
         <Icon name="ShieldCheck" size={16} color={colors.textMuted} />
         <Text style={[type.caption, styles.flex]}>
-          Referral rewards require a unique verified device and phone number. Accounts flagged for self-referral or fraud are not eligible.
+          Referral rewards are for genuine new users. Accounts flagged for self-referral or fraud are not eligible.
         </Text>
       </View>
     </Screen>
@@ -169,5 +188,6 @@ const styles = StyleSheet.create({
   rail: { width: 2, flex: 1, minHeight: 16, backgroundColor: 'rgba(52,245,180,0.2)', marginTop: 4, marginBottom: -14 },
   stepBody: { flex: 1, gap: 2, paddingTop: 2 },
   friend: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 14 },
+  none: { marginTop: 10 },
   fine: { flexDirection: 'row', gap: 10, marginTop: 18, paddingHorizontal: 4 },
 });

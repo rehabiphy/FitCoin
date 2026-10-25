@@ -5,24 +5,54 @@ import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated';
 import Screen from '../../components/Screen';
 import Header from '../../components/Header';
 import Card from '../../components/Card';
-import Avatar from '../../components/Avatar';
+import Avatar, { initialsOf } from '../../components/Avatar';
 import ProgressRing from '../../components/ProgressRing';
 import GradientButton from '../../components/GradientButton';
 import IconBubble from '../../components/IconBubble';
 import Icon from '../../components/Icon';
 import CoinIcon from '../../components/CoinIcon';
 import { formatNumber } from '../../components/AnimatedNumber';
-import { challenges, leaderboard } from '../../data/mock';
+import useApi from '../../hooks/useApi';
+import { challengesApi } from '../../api/engagementApi';
+import { avatarColor, timeLeft } from '../../utils/format';
 import { colors, type, TOKEN } from '../../theme';
 
+// Which activity screen the "Track" button opens, by challenge icon
+const TRACK_BY_ICON = { Footprints: 'walk', Droplet: 'water', Bike: 'cycle', Wind: 'breathe', BookOpen: 'read' };
+
 export default function ChallengeDetailScreen({ route, navigation }) {
-  const c = challenges.find(x => x.id === route.params?.id) || challenges[0];
-  const [joined, setJoined] = useState(c.joined);
+  const id = route.params?.id;
   const insets = useSafeAreaInsets();
+  const { data: c, setData } = useApi(() => challengesApi.detail(id).then(d => d.challenge), [id]);
+  const [joining, setJoining] = useState(false);
+  const [error, setError] = useState('');
+
+  if (!c) {
+    return <Screen header={<Header title="Challenge" />} />;
+  }
+  const joined = c.joined;
+
+  const join = async () => {
+    setJoining(true);
+    setError('');
+    try {
+      const { challenge } = await challengesApi.join(c.id);
+      setData(challenge);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setJoining(false);
+    }
+  };
+
+  const track = () => {
+    const activity = TRACK_BY_ICON[c.icon];
+    navigation.navigate(activity ? 'ActivityDetail' : 'Activity', activity ? { id: activity } : undefined);
+  };
 
   const rules = [
     'Activity must be auto-tracked or verified to count.',
-    'Rewards are credited within 24h after the challenge ends.',
+    `The prize is credited as soon as you complete it — this ${c.type.toLowerCase()} run ends in ${timeLeft(c.endsAt)}.`,
     'Duplicate or suspicious entries are excluded from rankings.',
   ];
 
@@ -37,12 +67,15 @@ export default function ChallengeDetailScreen({ route, navigation }) {
         <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
           {joined ? (
             <Animated.View entering={FadeIn} style={styles.joinedRow}>
-              <Icon name="CircleCheck" size={20} color={colors.mint} />
-              <Text style={styles.joinedText}>You’re in! Keep going.</Text>
-              <GradientButton title="Track" size="md" colors={c.gradient} onPress={() => navigation.navigate('Activity')} />
+              <Icon name={c.completed ? 'Trophy' : 'CircleCheck'} size={20} color={c.completed ? colors.gold : colors.mint} />
+              <Text style={styles.joinedText}>{c.completed ? `Completed! +${c.reward} ${TOKEN} earned` : 'You’re in! Keep going.'}</Text>
+              {!c.completed ? <GradientButton title="Track" size="md" colors={c.gradient} onPress={track} /> : null}
             </Animated.View>
           ) : (
-            <GradientButton title={`Join challenge · win ${c.reward} ${TOKEN}`} colors={c.gradient} onPress={() => setJoined(true)} />
+            <>
+              {error ? <Text style={styles.error}>{error}</Text> : null}
+              <GradientButton title={`Join challenge · win ${c.reward} ${TOKEN}`} colors={c.gradient} loading={joining} onPress={join} />
+            </>
           )}
         </View>
       }>
@@ -68,7 +101,7 @@ export default function ChallengeDetailScreen({ route, navigation }) {
         </Card>
         <Card style={styles.stat}>
           <Icon name="Timer" size={22} color={colors.pink} />
-          <Text style={styles.statValue}>{c.endsIn}</Text>
+          <Text style={styles.statValue}>{timeLeft(c.endsAt)}</Text>
           <Text style={type.caption}>Ends in</Text>
         </Card>
       </Animated.View>
@@ -82,7 +115,9 @@ export default function ChallengeDetailScreen({ route, navigation }) {
             <View style={styles.flex}>
               <Text style={type.h3}>Your progress</Text>
               <Text style={[type.body, styles.mt4]}>{c.progressLabel}</Text>
-              <Text style={[type.caption, styles.mt4]}>You’re ahead of 68% of participants</Text>
+              <Text style={[type.caption, styles.mt4]}>
+                {c.percentile !== undefined ? `You’re ahead of ${c.percentile}% of participants` : 'You’re the first one here!'}
+              </Text>
             </View>
           </Card>
         </Animated.View>
@@ -91,14 +126,17 @@ export default function ChallengeDetailScreen({ route, navigation }) {
       <Animated.View entering={FadeInDown.delay(220).duration(500)}>
         <Card style={styles.section}>
           <Text style={type.h3}>Top participants</Text>
-          {leaderboard.slice(0, 4).map((p, i) => (
-            <View key={p.id} style={styles.person}>
-              <Text style={styles.rank}>{i + 1}</Text>
-              <Avatar initials={p.avatar} size={36} color={p.color} />
-              <Text style={[type.bodyStrong, styles.flex]}>{p.name}</Text>
-              <Text style={type.caption}>{formatNumber(p.points / 10)} pts</Text>
+          {(c.topParticipants || []).map(p => (
+            <View key={p.userId} style={styles.person}>
+              <Text style={styles.rank}>{p.rank}</Text>
+              <Avatar initials={initialsOf(p.name)} size={36} color={avatarColor(p.userId)} />
+              <Text style={[type.bodyStrong, styles.flex]}>{p.isMe ? `${p.name} (you)` : p.name}</Text>
+              <Text style={type.caption}>
+                {formatNumber(p.progressValue, p.progressValue % 1 ? 1 : 0)} / {c.target} {c.unitLabel}
+              </Text>
             </View>
           ))}
+          {!c.topParticipants?.length ? <Text style={[type.caption, styles.mt4]}>No one has joined this run yet — be the first!</Text> : null}
         </Card>
       </Animated.View>
 
@@ -149,4 +187,5 @@ const styles = StyleSheet.create({
   },
   joinedRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   joinedText: { flex: 1, color: colors.text, fontWeight: '700' },
+  error: { color: colors.danger, textAlign: 'center', marginBottom: 10, fontWeight: '600' },
 });

@@ -2,6 +2,21 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Step counting (see java/com/fitcoin/steps). The step sensor needs
+         ACTIVITY_RECOGNITION; a "health" foreground service keeps the process
+         alive so the sensor keeps counting while the app is closed. -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Lets the ~90 s heartbeat run on time; it falls back to inexact alarms if not granted. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- Lets the app ask to be exempt from battery optimisation, which some phones use to kill the step service. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
+
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
@@ -23,5 +38,21 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+
+      <service
+        android:name=".steps.StepTrackingService"
+        android:enabled="true"
+        android:exported="false"
+        android:stopWithTask="false"
+        android:foregroundServiceType="health" />
+
+      <receiver android:name=".steps.StepHeartbeatReceiver" android:exported="false" />
+      <receiver android:name=".steps.MidnightStepReceiver" android:exported="false" />
+      <receiver android:name=".steps.StepBootReceiver" android:exported="false">
+        <intent-filter>
+          <action android:name="android.intent.action.BOOT_COMPLETED" />
+          <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+        </intent-filter>
+      </receiver>
     </application>
 </manifest>

@@ -11,7 +11,7 @@ const DEV_API_URL = Platform.select({
   default: 'http://localhost:5000/api/v1',
 });
 
-const PROD_API_URL = 'https://api.fitcoin.app/api/v1';
+const PROD_API_URL = 'https://fitcoin-7jq7.onrender.com/api/v1';
 
 export const API_BASE_URL = __DEV__ ? DEV_API_URL : PROD_API_URL;
 
@@ -22,4 +22,4 @@ export const API_TIMEOUT_MS = 15000;
  * (APIs & Services → Credentials). Google signs the ID token for this client,
  * so the backend's GOOGLE_CLIENT_IDS must contain the same value.
  */
-export const GOOGLE_WEB_CLIENT_ID = 'your-web-client-id.apps.googleusercontent.com';
+export const GOOGLE_WEB_CLIENT_ID = '694391739606-tul7mvb2muc18brnmc95kc7gr7jopcdv.apps.googleusercontent.com';

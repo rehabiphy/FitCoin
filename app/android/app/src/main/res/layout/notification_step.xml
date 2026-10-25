@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Persistent step notification (StepNotification.kt): logo, steps + kcal with
+     icons, distance-to-goal and a progress bar. The logo is hidden on Samsung,
+     whose shade already draws the small icon. Text uses the system notification
+     styles so light/dark shades are followed. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingTop="8dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="8dp">
+
+    <ImageView
+        android:id="@+id/step_logo"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/notif_logo_bg"
+        android:contentDescription="@null"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_notif_footprints" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_notif_footprints" />
+
+            <TextView
+                android:id="@+id/step_count_text"
+                style="@android:style/TextAppearance.Material.Notification.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_notif_flame" />
+
+            <TextView
+                android:id="@+id/step_kcal_text"
+                style="@android:style/TextAppearance.Material.Notification.Title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/step_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:progressBackgroundTint="#66808080" />
+
+        <TextView
+            android:id="@+id/step_goal_text"
+            style="@android:style/TextAppearance.Material.Notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:maxLines="1"
+            android:textSize="12sp" />
+    </LinearLayout>
+</LinearLayout>

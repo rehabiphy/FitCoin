@@ -10,7 +10,8 @@ import IconBubble from '../../components/IconBubble';
 import ProgressBar from '../../components/ProgressBar';
 import PressableScale from '../../components/PressableScale';
 import { TAB_BAR_SPACE } from '../../components/TabBar';
-import { user, wallet } from '../../data/mock';
+import useApi from '../../hooks/useApi';
+import { statsApi } from '../../api/engagementApi';
 import { colors, gradients, type } from '../../theme';
 
 function Row({ icon, color, label, value, onPress, right, last }) {
@@ -37,12 +38,16 @@ export default function ProfileScreen({ navigation }) {
 
   const joined = account?.createdAt
     ? new Date(account.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-    : user.joined;
+    : '';
+  const { data: me } = useApi(() => statsApi.me().then(d => d.stats), []);
+  const user = me || { level: 1, levelName: 'Starter', xp: 0, xpLevelStart: 0, xpNext: 100, streak: 0, weeklyRank: null, lifetimeEarned: 0 };
+  const earned = user.lifetimeEarned;
+  const levelSpan = Math.max(1, user.xpNext - user.xpLevelStart);
 
   const stats = [
     { label: 'Streak', value: `${user.streak}d`, icon: 'Flame', color: colors.orange },
-    { label: 'Rank', value: `#${user.rank}`, icon: 'Crown', color: colors.gold },
-    { label: 'Earned', value: `${(wallet.lifetime / 1000).toFixed(1)}k`, icon: 'Coins', color: colors.mint },
+    { label: 'Weekly rank', value: user.weeklyRank ? `#${user.weeklyRank}` : '—', icon: 'Crown', color: colors.gold },
+    { label: 'Earned', value: earned >= 1000 ? `${(earned / 1000).toFixed(1)}k` : `${Math.round(earned)}`, icon: 'Coins', color: colors.mint },
   ];
 
   return (
@@ -76,7 +81,7 @@ export default function ProfileScreen({ navigation }) {
               <Text style={type.caption}>/{user.xpNext}</Text>
             </Text>
           </View>
-          <ProgressBar progress={user.xp / user.xpNext} height={8} style={styles.levelBar} delay={300} />
+          <ProgressBar progress={(user.xp - user.xpLevelStart) / levelSpan} height={8} style={styles.levelBar} delay={300} />
         </Card>
       </Animated.View>
 

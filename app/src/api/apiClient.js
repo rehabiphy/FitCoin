@@ -38,6 +38,8 @@ async function rawRequest(method, path, { body, token, signal } = {}) {
       method,
       headers: {
         Accept: 'application/json',
+        // Lets the server work in the user's local day (IST = 330)
+        'X-Tz-Offset': String(-new Date().getTimezoneOffset()),
         ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },

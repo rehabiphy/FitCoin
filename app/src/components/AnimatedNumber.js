@@ -27,10 +27,10 @@ export default function AnimatedNumber({ value, decimals = 0, duration = 1100, p
         const t = Math.min((ts - start) / duration, 1);
         const v = startValue + (value - startValue) * easeOutCubic(t);
         setDisplay(v);
+        // Remember where we are, so a new value arriving mid-animation continues from here
+        from.current = v;
         if (t < 1) {
           frame = requestAnimationFrame(tick);
-        } else {
-          from.current = value;
         }
       };
       frame = requestAnimationFrame(tick);

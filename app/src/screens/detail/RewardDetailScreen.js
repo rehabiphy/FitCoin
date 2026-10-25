@@ -10,10 +10,10 @@ import GradientButton from '../../components/GradientButton';
 import Icon from '../../components/Icon';
 import CoinIcon from '../../components/CoinIcon';
 import { formatNumber } from '../../components/AnimatedNumber';
-import { rewards, wallet } from '../../data/mock';
+import useApi from '../../hooks/useApi';
+import { marketplaceApi } from '../../api/engagementApi';
+import { useSteps } from '../../context/StepsContext';
 import { colors, gradients, radius, shadow, type, TOKEN } from '../../theme';
-
-const FEE_RATE = 0.02;
 
 function Line({ label, value, strong }) {
   return (
@@ -25,17 +25,34 @@ function Line({ label, value, strong }) {
 }
 
 export default function RewardDetailScreen({ route, navigation }) {
-  const r = rewards.find(x => x.id === route.params?.id) || rewards[0];
   const insets = useSafeAreaInsets();
+  const { wallet, reloadWallet } = useSteps();
+  const { data: r } = useApi(() => marketplaceApi.reward(route.params?.id).then(d => d.reward), [route.params?.id]);
   const [sheet, setSheet] = useState(false);
   const [stage, setStage] = useState('confirm'); // confirm | loading | done
-  const fee = Math.ceil(r.cost * FEE_RATE);
-  const total = r.cost + fee;
-  const affordable = wallet.balance >= total;
+  const [error, setError] = useState('');
+  const [redemption, setRedemption] = useState(null);
 
-  const redeem = () => {
+  if (!r) {
+    return <Screen header={<Header title="Reward" />} />;
+  }
+  const FEE_RATE = r.feeRate;
+  const fee = r.fee;
+  const total = r.total;
+  const affordable = wallet.balance >= total && r.inStock;
+
+  const redeem = async () => {
     setStage('loading');
-    setTimeout(() => setStage('done'), 1300);
+    setError('');
+    try {
+      const result = await marketplaceApi.redeem(r.slug);
+      setRedemption(result.redemption);
+      setStage('done');
+      reloadWallet();
+    } catch (err) {
+      setError(err.message);
+      setStage('confirm');
+    }
   };
 
   const close = () => {
@@ -44,6 +61,7 @@ export default function RewardDetailScreen({ route, navigation }) {
       navigation.goBack();
     }
     setStage('confirm');
+    setError('');
   };
 
   return (
@@ -63,7 +81,7 @@ export default function RewardDetailScreen({ route, navigation }) {
             </View>
           </View>
           <GradientButton
-            title={affordable ? 'Redeem now' : 'Not enough FIT'}
+            title={!r.inStock ? 'Out of stock' : affordable ? 'Redeem now' : 'Not enough FIT'}
             disabled={!affordable}
             style={styles.flex}
             onPress={() => setSheet(true)}
@@ -88,11 +106,11 @@ export default function RewardDetailScreen({ route, navigation }) {
           </View>
           <View style={styles.meta}>
             <Icon name="ShoppingBag" size={13} color={colors.textSecondary} />
-            <Text style={type.caption}>{r.stock}</Text>
+            <Text style={type.caption}>{r.stockLabel}</Text>
           </View>
           <View style={styles.meta}>
             <Icon name="Clock" size={13} color={colors.textSecondary} />
-            <Text style={type.caption}>Valid 90 days</Text>
+            <Text style={type.caption}>Valid {r.validDays} days</Text>
           </View>
         </View>
       </Animated.View>
@@ -113,7 +131,7 @@ export default function RewardDetailScreen({ route, navigation }) {
           <Text style={type.h3}>How it works</Text>
           {[
             'Redeem with FIT — your balance updates instantly.',
-            'Your voucher code appears in Wallet → History within 24h.',
+            'Your voucher code appears right away and is saved in your notifications.',
             'Redemptions are final and can’t be exchanged for cash.',
           ].map((t, i) => (
             <View key={t} style={styles.step}>
@@ -140,9 +158,18 @@ export default function RewardDetailScreen({ route, navigation }) {
                 <Animated.Text entering={FadeInDown.delay(150)} style={[type.h1, styles.center]}>
                   Reward redeemed!
                 </Animated.Text>
-                <Animated.Text entering={FadeInDown.delay(250)} style={[type.body, styles.center]}>
-                  Your {r.brand} {r.title} is being processed. We’ll notify you when the code is ready.
-                </Animated.Text>
+                {redemption?.code ? (
+                  <Animated.View entering={FadeInDown.delay(250)} style={styles.codeBox}>
+                    <Text style={type.caption}>Your {r.brand} code</Text>
+                    <Text selectable style={styles.code}>
+                      {redemption.code}
+                    </Text>
+                  </Animated.View>
+                ) : (
+                  <Animated.Text entering={FadeInDown.delay(250)} style={[type.body, styles.center]}>
+                    Your {r.brand} {r.title} is being processed. We’ll notify you when the code is ready.
+                  </Animated.Text>
+                )}
                 <GradientButton title="Done" colors={gradients.mint} onPress={close} style={styles.sheetBtn} />
               </View>
             ) : (
@@ -161,6 +188,7 @@ export default function RewardDetailScreen({ route, navigation }) {
                   </View>
                   <Text style={styles.confirmCost}>{formatNumber(total)}</Text>
                 </Card>
+                {error ? <Text style={styles.error}>{error}</Text> : null}
                 <GradientButton title="Confirm & Redeem" loading={stage === 'loading'} onPress={redeem} style={styles.sheetBtn} />
                 <GradientButton title="Cancel" variant="ghost" onPress={close} style={styles.mt10} />
               </View>
@@ -225,5 +253,18 @@ const styles = StyleSheet.create({
   confirmCost: { color: colors.gold, fontWeight: '800', fontSize: 16 },
   sheetBtn: { marginTop: 22, alignSelf: 'stretch' },
   success: { alignItems: 'center', gap: 10, paddingTop: 8 },
+  error: { color: colors.danger, textAlign: 'center', marginTop: 14, fontWeight: '600' },
+  codeBox: {
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(52,245,180,0.45)',
+    backgroundColor: 'rgba(52,245,180,0.06)',
+  },
+  code: { color: colors.text, fontSize: 20, fontWeight: '900', letterSpacing: 2 },
   successIcon: { width: 96, height: 96, borderRadius: 48, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: 10 },
 });

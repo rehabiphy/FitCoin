@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import RootNavigator from './src/navigation/RootNavigator';
 import { AuthProvider } from './src/context/AuthContext';
+import { StepsProvider } from './src/context/StepsContext';
 import { colors } from './src/theme';
 
 const navTheme = {
@@ -24,9 +25,11 @@ export default function App() {
     <SafeAreaProvider style={{ backgroundColor: colors.bg }}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       <AuthProvider>
-        <NavigationContainer theme={navTheme}>
-          <RootNavigator />
-        </NavigationContainer>
+        <StepsProvider>
+          <NavigationContainer theme={navTheme}>
+            <RootNavigator />
+          </NavigationContainer>
+        </StepsProvider>
       </AuthProvider>
     </SafeAreaProvider>
   );

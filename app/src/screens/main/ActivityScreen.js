@@ -10,7 +10,11 @@ import Icon from '../../components/Icon';
 import CoinIcon from '../../components/CoinIcon';
 import AnimatedNumber, { formatNumber } from '../../components/AnimatedNumber';
 import Header from '../../components/Header';
-import { activities } from '../../data/mock';
+import useApi from '../../hooks/useApi';
+import { activitiesApi } from '../../api/engagementApi';
+import { useSteps } from '../../context/StepsContext';
+import { withVisuals } from '../../constants/activities';
+import { timeAgo } from '../../utils/format';
 import { colors, gradients, type, TOKEN } from '../../theme';
 
 function Stat({ label, value, color }) {
@@ -26,10 +30,17 @@ function Stat({ label, value, color }) {
 }
 
 export default function ActivityScreen({ navigation }) {
-  const overall = activities.reduce((s, a) => s + Math.min(a.current / a.goal, 1), 0) / activities.length;
+  const { steps, goal, lastSyncAt } = useSteps();
+  const { data } = useApi(() => activitiesApi.today(), []);
+  const activities = (data?.activities || [])
+    .map(withVisuals)
+    .map(a => (a.id === 'walk' ? { ...a, current: Math.max(a.current, steps), goal } : a));
+  const count = activities.length || 1;
+  const overall = activities.reduce((s, a) => s + Math.min(a.current / a.goal, 1), 0) / count;
   const done = activities.filter(a => a.current >= a.goal).length;
-  const potential = activities.reduce((s, a) => s + a.reward, 0);
-  const earned = activities.reduce((s, a) => s + Math.round(a.reward * Math.min(a.current / a.goal, 1)), 0);
+  const potential = data?.summary.potential ?? 0;
+  const earned = data?.summary.earned ?? 0;
+  const synced = lastSyncAt || data?.lastStepSyncAt;
 
   return (
     <Screen
@@ -43,7 +54,7 @@ export default function ActivityScreen({ navigation }) {
         <Text style={type.h2}>Your habits today</Text>
         <View style={styles.sync}>
           <View style={styles.syncDot} />
-          <Text style={styles.syncText}>Synced 2m ago</Text>
+          <Text style={styles.syncText}>{synced ? `Synced ${timeAgo(synced)}` : 'Not synced yet'}</Text>
         </View>
       </Animated.View>
 
@@ -87,7 +98,9 @@ export default function ActivityScreen({ navigation }) {
                 </View>
                 <View style={[styles.reward, complete && styles.rewardDone]}>
                   {complete ? <Icon name="Check" size={13} color={colors.mint} strokeWidth={3} /> : <CoinIcon size={13} />}
-                  <Text style={[styles.rewardText, complete && { color: colors.mint }]}>+{a.reward}</Text>
+                  <Text style={[styles.rewardText, complete && { color: colors.mint }]}>
+                    {a.earned > 0 ? `${a.earned}/${a.reward}` : `+${a.reward}`}
+                  </Text>
                 </View>
               </View>
               <ProgressBar progress={p} gradient={a.gradient} height={7} delay={250 + i * 70} style={styles.bar} />

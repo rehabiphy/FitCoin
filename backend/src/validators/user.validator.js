@@ -11,6 +11,7 @@ export const updateProfileSchema = z
       .refine(v => v === '' || /^\+?[0-9\s-]{7,20}$/.test(v), { error: 'Enter a valid phone number' })
       .optional(),
     avatar: z.url({ error: 'Avatar must be a URL' }).max(2048).optional(),
+    stepGoal: z.number().int().min(1000, { error: 'Goal must be at least 1,000 steps' }).max(50000).optional(),
   })
   .refine(data => Object.keys(data).length > 0, { error: 'Nothing to update' });
 

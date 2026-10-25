@@ -4,7 +4,7 @@ import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated'
 import Screen from '../../components/Screen';
 import Card from '../../components/Card';
 import Chip from '../../components/Chip';
-import Avatar from '../../components/Avatar';
+import Avatar, { initialsOf } from '../../components/Avatar';
 import IconBubble from '../../components/IconBubble';
 import ProgressBar from '../../components/ProgressBar';
 import CoinIcon from '../../components/CoinIcon';
@@ -13,25 +13,32 @@ import SectionHeader from '../../components/SectionHeader';
 import GradientView from '../../components/GradientFill';
 import { formatNumber } from '../../components/AnimatedNumber';
 import { TAB_BAR_SPACE } from '../../components/TabBar';
-import { badges, challenges, leaderboard, user } from '../../data/mock';
+import useApi from '../../hooks/useApi';
+import { badgesApi, challengesApi, leaderboardApi } from '../../api/engagementApi';
+import { avatarColor, themeColor, timeLeft } from '../../utils/format';
 import { colors, gradients, radius, type } from '../../theme';
 
 const FILTERS = ['All', 'Daily', 'Weekly', 'Joined'];
 
-function RankCard({ onPress }) {
-  const top = leaderboard.slice(0, 3);
+function RankCard({ onPress, board }) {
+  const top = (board?.entries || []).slice(0, 3);
+  const me = board?.me;
+  let caption = 'Earn FIT this week to get ranked';
+  if (me?.rank) {
+    caption = me.rank === 1 ? `${formatNumber(me.points)} pts · you’re on top!` : `${formatNumber(me.points)} pts · ${formatNumber(me.pointsToNext)} pts to move up`;
+  }
   return (
     <Card onPress={onPress} padded={false}>
       <GradientView colors={['rgba(124,92,255,0.35)', 'rgba(34,211,238,0.08)']} style={styles.rankCard}>
         <View style={styles.flex}>
           <Text style={type.label}>Weekly leaderboard</Text>
-          <Text style={[type.h1, styles.rankValue]}>#{user.rank}</Text>
-          <Text style={type.caption}>Top 8% · 312 pts to move up</Text>
+          <Text style={[type.h1, styles.rankValue]}>{me?.rank ? `#${me.rank}` : '—'}</Text>
+          <Text style={type.caption}>{caption}</Text>
         </View>
         <View style={styles.stack}>
           {top.map((p, i) => (
-            <View key={p.id} style={[styles.stackItem, { marginLeft: i ? -14 : 0, zIndex: 3 - i }]}>
-              <Avatar initials={p.avatar} size={40} color={p.color} />
+            <View key={p.userId} style={[styles.stackItem, { marginLeft: i ? -14 : 0, zIndex: 3 - i }]}>
+              <Avatar initials={initialsOf(p.name)} size={40} color={avatarColor(p.userId)} />
             </View>
           ))}
         </View>
@@ -70,7 +77,7 @@ function ChallengeCard({ c, onPress }) {
         </View>
         <View style={styles.metaItem}>
           <Icon name="Timer" size={14} color={colors.textMuted} />
-          <Text style={type.caption}>{c.endsIn}</Text>
+          <Text style={type.caption}>{timeLeft(c.endsAt)}</Text>
         </View>
         <View style={styles.flex} />
         <View style={styles.prize}>
@@ -84,6 +91,11 @@ function ChallengeCard({ c, onPress }) {
 
 export default function ChallengesScreen({ navigation }) {
   const [filter, setFilter] = useState('All');
+  const { data: challengeData, loading } = useApi(() => challengesApi.list('all'), []);
+  const { data: board } = useApi(() => leaderboardApi.get('weekly'), []);
+  const { data: badgeData } = useApi(() => badgesApi.list(), []);
+  const challenges = challengeData?.challenges || [];
+  const badges = (badgeData?.badges || []).map(b => ({ ...b, color: themeColor(b.color) }));
   const list = challenges.filter(c =>
     filter === 'All' ? true : filter === 'Joined' ? c.joined : c.type === filter,
   );
@@ -96,7 +108,7 @@ export default function ChallengesScreen({ navigation }) {
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(80).duration(500)}>
-        <RankCard onPress={() => navigation.navigate('Leaderboard')} />
+        <RankCard board={board} onPress={() => navigation.navigate('Leaderboard')} />
       </Animated.View>
 
       <SectionHeader title="Badges" action="View all" onAction={() => navigation.navigate('Badges')} style={styles.section} />
@@ -131,7 +143,7 @@ export default function ChallengesScreen({ navigation }) {
           <ChallengeCard c={c} onPress={() => navigation.navigate('ChallengeDetail', { id: c.id })} />
         </Animated.View>
       ))}
-      {list.length === 0 ? (
+      {list.length === 0 && !loading ? (
         <View style={styles.empty}>
           <Icon name="Target" size={36} color={colors.textMuted} />
           <Text style={type.body}>No challenges here yet.</Text>

@@ -1,9 +1,11 @@
 import env from './config/env.js';
 import app from './app.js';
 import { connectDB, disconnectDB } from './config/db.js';
+import { ensureSeedData } from './seed/index.js';
 
 async function start() {
   await connectDB();
+  await ensureSeedData();
 
   // 0.0.0.0 so phones / emulators on the same network can reach it
   const server = app.listen(env.port, '0.0.0.0', () => {

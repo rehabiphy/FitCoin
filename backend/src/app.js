@@ -24,7 +24,7 @@ app.use(
     // Native apps send no Origin header; browsers must be on the allow-list
     origin: (origin, cb) => cb(null, !origin || env.corsOrigins.includes(origin)),
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Tz-Offset'],
   }),
 );
 app.use(express.json({ limit: '10kb' }));

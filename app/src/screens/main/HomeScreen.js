@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
@@ -25,7 +26,14 @@ import BarChart from '../../components/BarChart';
 import Icon from '../../components/Icon';
 import IconBubble from '../../components/IconBubble';
 import { TAB_BAR_SPACE } from '../../components/TabBar';
-import { activities, challenges, user, wallet } from '../../data/mock';
+import StepsCard from '../../components/StepsCard';
+import { useSteps } from '../../context/StepsContext';
+import useApi from '../../hooks/useApi';
+import { activitiesApi, challengesApi, notificationsApi, statsApi } from '../../api/engagementApi';
+import { withVisuals } from '../../constants/activities';
+import { timeLeft } from '../../utils/format';
+
+const EMPTY_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => ({ day, value: 0 }));
 import { colors, gradients, radius, type, TOKEN } from '../../theme';
 
 function greeting() {
@@ -56,6 +64,7 @@ function Flame() {
 }
 
 function BalanceCard({ navigation }) {
+  const { wallet } = useSteps();
   return (
     <GradientView colors={gradients.wallet} style={styles.balance}>
       <View style={styles.balanceGlow} />
@@ -83,7 +92,7 @@ function BalanceCard({ navigation }) {
             {wallet.earnedToday} / {wallet.dailyCap}
           </Text>
         </View>
-        <ProgressBar progress={wallet.earnedToday / wallet.dailyCap} gradient={['#FFFFFF', '#B9F8FF']} height={6} delay={300} />
+        <ProgressBar progress={wallet.dailyCap ? wallet.earnedToday / wallet.dailyCap : 0} gradient={['#FFFFFF', '#B9F8FF']} height={6} delay={300} />
       </View>
 
       <View style={styles.balanceActions}>
@@ -100,27 +109,44 @@ function BalanceCard({ navigation }) {
   );
 }
 
-function StreakCard() {
+function streakHint(stats) {
+  if (!stats) {
+    return ' ';
+  }
+  const { streakBonus, activeToday, streak } = stats;
+  if (!activeToday) {
+    return streak > 0 ? 'Earn FIT from any habit today to keep your streak' : 'Earn FIT from any habit today to start a streak';
+  }
+  return streakBonus.daysToBonus === streakBonus.every
+    ? `Streak bonus earned! Next +${streakBonus.amount} ${TOKEN} in ${streakBonus.every} days`
+    : `${streakBonus.daysToBonus} more day${streakBonus.daysToBonus > 1 ? 's' : ''} for a +${streakBonus.amount} ${TOKEN} streak bonus`;
+}
+
+function StreakCard({ stats }) {
   const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-  const done = 6;
+  const week = stats?.week || days.map(() => ({}));
+  const streak = stats?.streak ?? 0;
   return (
     <Card style={styles.streak}>
       <View style={styles.streakTop}>
         <Flame />
         <View style={styles.flex}>
-          <Text style={type.h3}>{user.streak}-day streak 🔥</Text>
-          <Text style={type.caption}>Log one activity today to earn +50 {TOKEN} bonus</Text>
+          <Text style={type.h3}>{streak > 0 ? `${streak}-day streak 🔥` : 'Start a streak 🔥'}</Text>
+          <Text style={type.caption}>{streakHint(stats)}</Text>
         </View>
       </View>
       <View style={styles.weekRow}>
-        {days.map((d, i) => (
-          <Animated.View key={i} entering={FadeInDown.delay(400 + i * 60).springify()} style={styles.dayCol}>
-            <View style={[styles.dayDot, i < done && styles.dayDone, i === done && styles.dayToday]}>
-              {i < done ? <Icon name="Check" size={14} color={colors.bg} strokeWidth={3} /> : null}
-            </View>
-            <Text style={[styles.dayText, i === done && { color: colors.text }]}>{d}</Text>
-          </Animated.View>
-        ))}
+        {days.map((d, i) => {
+          const day = week[i] || {};
+          return (
+            <Animated.View key={i} entering={FadeInDown.delay(400 + i * 60).springify()} style={styles.dayCol}>
+              <View style={[styles.dayDot, day.active && styles.dayDone, day.isToday && !day.active && styles.dayToday]}>
+                {day.active ? <Icon name="Check" size={14} color={colors.bg} strokeWidth={3} /> : null}
+              </View>
+              <Text style={[styles.dayText, day.isToday && { color: colors.text }]}>{d}</Text>
+            </Animated.View>
+          );
+        })}
       </View>
     </Card>
   );
@@ -153,8 +179,24 @@ const QUICK = [
 
 export default function HomeScreen({ navigation }) {
   const { user: account } = useAuth();
-  const joined = challenges.filter(c => c.joined).slice(0, 2);
-  const firstName = account?.name?.split(' ')[0] || user.firstName;
+  const { steps, goal, wallet, reloadWallet } = useSteps();
+  const { data: stats } = useApi(() => statsApi.me().then(d => d.stats), []);
+  const { data: today } = useApi(() => activitiesApi.today(), []);
+  const { data: challengeData } = useApi(() => challengesApi.list('joined'), []);
+  const { data: unread } = useApi(() => notificationsApi.unreadCount().then(d => d.unread), []);
+  useFocusEffect(
+    useCallback(() => {
+      reloadWallet();
+    }, [reloadWallet]),
+  );
+
+  const joined = (challengeData?.challenges || []).slice(0, 2);
+  const firstName = account?.name?.split(' ')[0] || '';
+  // Walking uses the live step count; everything else comes from the server
+  const goals = (today?.activities || [])
+    .map(withVisuals)
+    .map(a => (a.id === 'walk' ? { ...a, current: Math.max(a.current, steps), goal } : a));
+  const weekly = wallet.weekly.length ? wallet.weekly : EMPTY_WEEK;
 
   return (
     <Screen scroll contentContainerStyle={styles.content}>
@@ -166,15 +208,19 @@ export default function HomeScreen({ navigation }) {
           <Text style={type.caption}>{greeting()},</Text>
           <Text style={type.h2}>{firstName} 👋</Text>
         </View>
-        <IconButton icon="Bell" badge onPress={() => navigation.navigate('Notifications')} />
+        <IconButton icon="Bell" badge={unread > 0} onPress={() => navigation.navigate('Notifications')} />
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(80).duration(600)}>
         <BalanceCard navigation={navigation} />
       </Animated.View>
 
+      <Animated.View entering={FadeInDown.delay(120).duration(600)}>
+        <StepsCard onPress={() => navigation.navigate('ActivityDetail', { id: 'walk' })} />
+      </Animated.View>
+
       <Animated.View entering={FadeInDown.delay(160).duration(600)}>
-        <StreakCard />
+        <StreakCard stats={stats} />
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(220).duration(600)}>
@@ -190,7 +236,7 @@ export default function HomeScreen({ navigation }) {
 
       <SectionHeader title="Today’s goals" action="See all" onAction={() => navigation.navigate('Activity')} style={styles.section} />
       <View style={styles.goalGrid}>
-        {activities.map((a, i) => (
+        {goals.map((a, i) => (
           <GoalTile key={a.id} item={a} index={i} onPress={() => navigation.navigate('ActivityDetail', { id: a.id })} />
         ))}
       </View>
@@ -202,20 +248,26 @@ export default function HomeScreen({ navigation }) {
             <View>
               <Text style={type.caption}>Earned this week</Text>
               <View style={styles.chartValueRow}>
-                <AnimatedNumber value={1370} style={type.h1} />
+                <AnimatedNumber value={wallet.earnedThisWeek} decimals={wallet.earnedThisWeek % 1 ? 1 : 0} style={type.h1} />
                 <Text style={styles.chartUnit}>{TOKEN}</Text>
               </View>
             </View>
-            <View style={styles.trendChip}>
-              <Icon name="ArrowUpRight" size={14} color={colors.mint} />
-              <Text style={styles.trendText}>18.4%</Text>
-            </View>
           </View>
-          <BarChart data={wallet.weekly} />
+          <BarChart data={weekly} />
         </Card>
       </Animated.View>
 
       <SectionHeader title="Active challenges" action="Explore" onAction={() => navigation.navigate('Challenges')} style={styles.section} />
+      {challengeData && joined.length === 0 ? (
+        <Card onPress={() => navigation.navigate('Challenges')} style={styles.challenge}>
+          <IconBubble icon="Trophy" gradient={gradients.primary} size={50} radius={16} />
+          <View style={styles.flex}>
+            <Text style={type.bodyStrong}>Join a challenge</Text>
+            <Text style={type.caption}>Win bonus {TOKEN} by finishing daily and weekly challenges.</Text>
+          </View>
+          <Icon name="ChevronRight" size={18} color={colors.textMuted} />
+        </Card>
+      ) : null}
       {joined.map((c, i) => (
         <Animated.View key={c.id} entering={FadeInDown.delay(350 + i * 80).duration(500)}>
           <Card onPress={() => navigation.navigate('ChallengeDetail', { id: c.id })} style={styles.challenge}>
@@ -223,7 +275,7 @@ export default function HomeScreen({ navigation }) {
             <View style={styles.flex}>
               <View style={styles.challengeTop}>
                 <Text style={type.bodyStrong}>{c.title}</Text>
-                <Text style={styles.endsIn}>{c.endsIn}</Text>
+                <Text style={styles.endsIn}>{timeLeft(c.endsAt)}</Text>
               </View>
               <ProgressBar progress={c.progress} gradient={c.gradient} height={6} style={styles.challengeBar} delay={500} />
               <View style={styles.challengeTop}>
@@ -351,17 +403,6 @@ const styles = StyleSheet.create({
   chartHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 },
   chartValueRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6, marginTop: 2 },
   chartUnit: { color: colors.textMuted, fontWeight: '700', marginBottom: 4 },
-  trendChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    backgroundColor: 'rgba(52,245,180,0.12)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 999,
-  },
-  trendText: { color: colors.mint, fontSize: 12, fontWeight: '800' },
-
   challenge: { flexDirection: 'row', gap: 14, alignItems: 'center', marginBottom: 12 },
   challengeTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   challengeBar: { marginVertical: 8 },

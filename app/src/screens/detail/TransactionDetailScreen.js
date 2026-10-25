@@ -6,7 +6,9 @@ import IconBubble from '../../components/IconBubble';
 import GradientButton from '../../components/GradientButton';
 import { StatusPill, txColor } from '../../components/TransactionRow';
 import { formatNumber } from '../../components/AnimatedNumber';
-import { transactions } from '../../data/mock';
+import useApi from '../../hooks/useApi';
+import { transactionsApi } from '../../api/engagementApi';
+import { txView } from '../../utils/format';
 import { colors, type, TOKEN } from '../../theme';
 
 function Row({ label, value }) {
@@ -18,12 +20,21 @@ function Row({ label, value }) {
   );
 }
 
-const TYPE_LABEL = { earn: 'Reward', redeem: 'Redemption', fee: 'Fee', expire: 'Expiry' };
+const TYPE_LABEL = { earn: 'Reward', bonus: 'Bonus', redeem: 'Redemption', fee: 'Fee', expire: 'Expiry' };
 
 /** Bottom sheet presented as a transparent modal over the wallet. */
 export default function TransactionDetailScreen({ route, navigation }) {
-  const tx = transactions.find(t => t.id === route.params?.id) || transactions[0];
   const insets = useSafeAreaInsets();
+  const { data } = useApi(() => transactionsApi.get(route.params?.id).then(d => txView(d.transaction)), [route.params?.id], { focus: false });
+
+  if (!data) {
+    return (
+      <Animated.View entering={FadeIn.duration(200)} style={styles.backdrop}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={() => navigation.goBack()} />
+      </Animated.View>
+    );
+  }
+  const tx = data;
   const positive = tx.amount > 0;
 
   return (
@@ -45,9 +56,10 @@ export default function TransactionDetailScreen({ route, navigation }) {
 
         <View style={styles.details}>
           <Row label="Type" value={TYPE_LABEL[tx.type]} />
-          <Row label="Details" value={tx.subtitle} />
+          {tx.subtitle ? <Row label="Details" value={tx.subtitle} /> : null}
           <Row label="Date" value={tx.date} />
-          <Row label="Reference" value={`FTX-${tx.id.toUpperCase()}-82${tx.id.length}91`} />
+          {tx.voucherCode ? <Row label="Voucher code" value={tx.voucherCode} /> : null}
+          <Row label="Reference" value={tx.reference} />
           <Row label="Network" value="Off-chain ledger" />
         </View>
 

@@ -7,17 +7,24 @@ import Card from '../../components/Card';
 import ProgressRing from '../../components/ProgressRing';
 import IconBubble from '../../components/IconBubble';
 import Icon from '../../components/Icon';
-import { badges, user } from '../../data/mock';
+import useApi from '../../hooks/useApi';
+import { badgesApi, statsApi } from '../../api/engagementApi';
+import { themeColor } from '../../utils/format';
 import { colors, gradients, type } from '../../theme';
 
 export default function BadgesScreen() {
+  const { data } = useApi(() => badgesApi.list(), []);
+  const { data: stats } = useApi(() => statsApi.me().then(d => d.stats), []);
+  const badges = (data?.badges || []).map(b => ({ ...b, color: themeColor(b.color) }));
   const earned = badges.filter(b => b.earned).length;
+  const total = badges.length || 1;
+  const left = badges.length - earned;
 
   return (
     <Screen scroll edges={['top', 'bottom']} header={<Header title="Achievements" />} tint={colors.pink} contentContainerStyle={styles.content}>
       <Animated.View entering={FadeInDown.duration(500)}>
         <Card style={styles.summary}>
-          <ProgressRing size={100} stroke={10} progress={earned / badges.length} gradient={gradients.pink}>
+          <ProgressRing size={100} stroke={10} progress={earned / total} gradient={gradients.pink}>
             <Text style={styles.count}>
               {earned}
               <Text style={type.caption}>/{badges.length}</Text>
@@ -26,7 +33,8 @@ export default function BadgesScreen() {
           <View style={styles.flex}>
             <Text style={type.h2}>Badge collector</Text>
             <Text style={[type.body, styles.mt4]}>
-              Level {user.level} {user.levelName}. Unlock {badges.length - earned} more badges to reach Champion tier.
+              {stats ? `Level ${stats.level} ${stats.levelName}. ` : ''}
+              {left > 0 ? `Unlock ${left} more badge${left > 1 ? 's' : ''} to complete your collection.` : 'You’ve unlocked every badge!'}
             </Text>
           </View>
         </Card>
@@ -46,6 +54,11 @@ export default function BadgesScreen() {
               </View>
               <Text style={[type.bodyStrong, styles.name]}>{b.name}</Text>
               <Text style={[type.caption, styles.center]}>{b.desc}</Text>
+              {!b.earned && b.target > 1 ? (
+                <Text style={[type.caption, styles.progress]}>
+                  {b.progressValue} / {b.target}
+                </Text>
+              ) : null}
             </Card>
           </Animated.View>
         ))}
@@ -79,4 +92,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   name: { marginTop: 10 },
+  progress: { marginTop: 4, color: colors.textSecondary, fontWeight: '700' },
 });

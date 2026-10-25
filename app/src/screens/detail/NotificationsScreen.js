@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeOutLeft, LinearTransition } from 'react-native-reanimated';
 import Screen from '../../components/Screen';
@@ -6,16 +6,36 @@ import Header from '../../components/Header';
 import Card from '../../components/Card';
 import IconBubble from '../../components/IconBubble';
 import Icon from '../../components/Icon';
-import { notifications as initial } from '../../data/mock';
+import useApi from '../../hooks/useApi';
+import { notificationsApi } from '../../api/engagementApi';
+import { isToday, themeColor, timeAgo } from '../../utils/format';
 import { colors, type } from '../../theme';
 
+const withGroup = n => ({ ...n, color: themeColor(n.color), time: timeAgo(n.createdAt), group: isToday(n.createdAt) ? 'Today' : 'Earlier' });
+
 export default function NotificationsScreen() {
-  const [items, setItems] = useState(initial);
+  const { data, loading, setData } = useApi(() => notificationsApi.list(), []);
+  const items = (data?.items || []).map(withGroup);
   const groups = ['Today', 'Earlier'];
 
-  const markAll = () => setItems(list => list.map(n => ({ ...n, unread: false })));
-  const dismiss = id => setItems(list => list.filter(n => n.id !== id));
-  const read = id => setItems(list => list.map(n => (n.id === id ? { ...n, unread: false } : n)));
+  // Update the screen immediately, then tell the server (it's fine if that fails; the next load corrects it)
+  const update = fn => setData(d => (d ? { ...d, items: fn(d.items) } : d));
+  const markAll = () => {
+    update(list => list.map(n => ({ ...n, unread: false })));
+    notificationsApi.readAll().catch(() => {});
+  };
+  const dismiss = id => {
+    update(list => list.filter(n => n.id !== id));
+    notificationsApi.remove(id).catch(() => {});
+  };
+  const read = id => {
+    const n = items.find(x => x.id === id);
+    if (!n?.unread) {
+      return;
+    }
+    update(list => list.map(x => (x.id === id ? { ...x, unread: false } : x)));
+    notificationsApi.read(id).catch(() => {});
+  };
 
   return (
     <Screen
@@ -65,7 +85,7 @@ export default function NotificationsScreen() {
           </View>
         );
       })}
-      {items.length === 0 ? (
+      {items.length === 0 && !loading ? (
         <Animated.View entering={FadeInDown} style={styles.empty}>
           <IconBubble icon="Bell" color={colors.primary} size={72} radius={24} />
           <Text style={type.h3}>You’re all caught up</Text>

@@ -9,11 +9,13 @@ import CoinIcon from '../../components/CoinIcon';
 import PressableScale from '../../components/PressableScale';
 import GradientView from '../../components/GradientFill';
 import { formatNumber } from '../../components/AnimatedNumber';
-import { marketCategories, rewards, wallet } from '../../data/mock';
+import useApi from '../../hooks/useApi';
+import { marketplaceApi } from '../../api/engagementApi';
+import { useSteps } from '../../context/StepsContext';
 import { colors, gradients, radius, type } from '../../theme';
 
-function RewardCard({ r, index, onPress }) {
-  const affordable = wallet.balance >= r.cost;
+function RewardCard({ r, index, onPress, balance }) {
+  const affordable = balance >= r.total && r.inStock;
   return (
     <Animated.View entering={FadeInDown.delay(index * 60).duration(400)} layout={LinearTransition.springify()} style={styles.cell}>
       <PressableScale onPress={onPress} style={styles.reward}>
@@ -44,15 +46,23 @@ function RewardCard({ r, index, onPress }) {
 export default function MarketplaceScreen({ navigation }) {
   const [cat, setCat] = useState('All');
   const [query, setQuery] = useState('');
+  const { wallet, reloadWallet } = useSteps();
+  const { data, loading } = useApi(async () => {
+    const [{ rewards }, { categories }] = await Promise.all([marketplaceApi.rewards(), marketplaceApi.categories()]);
+    reloadWallet();
+    return { rewards, categories };
+  }, [reloadWallet]);
+  const categories = data?.categories || ['All'];
 
+  // The whole catalog is small, so search/filter instantly on the phone
   const list = useMemo(
     () =>
-      rewards.filter(
+      (data?.rewards || []).filter(
         r =>
           (cat === 'All' || r.category === cat) &&
           (r.title + r.brand).toLowerCase().includes(query.trim().toLowerCase()),
       ),
-    [cat, query],
+    [data, cat, query],
   );
 
   return (
@@ -98,17 +108,17 @@ export default function MarketplaceScreen({ navigation }) {
       </Animated.View>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bleed} contentContainerStyle={styles.chips}>
-        {marketCategories.map(c => (
+        {categories.map(c => (
           <Chip key={c} label={c} active={cat === c} onPress={() => setCat(c)} />
         ))}
       </ScrollView>
 
       <View style={styles.grid}>
         {list.map((r, i) => (
-          <RewardCard key={r.id} r={r} index={i} onPress={() => navigation.navigate('RewardDetail', { id: r.id })} />
+          <RewardCard key={r.id} r={r} index={i} balance={wallet.balance} onPress={() => navigation.navigate('RewardDetail', { id: r.slug })} />
         ))}
       </View>
-      {list.length === 0 ? (
+      {list.length === 0 && !loading ? (
         <View style={styles.empty}>
           <Icon name="Search" size={32} color={colors.textMuted} />
           <Text style={type.body}>No rewards match your search</Text>

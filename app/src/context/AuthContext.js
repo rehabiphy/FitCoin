@@ -3,6 +3,7 @@ import { authApi, userApi } from '../api/authApi';
 import { setSessionExpiredHandler } from '../api/apiClient';
 import { clearSession, getRefreshToken, loadSession, saveSession } from '../services/tokenStorage';
 import { getGoogleIdToken, googleSignOut } from '../services/googleAuth';
+import StepCounter from '../native/StepCounter';
 
 const AuthContext = createContext(null);
 
@@ -30,6 +31,7 @@ export function AuthProvider({ children }) {
   // Restore session on launch
   useEffect(() => {
     setSessionExpiredHandler(() => {
+      StepCounter.stopTracking().catch(() => {});
       setUser(null);
       setStatus('signedOut');
     });
@@ -80,6 +82,8 @@ export function AuthProvider({ children }) {
       authApi.logout(refreshToken).catch(() => {});
     }
     googleSignOut();
+    // Stop the step service + notification; the ledger keeps its data
+    StepCounter.stopTracking().catch(() => {});
     await endSessionLocally();
   }, [endSessionLocally]);
 

@@ -3,6 +3,7 @@ import env from '../config/env.js';
 import User from '../models/User.js';
 import ApiError from '../utils/ApiError.js';
 import { verifyGoogleIdToken } from '../services/google.service.js';
+import { notify } from '../services/notification.service.js';
 import {
   issueTokens,
   revokeAllForUser,
@@ -18,8 +19,19 @@ const DUMMY_HASH = bcrypt.hashSync('fitcoin-dummy-password', env.bcryptRounds);
 const requestMeta = req => ({ userAgent: req.get('user-agent'), ip: req.ip });
 
 async function sendAuth(res, req, user, status = 200) {
+  const isNew = user.isNew;
   user.lastLoginAt = new Date();
   await user.save();
+  if (isNew) {
+    await notify(user._id, {
+      type: 'system',
+      title: 'Welcome to Fitcoin!',
+      body: 'Walk, hydrate, sleep and breathe your way to FIT rewards. Start by enabling step tracking.',
+      icon: 'Sparkles',
+      color: 'primary',
+      dedupeKey: `welcome:${user._id}`,
+    });
+  }
   const tokens = await issueTokens(user, requestMeta(req));
   res.status(status).json({ success: true, data: { user: user.toPublicJSON(), tokens } });
 }
