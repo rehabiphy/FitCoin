@@ -94,9 +94,15 @@ export function AuthProvider({ children }) {
     return updated;
   }, []);
 
+  /** Stores a fresh user object returned by the server (e.g. after upgrading to premium). */
+  const applyUser = useCallback(async fresh => {
+    await saveSession({ user: fresh });
+    setUser(fresh);
+  }, []);
+
   const value = useMemo(
-    () => ({ status, user, isSignedIn: status === 'signedIn', signIn, signUp, signInWithGoogle, signOut, updateProfile }),
-    [status, user, signIn, signUp, signInWithGoogle, signOut, updateProfile],
+    () => ({ status, user, isSignedIn: status === 'signedIn', signIn, signUp, signInWithGoogle, signOut, updateProfile, applyUser }),
+    [status, user, signIn, signUp, signInWithGoogle, signOut, updateProfile, applyUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,12 +1,19 @@
 import { STEP_RULES } from './rewards.js';
 
 /**
- * Every habit the app tracks, with its goal and reward rule.
+ * Every habit the app tracks. Names, units and anti-cheat limits live here.
+ * Coin values (rate, daily max, goal) are only the *defaults*: the live values
+ * are edited in the admin panel and read through rewardConfig.service.js.
+ *
  * `kind` decides how values are logged:
  *  - steps:   uploaded from the phone's step counter (see steps.service.js)
  *  - counter: each log adds 1 (water glasses)
  *  - session: timed on the server — start, then finish (reading, breathing, cycling)
  *  - daily:   one value per day, latest wins (sleep hours)
+ *
+ * `rewardMode`:
+ *  - perUnit: `perUnit` FIT for every full `unitSize` logged, up to `maxReward` a day
+ *  - goal:    `maxReward` FIT once the day's value reaches `goal`
  */
 export const ACTIVITIES = {
   walk: {
@@ -14,75 +21,75 @@ export const ACTIVITIES = {
     name: 'Walking',
     kind: 'steps',
     unit: 'steps',
-    goal: STEP_RULES.defaultGoal,
-    rate: `${STEP_RULES.fitPerThousand} FIT / 1k steps`,
-    maxReward: STEP_RULES.fitPerThousand * STEP_RULES.maxMilestones,
+    rateUnit: '1k steps',
+    rewardMode: 'perUnit',
+    unitSize: 1000,
     verified: 'Phone step sensor',
-    reward: steps => Math.min(STEP_RULES.maxMilestones, Math.floor(steps / 1000)) * STEP_RULES.fitPerThousand,
+    defaults: { perUnit: STEP_RULES.fitPerThousand, maxReward: STEP_RULES.fitPerThousand * STEP_RULES.maxMilestones, goal: STEP_RULES.defaultGoal },
   },
   cycle: {
     id: 'cycle',
     name: 'Cycling',
     kind: 'session',
     unit: 'km',
-    goal: 15,
-    rate: '5 FIT / km',
-    maxReward: 75,
+    rateUnit: 'km',
+    rewardMode: 'perUnit',
+    unitSize: 1,
     verified: 'Timed ride',
     // A ride can't be faster than this on average
     maxSpeedKmh: 45,
     maxSessionMinutes: 600,
-    reward: km => Math.min(75, Math.floor(km) * 5),
+    defaults: { perUnit: 5, maxReward: 75, goal: 15 },
   },
   water: {
     id: 'water',
     name: 'Hydration',
     kind: 'counter',
     unit: 'glasses',
-    goal: 8,
-    rate: '3 FIT / glass',
-    maxReward: 24,
+    rateUnit: 'glass',
+    rewardMode: 'perUnit',
+    unitSize: 1,
     verified: 'Manual log',
     maxPerDay: 16,
     // Logging faster than this is ignored (stops tap-spamming)
     minMinutesBetween: 10,
-    reward: glasses => Math.min(24, glasses * 3),
+    defaults: { perUnit: 3, maxReward: 24, goal: 8 },
   },
   sleep: {
     id: 'sleep',
     name: 'Sleep',
     kind: 'daily',
     unit: 'hours',
-    goal: 8,
-    rate: '40 FIT / goal met',
-    maxReward: 40,
+    rateUnit: 'goal met',
+    rewardMode: 'goal',
+    unitSize: 1,
     verified: 'Manual log',
     maxValue: 14,
-    reward: hours => (hours >= 8 ? 40 : 0),
+    defaults: { perUnit: 0, maxReward: 40, goal: 8 },
   },
   read: {
     id: 'read',
     name: 'Reading',
     kind: 'session',
     unit: 'min',
-    goal: 30,
-    rate: '1 FIT / min',
-    maxReward: 30,
+    rateUnit: 'min',
+    rewardMode: 'perUnit',
+    unitSize: 1,
     verified: 'Timer',
     maxSessionMinutes: 180,
-    reward: minutes => Math.min(30, Math.floor(minutes)),
+    defaults: { perUnit: 1, maxReward: 30, goal: 30 },
   },
   breathe: {
     id: 'breathe',
     name: 'Breathing',
     kind: 'session',
     unit: 'min',
-    goal: 10,
-    rate: '2 FIT / min',
-    maxReward: 20,
+    rateUnit: 'min',
+    rewardMode: 'perUnit',
+    unitSize: 1,
     verified: 'Guided session',
     maxSessionMinutes: 60,
-    reward: minutes => Math.min(20, Math.floor(minutes) * 2),
+    defaults: { perUnit: 2, maxReward: 20, goal: 10 },
   },
 };
 

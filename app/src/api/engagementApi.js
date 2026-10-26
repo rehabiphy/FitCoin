@@ -10,6 +10,8 @@ export const activitiesApi = {
   /** { activities, summary, lastStepSyncAt } */
   today: () => apiClient.get('/activities'),
   detail: id => apiClient.get(`/activities/${id}`),
+  /** Free members' active habits; returns the same shape as today() */
+  selectHabits: habits => apiClient.put('/activities/selection', { habits }),
   logWater: () => apiClient.post('/activities/water/log'),
   logSleep: hours => apiClient.post('/activities/sleep/log', { hours }),
   startSession: id => apiClient.post(`/activities/${id}/sessions`),

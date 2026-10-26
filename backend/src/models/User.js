@@ -34,6 +34,13 @@ const userSchema = new mongoose.Schema(
     // Set once the referral reward for this user (as the invited friend) has been paid or ruled out
     referralRewardedAt: { type: Date },
     referralStatus: { type: String, enum: ['pending', 'rewarded', 'capped'], default: undefined },
+    // Habits a free member picked to earn from (premium members earn from all). See habits.service.js
+    activeHabits: { type: [String], default: undefined },
+    habitsChosenAt: { type: Date },
+    // Premium membership: active while premiumUntil is in the future
+    premiumSince: { type: Date },
+    premiumUntil: { type: Date },
+    premiumSource: { type: String, enum: ['purchase', 'admin', 'test'], default: undefined },
     // Short lock so two redemptions can't spend the same balance at once
     walletLockUntil: { type: Date, select: false },
     // Bumped to invalidate every outstanding token for this user (e.g. password change)
@@ -51,6 +58,12 @@ userSchema.pre('save', async function hashPassword() {
     const base = (this.name || 'FIT').replace(/[^a-z]/gi, '').slice(0, 5).toUpperCase() || 'FIT';
     this.referralCode = `FIT-${base}${crypto.randomInt(10, 99)}${crypto.randomBytes(1).toString('hex').toUpperCase()}`;
   }
+});
+
+userSchema.index({ premiumUntil: 1 }, { sparse: true });
+
+userSchema.virtual('isPremium').get(function isPremium() {
+  return !!this.premiumUntil && this.premiumUntil.getTime() > Date.now();
 });
 
 userSchema.methods.comparePassword = function comparePassword(candidate) {
@@ -73,6 +86,8 @@ userSchema.methods.toPublicJSON = function toPublicJSON() {
     authProviders: this.authProviders,
     role: this.role,
     stepGoal: this.stepGoal ?? 10000,
+    isPremium: this.isPremium,
+    premiumUntil: this.isPremium ? this.premiumUntil : null,
     createdAt: this.createdAt,
   };
 };

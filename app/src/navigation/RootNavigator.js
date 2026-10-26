@@ -20,6 +20,7 @@ import TransactionsScreen from '../screens/detail/TransactionsScreen';
 import TransactionDetailScreen from '../screens/detail/TransactionDetailScreen';
 import TokenRulesScreen from '../screens/detail/TokenRulesScreen';
 import EditProfileScreen from '../screens/detail/EditProfileScreen';
+import PremiumScreen from '../screens/detail/PremiumScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -58,6 +59,7 @@ export default function RootNavigator() {
           />
           <Stack.Screen name="TokenRules" component={TokenRulesScreen} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+          <Stack.Screen name="Premium" component={PremiumScreen} options={{ animation: 'fade_from_bottom' }} />
         </Stack.Group>
       ) : (
         <Stack.Group>

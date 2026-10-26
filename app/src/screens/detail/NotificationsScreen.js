@@ -14,7 +14,7 @@ import { colors, type } from '../../theme';
 const withGroup = n => ({ ...n, color: themeColor(n.color), time: timeAgo(n.createdAt), group: isToday(n.createdAt) ? 'Today' : 'Earlier' });
 
 export default function NotificationsScreen() {
-  const { data, loading, setData } = useApi(() => notificationsApi.list(), []);
+  const { data, loading, setData, reload } = useApi(() => notificationsApi.list(), []);
   const items = (data?.items || []).map(withGroup);
   const groups = ['Today', 'Earlier'];
 
@@ -40,6 +40,7 @@ export default function NotificationsScreen() {
   return (
     <Screen
       scroll
+      onRefresh={reload}
       edges={['top', 'bottom']}
       header={
         <Header

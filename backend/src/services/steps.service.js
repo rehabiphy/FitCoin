@@ -3,11 +3,16 @@ import StepDay from '../models/StepDay.js';
 import { STEP_RULES } from '../config/rewards.js';
 import { creditDailyReward } from './rewards.service.js';
 import { afterActivity } from './progress.service.js';
+import { baseReward } from './rewardConfig.service.js';
+import { applyMultiplier, rewardContext } from './premium.service.js';
+import { canEarnHabit } from './habits.service.js';
 import { addDays, minutesSinceMidnight, todayKey } from '../utils/dates.js';
 
-/** FIT a given step count is worth for one day. */
-export const stepReward = steps =>
-  Math.min(STEP_RULES.maxMilestones, Math.floor(steps / 1000)) * STEP_RULES.fitPerThousand;
+/** FIT a given step count is worth for one day, for a user's reward context (see rewardContext). */
+export const stepReward = (ctx, steps) => applyMultiplier(ctx, baseReward('walk', ctx.config.habits.walk, steps));
+
+/** Most FIT steps can earn in a day for this user. */
+export const stepRewardMax = ctx => applyMultiplier(ctx, ctx.config.habits.walk.maxReward);
 
 /**
  * Returns null if the upload is acceptable, otherwise the reason it was rejected.
@@ -52,22 +57,28 @@ async function upsertDay(userId, date, steps, source) {
  * Credits the day's step reward (one ledger row per user+day, only ever raised,
  * so repeated or concurrent uploads can never pay twice). Returns FIT newly added.
  */
-function creditStepReward(userId, date, steps) {
-  const goalReached = steps >= STEP_RULES.defaultGoal;
-  return creditDailyReward({
+async function creditStepReward(userId, date, steps, ctx) {
+  // Steps are still saved for an inactive Walking habit; they just don't earn FIT
+  if (!(await canEarnHabit(ctx, userId, 'walk', date))) {
+    return 0;
+  }
+  const goalReached = steps >= ctx.config.habits.walk.goal;
+  const amount = stepReward(ctx, steps);
+  return await creditDailyReward({
     userId,
     date,
     key: 'steps',
-    amount: stepReward(steps),
+    amount,
+    dailyCap: ctx.dailyCap,
     category: 'steps',
     title: 'Step reward',
     goalTitle: 'Daily step goal',
     goalReached,
-    subtitle: `Walking · ${steps.toLocaleString('en-US')} steps`,
-    meta: { activity: 'walk', steps },
+    subtitle: `Walking · ${steps.toLocaleString('en-US')} steps${ctx.premium ? ` · Premium ${ctx.multiplier}x` : ''}`,
+    meta: { activity: 'walk', steps, multiplier: ctx.multiplier },
     goalNotification: {
       title: 'Step goal reached!',
-      body: `${steps.toLocaleString('en-US')} steps today. You've earned the full ${stepReward(steps)} FIT — keep going!`,
+      body: `${steps.toLocaleString('en-US')} steps today. You've earned ${amount} FIT — keep going!`,
       icon: 'Footprints',
       color: 'mint',
     },
@@ -87,6 +98,7 @@ export async function syncSteps(userId, days, { tzOffset, source }) {
   // trusted(): our own operator, exempt from the global filter sanitising in app.js
   const existing = await StepDay.find({ user: userId, date: mongoose.trusted({ $in: days.map(d => d.date) }) });
   const byDate = new Map(existing.map(d => [d.date, d]));
+  const ctx = await rewardContext(userId);
 
   for (const { date, steps } of days) {
     const reason = rejectReason(date, steps, tzOffset, byDate.get(date));
@@ -95,7 +107,7 @@ export async function syncSteps(userId, days, { tzOffset, source }) {
       continue;
     }
     const day = await upsertDay(userId, date, steps, source);
-    const added = await creditStepReward(userId, date, day.steps);
+    const added = await creditStepReward(userId, date, day.steps, ctx);
     awarded += added;
     if (added > 0) {
       await afterActivity(userId, date);
@@ -111,9 +123,9 @@ export async function getDay(userId, date) {
   return { date, steps: day?.steps || 0, lastSyncedAt: day?.lastSyncedAt || null };
 }
 
-/** Daily totals for the given dates (missing days are 0). */
-export async function getDays(userId, dates) {
+/** Daily totals for the given dates (missing days are 0), with what they're worth at today's rates. */
+export async function getDays(userId, dates, ctx) {
   const rows = await StepDay.find({ user: userId, date: mongoose.trusted({ $in: dates }) });
   const byDate = new Map(rows.map(r => [r.date, r.steps]));
-  return dates.map(date => ({ date, steps: byDate.get(date) || 0, fit: stepReward(byDate.get(date) || 0) }));
+  return dates.map(date => ({ date, steps: byDate.get(date) || 0, fit: stepReward(ctx, byDate.get(date) || 0) }));
 }

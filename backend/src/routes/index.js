@@ -9,6 +9,8 @@ import challengeRoutes from './challenge.routes.js';
 import marketplaceRoutes from './marketplace.routes.js';
 import notificationRoutes from './notification.routes.js';
 import communityRoutes from './community.routes.js';
+import premiumRoutes from './premium.routes.js';
+import adminRoutes from './admin.routes.js';
 
 const router = Router();
 
@@ -27,6 +29,8 @@ router.use('/activities', activityRoutes);
 router.use('/challenges', challengeRoutes);
 router.use('/marketplace', marketplaceRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/premium', premiumRoutes);
+router.use('/admin', adminRoutes);
 router.use('/', communityRoutes);
 
 export default router;

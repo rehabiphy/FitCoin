@@ -1,5 +1,5 @@
-import React, { useId } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { colors } from '../theme';
@@ -31,6 +31,7 @@ export function AmbientBackground({ tint = colors.primary, accent = colors.cyan 
 /**
  * Base screen: dark ambient background + safe-area padding.
  * `scroll` wraps content in a ScrollView. `edges` controls which insets are applied.
+ * `onRefresh` (scroll screens) enables pull-to-refresh; the spinner stays until its promise settles.
  */
 export default function Screen({
   children,
@@ -42,11 +43,43 @@ export default function Screen({
   accent,
   header,
   footer,
+  onRefresh,
   ...rest
 }) {
   const insets = useSafeAreaInsets();
   const padTop = edges.includes('top') ? insets.top : 0;
   const padBottom = edges.includes('bottom') ? insets.bottom : 0;
+  const [refreshing, setRefreshing] = useState(false);
+  const mounted = useRef(true);
+  useEffect(
+    () => () => {
+      mounted.current = false;
+    },
+    [],
+  );
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await onRefresh();
+    } catch {
+      // screens keep showing their last data
+    } finally {
+      if (mounted.current) {
+        setRefreshing(false);
+      }
+    }
+  }, [onRefresh]);
+
+  const refreshControl = onRefresh ? (
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      tintColor={colors.text}
+      colors={[colors.primary, colors.cyan]}
+      progressBackgroundColor={colors.surfaceAlt}
+    />
+  ) : undefined;
 
   return (
     <View style={[styles.root, style]}>
@@ -57,6 +90,7 @@ export default function Screen({
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[{ paddingBottom: padBottom + 24 }, contentContainerStyle]}
           keyboardShouldPersistTaps="handled"
+          refreshControl={refreshControl}
           {...rest}>
           {children}
         </ScrollView>

@@ -71,7 +71,7 @@ function useElapsed(startedAt) {
 
 const SLEEP_OPTIONS = [6, 7, 7.5, 8, 8.5, 9];
 
-export default function ActivityDetailScreen({ route }) {
+export default function ActivityDetailScreen({ route, navigation }) {
   const id = route.params?.id || 'walk';
   const visuals = ACTIVITY_VISUALS[id] || ACTIVITY_VISUALS.walk;
   const live = useSteps();
@@ -144,13 +144,31 @@ export default function ActivityDetailScreen({ route }) {
       { text: 'Discard', style: 'destructive', onPress: () => act(() => activitiesApi.cancelSession(session.id), 'Session discarded') },
     ]);
 
+  // Free members can only log habits they picked
+  const inactive = data?.active === false;
+  const changeHabits = () => {
+    const inHistory = navigation.getState().routes.some(r => r.name === 'Activity');
+    if (inHistory) {
+      navigation.popTo('Activity', { pickHabits: true });
+    } else {
+      navigation.navigate('Activity', { pickHabits: true });
+    }
+  };
+
+  const refresh = async () => {
+    if (isWalk) {
+      await live.syncNow();
+    }
+    await Promise.all([reload(), live.reloadWallet()]);
+  };
+
   const historyData = (item.history || []).map((d, i, all) => ({
     day: new Date(`${d.date}T00:00:00`).toLocaleDateString('en-US', { weekday: 'short' }),
     value: isWalk && i === all.length - 1 ? Math.max(d.value, live.steps) : d.value,
   }));
 
   return (
-    <Screen scroll edges={['top', 'bottom']} header={<Header title={item.name} />} tint={item.color} accent={item.gradient[1]} contentContainerStyle={styles.content}>
+    <Screen scroll onRefresh={refresh} edges={['top', 'bottom']} header={<Header title={item.name} />} tint={item.color} accent={item.gradient[1]} contentContainerStyle={styles.content}>
       <Animated.View entering={ZoomIn.duration(500)} style={styles.ringWrap}>
         <SessionOrb active={!!session} color={item.color} slow={id === 'breathe'} />
         <ProgressRing size={230} stroke={18} progress={progress} gradient={item.gradient}>
@@ -181,7 +199,23 @@ export default function ActivityDetailScreen({ route }) {
         ))}
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(180).duration(500)} style={styles.actions}>
+      {inactive ? (
+        <Animated.View entering={FadeInDown.delay(180).duration(500)}>
+          <Card style={styles.inactive}>
+            <View style={styles.inactiveTop}>
+              <Icon name="Lock" size={18} color={colors.gold} />
+              <Text style={[type.bodyStrong, styles.flex]}>{item.name} isn’t one of your active habits</Text>
+            </View>
+            <Text style={type.body}>
+              Free members earn {TOKEN} from the habits they pick. Switch one of yours to {item.name.toLowerCase()}, or go Premium to earn from every habit.
+            </Text>
+            <GradientButton title="Change my habits" icon="ListChecks" colors={item.gradient} onPress={changeHabits} style={styles.mt14} />
+            <GradientButton title="Unlock all with Premium" icon="Crown" variant="ghost" size="md" onPress={() => navigation.navigate('Premium')} />
+          </Card>
+        </Animated.View>
+      ) : null}
+
+      <Animated.View entering={FadeInDown.delay(180).duration(500)} style={[styles.actions, inactive && styles.hidden]}>
         {isWalk ? (
           <>
             <GradientButton title="Sync now" icon="RefreshCw" colors={item.gradient} onPress={live.syncNow} />
@@ -302,6 +336,9 @@ const styles = StyleSheet.create({
   stat: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 14, paddingHorizontal: 6 },
   statValue: { color: colors.text, fontWeight: '800', fontSize: 14 },
   actions: { marginTop: 18, gap: 10 },
+  hidden: { display: 'none' },
+  inactive: { marginTop: 18, gap: 10, borderColor: 'rgba(255,201,77,0.35)' },
+  inactiveTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   optionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   option: {
     paddingHorizontal: 14,

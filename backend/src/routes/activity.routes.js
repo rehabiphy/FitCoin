@@ -7,6 +7,7 @@ import { validateParam } from '../middlewares/params.middleware.js';
 import {
   activityIdParam,
   finishSessionSchema,
+  habitSelectionSchema,
   idParam,
   sessionActivityParam,
   sleepLogSchema,
@@ -27,6 +28,7 @@ const writeLimiter = rateLimit({
 router.use(requireAuth);
 
 router.get('/', activity.today);
+router.put('/selection', writeLimiter, validate(habitSelectionSchema), activity.select);
 router.post('/water/log', writeLimiter, activity.logWater);
 router.post('/sleep/log', writeLimiter, validate(sleepLogSchema), activity.logSleep);
 router.post('/sessions/:sessionId/finish', writeLimiter, validateParam('sessionId', idParam), validate(finishSessionSchema), activity.finishSession);

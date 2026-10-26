@@ -47,10 +47,12 @@ export default function TransactionsScreen({ navigation }) {
     reloadWallet();
   }, [load, reloadWallet]);
 
+  const refresh = useCallback(() => Promise.all([load(1), reloadWallet()]), [load, reloadWallet]);
+
   const list = items.map(txView);
 
   return (
-    <Screen scroll edges={['top', 'bottom']} header={<Header title="Transaction history" />} contentContainerStyle={styles.content}>
+    <Screen scroll onRefresh={refresh} edges={['top', 'bottom']} header={<Header title="Transaction history" />} contentContainerStyle={styles.content}>
       <Animated.View entering={FadeInDown.duration(500)} style={styles.summary}>
         <Card style={styles.sumCard}>
           <Text style={type.caption}>Total earned</Text>

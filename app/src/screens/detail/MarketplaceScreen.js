@@ -47,9 +47,8 @@ export default function MarketplaceScreen({ navigation }) {
   const [cat, setCat] = useState('All');
   const [query, setQuery] = useState('');
   const { wallet, reloadWallet } = useSteps();
-  const { data, loading } = useApi(async () => {
-    const [{ rewards }, { categories }] = await Promise.all([marketplaceApi.rewards(), marketplaceApi.categories()]);
-    reloadWallet();
+  const { data, loading, reload } = useApi(async () => {
+    const [{ rewards }, { categories }] = await Promise.all([marketplaceApi.rewards(), marketplaceApi.categories(), reloadWallet()]);
     return { rewards, categories };
   }, [reloadWallet]);
   const categories = data?.categories || ['All'];
@@ -68,6 +67,7 @@ export default function MarketplaceScreen({ navigation }) {
   return (
     <Screen
       scroll
+      onRefresh={reload}
       edges={['top', 'bottom']}
       tint={colors.gold}
       accent={colors.pink}

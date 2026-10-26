@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
@@ -27,7 +27,10 @@ import Icon from '../../components/Icon';
 import IconBubble from '../../components/IconBubble';
 import { TAB_BAR_SPACE } from '../../components/TabBar';
 import StepsCard from '../../components/StepsCard';
+import PremiumCard from '../../components/PremiumCard';
+import PremiumPopup from '../../components/PremiumPopup';
 import { useSteps } from '../../context/StepsContext';
+import { usePremium } from '../../context/PremiumContext';
 import useApi from '../../hooks/useApi';
 import { activitiesApi, challengesApi, notificationsApi, statsApi } from '../../api/engagementApi';
 import { withVisuals } from '../../constants/activities';
@@ -179,27 +182,57 @@ const QUICK = [
 
 export default function HomeScreen({ navigation }) {
   const { user: account } = useAuth();
-  const { steps, goal, wallet, reloadWallet } = useSteps();
-  const { data: stats } = useApi(() => statsApi.me().then(d => d.stats), []);
-  const { data: today } = useApi(() => activitiesApi.today(), []);
-  const { data: challengeData } = useApi(() => challengesApi.list('joined'), []);
-  const { data: unread } = useApi(() => notificationsApi.unreadCount().then(d => d.unread), []);
+  const { steps, goal, wallet, reloadWallet, syncNow } = useSteps();
+  const { data: stats, reload: reloadStats } = useApi(() => statsApi.me().then(d => d.stats), []);
+  const { data: today, reload: reloadToday } = useApi(() => activitiesApi.today(), []);
+  const { data: challengeData, reload: reloadChallenges } = useApi(() => challengesApi.list('joined'), []);
+  const { data: unread, reload: reloadUnread } = useApi(() => notificationsApi.unreadCount().then(d => d.unread), []);
+  const { shouldShowPopup, dismissPopup, reload: reloadPremium } = usePremium();
+  const refresh = useCallback(async () => {
+    await syncNow(); // upload the latest steps first so rewards below are current
+    await Promise.all([reloadStats(), reloadToday(), reloadChallenges(), reloadUnread(), reloadWallet(), reloadPremium()]);
+  }, [syncNow, reloadStats, reloadToday, reloadChallenges, reloadUnread, reloadWallet, reloadPremium]);
+  const [popupOpen, setPopupOpen] = useState(false);
   useFocusEffect(
     useCallback(() => {
       reloadWallet();
     }, [reloadWallet]),
   );
 
+  // Upgrade offer once per launch, after Home has settled in
+  useEffect(() => {
+    if (!shouldShowPopup) {
+      return undefined;
+    }
+    const t = setTimeout(() => {
+      if (navigation.isFocused()) {
+        setPopupOpen(true);
+      }
+    }, 1200);
+    return () => clearTimeout(t);
+  }, [shouldShowPopup, navigation]);
+
+  const closePopup = () => {
+    setPopupOpen(false);
+    dismissPopup();
+  };
+  const openPremium = () => {
+    closePopup();
+    navigation.navigate('Premium');
+  };
+
   const joined = (challengeData?.challenges || []).slice(0, 2);
   const firstName = account?.name?.split(' ')[0] || '';
   // Walking uses the live step count; everything else comes from the server
+  // Only habits that earn for this member (free members pick theirs on the Activity screen)
   const goals = (today?.activities || [])
+    .filter(a => a.active !== false)
     .map(withVisuals)
     .map(a => (a.id === 'walk' ? { ...a, current: Math.max(a.current, steps), goal } : a));
   const weekly = wallet.weekly.length ? wallet.weekly : EMPTY_WEEK;
 
   return (
-    <Screen scroll contentContainerStyle={styles.content}>
+    <Screen scroll onRefresh={refresh} contentContainerStyle={styles.content}>
       <Animated.View entering={FadeInDown.duration(500)} style={styles.topBar}>
         <PressableScale onPress={() => navigation.navigate('Profile')}>
           <Avatar initials={initialsOf(account?.name)} size={46} />
@@ -213,6 +246,10 @@ export default function HomeScreen({ navigation }) {
 
       <Animated.View entering={FadeInDown.delay(80).duration(600)}>
         <BalanceCard navigation={navigation} />
+      </Animated.View>
+
+      <Animated.View entering={FadeInDown.delay(100).duration(600)}>
+        <PremiumCard onPress={() => navigation.navigate('Premium')} />
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(120).duration(600)}>
@@ -289,6 +326,8 @@ export default function HomeScreen({ navigation }) {
           </Card>
         </Animated.View>
       ))}
+
+      <PremiumPopup visible={popupOpen} onUpgrade={openPremium} onClose={closePopup} />
     </Screen>
   );
 }

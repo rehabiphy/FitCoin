@@ -39,7 +39,7 @@ export default function ProfileScreen({ navigation }) {
   const joined = account?.createdAt
     ? new Date(account.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
     : '';
-  const { data: me } = useApi(() => statsApi.me().then(d => d.stats), []);
+  const { data: me, reload } = useApi(() => statsApi.me().then(d => d.stats), []);
   const user = me || { level: 1, levelName: 'Starter', xp: 0, xpLevelStart: 0, xpNext: 100, streak: 0, weeklyRank: null, lifetimeEarned: 0 };
   const earned = user.lifetimeEarned;
   const levelSpan = Math.max(1, user.xpNext - user.xpLevelStart);
@@ -51,7 +51,7 @@ export default function ProfileScreen({ navigation }) {
   ];
 
   return (
-    <Screen scroll contentContainerStyle={styles.content} tint={colors.cyan} accent={colors.pink}>
+    <Screen scroll onRefresh={reload} contentContainerStyle={styles.content} tint={colors.cyan} accent={colors.pink}>
       <Animated.View entering={FadeInDown.duration(500)} style={styles.hero}>
         <Avatar initials={initialsOf(account?.name)} size={92} />
         <Text style={[type.h1, styles.name]}>{account?.name}</Text>

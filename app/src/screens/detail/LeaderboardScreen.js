@@ -59,7 +59,7 @@ export default function LeaderboardScreen() {
   const [period, setPeriod] = useState('Weekly');
   const insets = useSafeAreaInsets();
   const { user: account } = useAuth();
-  const { data, loading } = useApi(() => leaderboardApi.get(PERIOD_KEYS[period]), [period]);
+  const { data, loading, reload } = useApi(() => leaderboardApi.get(PERIOD_KEYS[period]), [period]);
   const entries = data?.entries || [];
   const [first, second, third] = entries;
   const rest = entries.slice(3);
@@ -72,6 +72,7 @@ export default function LeaderboardScreen() {
   return (
     <Screen
       scroll
+      onRefresh={reload}
       header={<Header title="Leaderboard" showBack={false} />}
       tint={colors.gold}
       contentContainerStyle={[styles.content, { paddingBottom: TAB_BAR_SPACE + 80 }]}

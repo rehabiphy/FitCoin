@@ -8,6 +8,13 @@ export const sleepLogSchema = z.object({
   hours: z.number({ error: 'Hours are required' }).min(0.5, { error: 'Log at least 30 minutes' }).max(14, { error: 'Up to 14 hours' }),
 });
 
+export const habitSelectionSchema = z.object({
+  habits: z
+    .array(activityIdParam, { error: 'Pick your habits' })
+    .min(1, { error: 'Pick at least one habit' })
+    .max(ACTIVITY_IDS.length),
+});
+
 export const finishSessionSchema = z.object({
   // Distance in km for cycling, or minutes actually spent (≤ timed) for others
   value: z.number().min(0).max(1000).optional(),

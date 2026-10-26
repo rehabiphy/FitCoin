@@ -61,9 +61,9 @@ function WalletCard({ wallet }) {
 export default function WalletScreen({ navigation }) {
   const [filter, setFilter] = useState('All');
   const { wallet, reloadWallet } = useSteps();
-  const { data, loading } = useApi(() => {
-    reloadWallet();
-    return transactionsApi.list({ limit: 6, group: TX_GROUPS[filter] });
+  const { data, loading, reload } = useApi(async () => {
+    const [, txs] = await Promise.all([reloadWallet(), transactionsApi.list({ limit: 6, group: TX_GROUPS[filter] })]);
+    return txs;
   }, [filter, reloadWallet]);
   const list = (data?.items || []).map(txView);
 
@@ -74,7 +74,7 @@ export default function WalletScreen({ navigation }) {
   ];
 
   return (
-    <Screen scroll contentContainerStyle={styles.content} tint={colors.primary} accent={colors.gold}>
+    <Screen scroll onRefresh={reload} contentContainerStyle={styles.content} tint={colors.primary} accent={colors.gold}>
       <Animated.View entering={FadeInDown.duration(500)} style={styles.head}>
         <Text style={type.h1}>Wallet</Text>
         <PressableScale style={styles.qr} onPress={() => navigation.navigate('Referral')}>

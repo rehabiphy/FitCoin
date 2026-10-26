@@ -1,7 +1,8 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeIn, SlideInDown, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
+import { sheetIn } from '../../components/motion';
 import IconBubble from '../../components/IconBubble';
 import GradientButton from '../../components/GradientButton';
 import { StatusPill, txColor } from '../../components/TransactionRow';
@@ -40,7 +41,7 @@ export default function TransactionDetailScreen({ route, navigation }) {
   return (
     <Animated.View entering={FadeIn.duration(200)} style={styles.backdrop}>
       <Pressable style={StyleSheet.absoluteFill} onPress={() => navigation.goBack()} />
-      <Animated.View entering={SlideInDown.springify().damping(18)} style={[styles.sheet, { paddingBottom: insets.bottom + 20 }]}>
+      <Animated.View entering={sheetIn} style={[styles.sheet, { paddingBottom: insets.bottom + 20 }]}>
         <View style={styles.handle} />
         <Animated.View entering={ZoomIn.delay(150).springify()} style={styles.center}>
           <IconBubble icon={tx.icon} color={txColor(tx)} size={64} radius={22} />

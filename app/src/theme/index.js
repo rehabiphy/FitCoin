@@ -37,6 +37,7 @@ export const gradients = {
   card: ['#1A2240', '#0E1426'],
   wallet: ['#5B3FE0', '#7C5CFF', '#22D3EE'],
   dark: ['#0B1120', '#060912'],
+  premium: ['#FFD86B', '#FF8A3D', '#FF5C9A'],
 };
 
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, xxxl: 32 };

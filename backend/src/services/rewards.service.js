@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import Transaction from '../models/Transaction.js';
-import { WALLET_RULES } from '../config/rewards.js';
 import { notify } from './notification.service.js';
 
 const trusted = mongoose.trusted;
@@ -22,7 +21,8 @@ async function habitRewardsOn(userId, date, excludeRefKey) {
 /**
  * Credits the reward for one habit on one day. There is one ledger row per
  * user + habit + day, only ever raised with $max — so repeated or simultaneous
- * calls can't pay twice. Applies the daily cap across all habits.
+ * calls can't pay twice. Applies the user's daily cap across all habits
+ * (free and premium caps are set in the admin panel, see premium.service.js).
  *
  * Returns the FIT newly added by this call.
  */
@@ -31,6 +31,7 @@ export async function creditDailyReward({
   date,
   key, // e.g. "steps" or "act-water"
   amount,
+  dailyCap,
   category,
   title,
   goalTitle,
@@ -44,7 +45,7 @@ export async function creditDailyReward({
   }
   const refKey = `${key}:${userId}:${date}`;
   const others = await habitRewardsOn(userId, date, refKey);
-  const allowed = Math.max(0, Math.min(amount, WALLET_RULES.dailyCap - others));
+  const allowed = Math.max(0, Math.min(amount, dailyCap - others));
   if (allowed <= 0) {
     return 0;
   }

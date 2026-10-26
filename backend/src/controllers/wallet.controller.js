@@ -3,7 +3,7 @@ import { getTransaction, getWalletSummary, listTransactions } from '../services/
 
 /** GET /wallet?tzOffset=330 */
 export async function summary(req, res) {
-  const wallet = await getWalletSummary(req.user._id, req.validatedQuery.tzOffset ?? req.tzOffset);
+  const wallet = await getWalletSummary(req.user, req.validatedQuery.tzOffset ?? req.tzOffset);
   res.json({ success: true, data: { wallet } });
 }
 

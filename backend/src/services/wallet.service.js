@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import Transaction from '../models/Transaction.js';
-import { WALLET_RULES } from '../config/rewards.js';
+import { rewardContext } from './premium.service.js';
 import { EXPIRY_RULES, MARKETPLACE_RULES } from '../config/progression.js';
 import { lastDays, todayKey } from '../utils/dates.js';
 
@@ -11,12 +11,13 @@ const round2 = n => Math.round(n * 100) / 100;
  * - balance: completed credits and debits, plus redemptions still processing (already reserved)
  * - pending: credits not yet confirmed
  */
-export async function getWalletSummary(userId, tzOffset) {
-  const user = new mongoose.Types.ObjectId(String(userId));
+export async function getWalletSummary(userOrId, tzOffset) {
+  const user = new mongoose.Types.ObjectId(String(userOrId?._id ?? userOrId));
   const week = lastDays(tzOffset, 7);
   const today = todayKey(tzOffset);
 
-  const [totals, weekly] = await Promise.all([
+  const [ctx, totals, weekly] = await Promise.all([
+    rewardContext(userOrId),
     Transaction.aggregate([
       { $match: { user } },
       {
@@ -70,7 +71,9 @@ export async function getWalletSummary(userId, tzOffset) {
     redeemed: round2(t.redeemed),
     earnedToday: round2(byDay.get(today) || 0),
     earnedThisWeek: round2(weeklySeries.reduce((sum, d) => sum + d.value, 0)),
-    dailyCap: WALLET_RULES.dailyCap,
+    dailyCap: ctx.dailyCap,
+    isPremium: ctx.premium,
+    multiplier: ctx.multiplier,
     weekly: weeklySeries,
     inrValue: round2(t.balance * MARKETPLACE_RULES.inrPerFit),
     expiringSoon: expiring.amount,

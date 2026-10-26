@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeIn, FadeInDown, SlideInDown, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated';
+import { sheetIn } from '../../components/motion';
 import Screen from '../../components/Screen';
 import Header from '../../components/Header';
 import Card from '../../components/Card';
@@ -27,7 +28,7 @@ function Line({ label, value, strong }) {
 export default function RewardDetailScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const { wallet, reloadWallet } = useSteps();
-  const { data: r } = useApi(() => marketplaceApi.reward(route.params?.id).then(d => d.reward), [route.params?.id]);
+  const { data: r, reload } = useApi(() => marketplaceApi.reward(route.params?.id).then(d => d.reward), [route.params?.id]);
   const [sheet, setSheet] = useState(false);
   const [stage, setStage] = useState('confirm'); // confirm | loading | done
   const [error, setError] = useState('');
@@ -67,6 +68,7 @@ export default function RewardDetailScreen({ route, navigation }) {
   return (
     <Screen
       scroll
+      onRefresh={() => Promise.all([reload(), reloadWallet()])}
       header={<Header title={r.brand} />}
       tint={r.gradient[0]}
       accent={r.gradient[1]}
@@ -147,7 +149,7 @@ export default function RewardDetailScreen({ route, navigation }) {
       <Modal visible={sheet} transparent animationType="none" statusBarTranslucent navigationBarTranslucent onRequestClose={close}>
         <Animated.View entering={FadeIn.duration(200)} style={styles.backdrop}>
           <Text style={StyleSheet.absoluteFill} onPress={stage === 'loading' ? undefined : close} />
-          <Animated.View entering={SlideInDown.springify().damping(18)} style={[styles.sheet, { paddingBottom: insets.bottom + 20 }]}>
+          <Animated.View entering={sheetIn} style={[styles.sheet, { paddingBottom: insets.bottom + 20 }]}>
             <View style={styles.handle} />
             {stage === 'done' ? (
               <View style={styles.success}>

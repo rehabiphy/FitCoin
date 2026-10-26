@@ -30,6 +30,11 @@ const env = {
   googleClientIds: list(process.env.GOOGLE_CLIENT_IDS),
   corsOrigins: list(process.env.CORS_ORIGINS),
   bcryptRounds: Number(process.env.BCRYPT_SALT_ROUNDS) || 12,
+  // Lets "Upgrade" activate premium without a payment (testing). On by default outside production;
+  // turn it off once real in-app purchases are connected in premium.service.js.
+  premiumTestPurchases: process.env.PREMIUM_TEST_PURCHASES
+    ? process.env.PREMIUM_TEST_PURCHASES === 'true'
+    : process.env.NODE_ENV !== 'production',
 };
 
 if (env.isProd && (env.jwt.accessSecret.length < 32 || env.jwt.refreshSecret.length < 32)) {

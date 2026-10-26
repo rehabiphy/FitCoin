@@ -5,6 +5,11 @@ export async function today(req, res) {
   res.json({ success: true, data: await activities.getToday(req.user, req.tzOffset) });
 }
 
+/** PUT /activities/selection — { habits: [ids] } a free member's active habits */
+export async function select(req, res) {
+  res.json({ success: true, data: await activities.selectHabits(req.user, req.body.habits, req.tzOffset) });
+}
+
 /** GET /activities/:id — one habit today + last 7 days */
 export async function detail(req, res) {
   const activity = await activities.getActivity(req.user, req.params.id, req.tzOffset);

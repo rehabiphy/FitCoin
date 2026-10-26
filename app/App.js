@@ -5,6 +5,7 @@ import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import RootNavigator from './src/navigation/RootNavigator';
 import { AuthProvider } from './src/context/AuthContext';
 import { StepsProvider } from './src/context/StepsContext';
+import { PremiumProvider } from './src/context/PremiumContext';
 import { colors } from './src/theme';
 
 const navTheme = {
@@ -26,9 +27,11 @@ export default function App() {
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       <AuthProvider>
         <StepsProvider>
-          <NavigationContainer theme={navTheme}>
-            <RootNavigator />
-          </NavigationContainer>
+          <PremiumProvider>
+            <NavigationContainer theme={navTheme}>
+              <RootNavigator />
+            </NavigationContainer>
+          </PremiumProvider>
         </StepsProvider>
       </AuthProvider>
     </SafeAreaProvider>

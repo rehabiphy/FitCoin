@@ -20,7 +20,7 @@ import { colors, gradients, radius, type, TOKEN } from '../../theme';
 
 export default function ReferralScreen() {
   const { user } = useAuth();
-  const { data } = useApi(() => referralsApi.get(), []);
+  const { data, reload } = useApi(() => referralsApi.get(), []);
   const [sent, setSent] = useState(false);
   const code = data?.code || user?.referralCode || '';
   const rules = data?.rules || { referrerReward: 100, refereeReward: 50, activeDaysRequired: 3, maxRewardedPerMonth: 20 };
@@ -49,7 +49,7 @@ export default function ReferralScreen() {
     });
 
   return (
-    <Screen scroll edges={['top', 'bottom']} header={<Header title="Refer & Earn" />} tint={colors.mint} contentContainerStyle={styles.content}>
+    <Screen scroll onRefresh={reload} edges={['top', 'bottom']} header={<Header title="Refer & Earn" />} tint={colors.mint} contentContainerStyle={styles.content}>
       <Animated.View entering={ZoomIn.duration(450)}>
         <GradientView colors={gradients.mint} style={styles.hero}>
           <View style={styles.heroCircle} />

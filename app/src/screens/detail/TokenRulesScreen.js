@@ -8,25 +8,49 @@ import IconBubble from '../../components/IconBubble';
 import Icon from '../../components/Icon';
 import CoinIcon from '../../components/CoinIcon';
 import { useSteps } from '../../context/StepsContext';
+import { usePremium } from '../../context/PremiumContext';
 import { colors, type, TOKEN } from '../../theme';
 
-const sections = dailyCap => [
+// Free-member rates from the server (set in the admin panel), one line per habit
+const habitPoints = premium =>
+  premium?.habits?.length
+    ? premium.habits.map(h => `${h.name}: ${h.rate}, up to ${h.maxReward} ${TOKEN} a day.`)
+    : ['Each activity has its own rate and daily maximum.'];
+
+const premiumSection = plan =>
+  plan?.enabled
+    ? [
+        {
+          icon: 'Crown',
+          color: colors.orange,
+          title: plan.title,
+          points: [
+            `Premium members earn ${plan.multiplier}x ${TOKEN} on every habit.`,
+            `Premium daily cap: ${plan.dailyCap} ${TOKEN} (free: ${plan.freeDailyCap} ${TOKEN}).`,
+            'Streak bonuses, challenges and referrals pay the same for everyone.',
+          ],
+        },
+      ]
+    : [];
+
+const sections = (dailyCap, premium) => [
   {
     icon: 'Coins',
     color: colors.gold,
     title: 'How FIT is issued',
     points: [
       'FIT is credited only after activities are verified on our servers.',
-      `Each activity has its own rate and daily maximum (e.g. 6 ${TOKEN} per 1,000 steps, up to 60 a day).`,
+      ...habitPoints(premium),
       `Every 7th day in a row you’re active earns a 50 ${TOKEN} streak bonus; challenges pay their prize when completed.`,
     ],
   },
+  ...premiumSection(premium?.plan),
   {
     icon: 'Target',
     color: colors.cyan,
     title: 'Earning limits',
     points: [
-      `Daily cap: ${dailyCap} ${TOKEN} across all activities.`,
+      `Your daily cap: ${dailyCap} ${TOKEN} across all activities.`,
       `Referral cap: 20 rewarded referrals per month.`,
       'Unusual activity may be held for review before credit.',
     ],
@@ -88,10 +112,11 @@ function Section({ s, index }) {
 }
 
 export default function TokenRulesScreen() {
-  const { wallet } = useSteps();
-  const SECTIONS = sections(wallet.dailyCap);
+  const { wallet, reloadWallet } = useSteps();
+  const { info, reload } = usePremium();
+  const SECTIONS = sections(wallet.dailyCap, info);
   return (
-    <Screen scroll edges={['top', 'bottom']} header={<Header title="Token & reward rules" />} contentContainerStyle={styles.content}>
+    <Screen scroll onRefresh={() => Promise.all([reload(), reloadWallet()])} edges={['top', 'bottom']} header={<Header title="Token & reward rules" />} contentContainerStyle={styles.content}>
       <Animated.View entering={FadeInDown.duration(450)} style={styles.intro}>
         <CoinIcon size={56} />
         <Text style={[type.h1, styles.introTitle]}>About {TOKEN} points</Text>

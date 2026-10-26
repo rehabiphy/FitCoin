@@ -7,6 +7,10 @@ import ApiError from '../utils/ApiError.js';
 import { ACTIVITIES, ACTIVITY_IDS } from '../config/activities.js';
 import { creditDailyReward } from './rewards.service.js';
 import { afterActivity } from './progress.service.js';
+import { baseReward, rateLabel } from './rewardConfig.service.js';
+import { applyMultiplier, rewardContext } from './premium.service.js';
+import { assertHabitActive, canEarnHabit, habitSelectionInfo, setActiveHabits } from './habits.service.js';
+import { groupOf } from '../config/rewards.js';
 import { lastDays, localNow, todayKey } from '../utils/dates.js';
 
 const trusted = mongoose.trusted;
@@ -25,30 +29,44 @@ const formatValue = (cfg, v) => (cfg.unit === 'steps' ? Math.round(v).toLocaleSt
 /** Credits the reward for an activity's current daily total, then runs streak/challenge/badge updates. */
 async function creditActivity(userId, activityId, date) {
   const cfg = ACTIVITIES[activityId];
-  const day = await DailyActivity.findOne({ user: userId, activity: activityId, date });
+  const [day, ctx] = await Promise.all([
+    DailyActivity.findOne({ user: userId, activity: activityId, date }),
+    rewardContext(userId),
+  ]);
+  const rule = ctx.config.habits[activityId];
   const value = day?.value || 0;
-  const goalReached = value >= cfg.goal;
-  const added = await creditDailyReward({
+  const goalReached = value >= rule.goal;
+  const amount = applyMultiplier(ctx, baseReward(activityId, rule, value));
+  const allowed = await canEarnHabit(ctx, userId, activityId, date);
+  const added = !allowed
+    ? 0
+    : await creditDailyReward({
     userId,
     date,
     key: `act-${activityId}`,
-    amount: cfg.reward(value),
+    amount,
+    dailyCap: ctx.dailyCap,
     category: 'activity',
     title: `${cfg.name} reward`,
     goalTitle: `${cfg.name} goal met`,
     goalReached,
-    subtitle: `${cfg.name} · ${formatValue(cfg, value)} ${cfg.unit}`,
-    meta: { activity: activityId, value },
+    subtitle: `${cfg.name} · ${formatValue(cfg, value)} ${cfg.unit}${ctx.premium ? ` · Premium ${ctx.multiplier}x` : ''}`,
+    meta: { activity: activityId, value, multiplier: ctx.multiplier },
     goalNotification: {
       title: `${cfg.name} goal met!`,
-      body: `You hit today's ${cfg.name.toLowerCase()} goal and earned ${cfg.reward(value)} FIT.`,
+      body: `You hit today's ${cfg.name.toLowerCase()} goal and earned ${amount} FIT.`,
       icon: 'Coins',
       color: 'gold',
     },
   });
   // Challenges can need more than the daily reward covers (e.g. 50 km a week), so always refresh
   await afterActivity(userId, date);
-  return { value, fitAdded: added };
+  return { value, fitAdded: added, ...(allowed ? {} : { notEarning: true }) };
+}
+
+/** Free members can only log habits they picked. */
+async function requireActive(userId, activityId) {
+  assertHabitActive(await rewardContext(userId), activityId);
 }
 
 async function addToDay(userId, activityId, date, delta) {
@@ -62,6 +80,7 @@ async function addToDay(userId, activityId, date, delta) {
 /** POST /activities/water/log — one glass. */
 export async function logWater(userId, tzOffset) {
   const cfg = ACTIVITIES.water;
+  await requireActive(userId, 'water');
   const date = todayKey(tzOffset);
   const day = await DailyActivity.findOne({ user: userId, activity: 'water', date });
   if (day?.value >= cfg.maxPerDay) {
@@ -95,6 +114,7 @@ export async function logWater(userId, tzOffset) {
 /** POST /activities/sleep/log — last night's sleep, counted for today. Latest log wins. */
 export async function logSleep(userId, tzOffset, hours) {
   const cfg = ACTIVITIES.sleep;
+  await requireActive(userId, 'sleep');
   const date = todayKey(tzOffset);
   const value = Math.min(cfg.maxValue, round1(hours));
   await DailyActivity.findOneAndUpdate(
@@ -125,6 +145,7 @@ export async function startSession(userId, activityId, tzOffset) {
   if (cfg.kind !== 'session') {
     throw ApiError.badRequest(`${cfg.name} doesn't use sessions`, 'NOT_A_SESSION');
   }
+  await requireActive(userId, activityId);
   await expireStaleSessions(userId);
   const existing = await ActivitySession.findOne({ user: userId, activity: activityId, status: 'active' });
   if (existing) {
@@ -211,7 +232,8 @@ export async function cancelSession(userId, sessionId) {
 export async function getToday(user, tzOffset) {
   const date = todayKey(tzOffset);
   await expireStaleSessions(user._id);
-  const [stepDay, days, rewards, sessions] = await Promise.all([
+  const [ctx, stepDay, days, rewards, sessions] = await Promise.all([
+    rewardContext(user),
     StepDay.findOne({ user: user._id, date }),
     DailyActivity.find({ user: user._id, date }),
     Transaction.find({ user: user._id, activityDate: date, category: trusted({ $in: ['steps', 'activity'] }) }),
@@ -223,8 +245,9 @@ export async function getToday(user, tzOffset) {
 
   const activities = ACTIVITY_IDS.map(id => {
     const cfg = ACTIVITIES[id];
+    const rule = ctx.config.habits[id];
     const current = id === 'walk' ? stepDay?.steps || 0 : valueOf.get(id) || 0;
-    const goal = id === 'walk' ? user.stepGoal || cfg.goal : cfg.goal;
+    const goal = id === 'walk' ? user.stepGoal || rule.goal : rule.goal;
     return {
       id,
       name: cfg.name,
@@ -234,29 +257,50 @@ export async function getToday(user, tzOffset) {
       goal,
       progress: Math.min(1, current / goal),
       completed: current >= goal,
-      reward: cfg.maxReward,
+      // Most this habit can earn today, after the premium multiplier
+      reward: applyMultiplier(ctx, rule.maxReward),
+      baseReward: rule.maxReward,
       earned: earnedOf.get(id) || 0,
-      rate: cfg.rate,
+      rate: rateLabel(id, rule, ctx.multiplier),
       verified: cfg.verified,
       activeSession: sessionOf.get(id) || null,
+      // Free members only earn from the habits they picked (per group: movement / lifestyle)
+      active: ctx.activeHabits.includes(id),
+      group: groupOf(id),
     };
   });
 
+  // Score, goals and potential count only the habits that can earn
+  const counted = activities.filter(a => a.active);
   const earned = activities.reduce((s, a) => s + a.earned, 0);
-  const potential = activities.reduce((s, a) => s + a.reward, 0);
+  const potential = Math.min(
+    ctx.dailyCap,
+    counted.reduce((s, a) => s + a.reward, 0),
+  );
   return {
     date,
     activities,
     summary: {
-      score: activities.reduce((s, a) => s + a.progress, 0) / activities.length,
-      done: activities.filter(a => a.completed).length,
-      total: activities.length,
+      score: counted.length ? counted.reduce((s, a) => s + a.progress, 0) / counted.length : 0,
+      done: counted.filter(a => a.completed).length,
+      total: counted.length,
       earned,
       potential,
       remaining: Math.max(0, potential - earned),
+      dailyCap: ctx.dailyCap,
+      isPremium: ctx.premium,
+      multiplier: ctx.multiplier,
     },
+    habits: await habitSelectionInfo(user, ctx, date),
     lastStepSyncAt: stepDay?.lastSyncedAt || null,
   };
+}
+
+/** PUT /activities/selection — saves a member's active habits, then returns today's view. */
+export async function selectHabits(user, habits, tzOffset) {
+  const ctx = await rewardContext(user);
+  await setActiveHabits(user, ctx, habits, todayKey(tzOffset));
+  return getToday(user, tzOffset);
 }
 
 /** One activity: today's numbers plus the last 7 days. */

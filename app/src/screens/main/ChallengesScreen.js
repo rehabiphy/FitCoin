@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
 import Screen from '../../components/Screen';
@@ -91,9 +91,13 @@ function ChallengeCard({ c, onPress }) {
 
 export default function ChallengesScreen({ navigation }) {
   const [filter, setFilter] = useState('All');
-  const { data: challengeData, loading } = useApi(() => challengesApi.list('all'), []);
-  const { data: board } = useApi(() => leaderboardApi.get('weekly'), []);
-  const { data: badgeData } = useApi(() => badgesApi.list(), []);
+  const { data: challengeData, loading, reload: reloadChallenges } = useApi(() => challengesApi.list('all'), []);
+  const { data: board, reload: reloadBoard } = useApi(() => leaderboardApi.get('weekly'), []);
+  const { data: badgeData, reload: reloadBadges } = useApi(() => badgesApi.list(), []);
+  const refresh = useCallback(
+    () => Promise.all([reloadChallenges(), reloadBoard(), reloadBadges()]),
+    [reloadChallenges, reloadBoard, reloadBadges],
+  );
   const challenges = challengeData?.challenges || [];
   const badges = (badgeData?.badges || []).map(b => ({ ...b, color: themeColor(b.color) }));
   const list = challenges.filter(c =>
@@ -101,7 +105,7 @@ export default function ChallengesScreen({ navigation }) {
   );
 
   return (
-    <Screen scroll contentContainerStyle={styles.content} tint={colors.pink} accent={colors.primary}>
+    <Screen scroll onRefresh={refresh} contentContainerStyle={styles.content} tint={colors.pink} accent={colors.primary}>
       <Animated.View entering={FadeInDown.duration(500)} style={styles.head}>
         <Text style={type.h1}>Challenges</Text>
         <Text style={type.body}>Compete, climb the ranks and win bonus rewards.</Text>

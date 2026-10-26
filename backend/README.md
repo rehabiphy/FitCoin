@@ -75,13 +75,32 @@ src/
 | PATCH  | `/notifications/:id/read` | Bearer |                                              |
 | POST   | `/notifications/read-all` | Bearer |                                              |
 | DELETE | `/notifications/:id` | Bearer |                                                   |
+| GET    | `/premium`           | Bearer | plan (from admin panel), user's status, free vs premium rates |
+| POST   | `/premium/upgrade`   | Bearer | activates/extends premium (test purchases only for now, see below) |
+| GET    | `/admin/overview`    | Admin  | members, premium members, FIT issued in 24 h       |
+| GET    | `/admin/config`      | Admin  | live coin values + premium plan, defaults         |
+| PUT    | `/admin/config`      | Admin  | `dailyCap, habits{id: {perUnit, maxReward, goal}}, premium{…}` |
+| GET    | `/admin/users`       | Admin  | query: `q?, premium = all, premium, free, page, limit` |
+| POST   | `/admin/users/:id/premium` | Admin | `days` — give or extend premium               |
+| DELETE | `/admin/users/:id/premium` | Admin | end premium now                               |
 
 The app sends an `X-Tz-Offset` header (minutes east of UTC, IST = 330) with every request so "today" means the
 user's local day; endpoints also accept a `tzOffset` query parameter.
 
-## Rules (all in `src/config/`)
+## Rules
 
-| Habit     | How it's logged                         | Reward                         |
+Coin values are **set in the admin panel** (`../admin`) and stored in MongoDB (`AppSetting`, key `rewards`).
+The values below are the defaults (`src/config/activities.js`, `src/config/rewards.js`) used until an admin saves
+something. The API caches the config for 15 s. Anti-cheat limits (max speed, glasses per day, session lengths…) stay in code.
+
+**Premium:** members earn habit rewards × the multiplier (default 2x) and get their own daily cap (default 600).
+Streaks, challenges and referrals pay the same for everyone. `POST /premium/upgrade` needs a payment check before
+launch — connect Google Play Billing in `upgrade()` in `src/services/premium.service.js`. Until then it only works
+while `PREMIUM_TEST_PURCHASES=true` (the default outside production). Admins can also give premium from the panel.
+
+**Admin access:** `npm run make-admin -- you@example.com` (account must exist; `--remove` to undo).
+
+| Habit     | How it's logged                         | Default reward                 |
 | --------- | --------------------------------------- | ------------------------------ |
 | Walking   | phone step counter                      | 6 FIT / 1,000 steps, max 60    |
 | Cycling   | timed ride + distance (≤ 45 km/h avg)   | 5 FIT / km, max 75             |
@@ -90,7 +109,7 @@ user's local day; endpoints also accept a `tzOffset` query parameter.
 | Reading   | session timed on the server             | 1 FIT / min, max 30            |
 | Breathing | session timed on the server             | 2 FIT / min, max 20            |
 
-- Habit rewards across a day are capped at 300 FIT.
+- Habit rewards across a day are capped at 300 FIT (600 for premium) by default.
 - **Streaks:** a day counts if any habit earned FIT; every 7th day in a row pays +50 FIT.
 - **Levels:** XP = lifetime FIT earned; level L needs 50·L·(L−1) XP.
 - **Challenges** (`src/seed/challenges.js`) run daily or weekly (Mon–Sun). Progress is calculated from real activity

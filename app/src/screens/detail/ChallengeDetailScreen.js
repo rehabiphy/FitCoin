@@ -23,7 +23,7 @@ const TRACK_BY_ICON = { Footprints: 'walk', Droplet: 'water', Bike: 'cycle', Win
 export default function ChallengeDetailScreen({ route, navigation }) {
   const id = route.params?.id;
   const insets = useSafeAreaInsets();
-  const { data: c, setData } = useApi(() => challengesApi.detail(id).then(d => d.challenge), [id]);
+  const { data: c, setData, reload } = useApi(() => challengesApi.detail(id).then(d => d.challenge), [id]);
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState('');
 
@@ -59,6 +59,7 @@ export default function ChallengeDetailScreen({ route, navigation }) {
   return (
     <Screen
       scroll
+      onRefresh={reload}
       header={<Header title="Challenge" />}
       tint={c.gradient[0]}
       accent={c.gradient[1]}

@@ -44,6 +44,29 @@ export function timeLeft(date) {
   return `${h}h ${String(m % 60).padStart(2, '0')}m`;
 }
 
+const CURRENCY_SYMBOLS = { INR: '₹', USD: '$', EUR: '€', GBP: '£' };
+
+/** "₹99" / "AED 49" */
+export function priceLabel(price, currency = 'INR') {
+  const symbol = CURRENCY_SYMBOLS[currency];
+  const amount = Number(price || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+  return symbol ? `${symbol}${amount}` : `${currency} ${amount}`;
+}
+
+/** "30 days" / "1 month" / "1 year" */
+export function durationLabel(days) {
+  if (days === 365) {
+    return '1 year';
+  }
+  if (days === 30 || days === 31) {
+    return '1 month';
+  }
+  return `${days} day${days === 1 ? '' : 's'}`;
+}
+
+/** "Nov 25, 2026" */
+export const shortDate = date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
 export const isToday = date => new Date(date).toDateString() === new Date().toDateString();
 
 /** "Today, 8:42 PM" / "Yesterday, 6:18 PM" / "Oct 18, 2026". */

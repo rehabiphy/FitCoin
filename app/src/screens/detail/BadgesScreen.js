@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 import Screen from '../../components/Screen';
@@ -13,15 +13,16 @@ import { themeColor } from '../../utils/format';
 import { colors, gradients, type } from '../../theme';
 
 export default function BadgesScreen() {
-  const { data } = useApi(() => badgesApi.list(), []);
-  const { data: stats } = useApi(() => statsApi.me().then(d => d.stats), []);
+  const { data, reload } = useApi(() => badgesApi.list(), []);
+  const { data: stats, reload: reloadStats } = useApi(() => statsApi.me().then(d => d.stats), []);
+  const refresh = useCallback(() => Promise.all([reload(), reloadStats()]), [reload, reloadStats]);
   const badges = (data?.badges || []).map(b => ({ ...b, color: themeColor(b.color) }));
   const earned = badges.filter(b => b.earned).length;
   const total = badges.length || 1;
   const left = badges.length - earned;
 
   return (
-    <Screen scroll edges={['top', 'bottom']} header={<Header title="Achievements" />} tint={colors.pink} contentContainerStyle={styles.content}>
+    <Screen scroll onRefresh={refresh} edges={['top', 'bottom']} header={<Header title="Achievements" />} tint={colors.pink} contentContainerStyle={styles.content}>
       <Animated.View entering={FadeInDown.duration(500)}>
         <Card style={styles.summary}>
           <ProgressRing size={100} stroke={10} progress={earned / total} gradient={gradients.pink}>
