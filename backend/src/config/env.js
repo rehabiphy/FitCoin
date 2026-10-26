@@ -13,6 +13,14 @@ const list = value =>
     .map(v => v.trim())
     .filter(Boolean);
 
+// Browser apps that may always call the API (plus anything in CORS_ORIGINS)
+const BUILT_IN_ORIGINS = [
+  'https://fit-coin-beryl.vercel.app', // admin panel
+];
+
+// Browsers send the origin without a trailing slash, so compare without one
+const origin = value => value.replace(/\/+$/, '');
+
 const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   isProd: process.env.NODE_ENV === 'production',
@@ -28,7 +36,7 @@ const env = {
     audience: 'fitcoin-app',
   },
   googleClientIds: list(process.env.GOOGLE_CLIENT_IDS),
-  corsOrigins: list(process.env.CORS_ORIGINS),
+  corsOrigins: [...new Set([...BUILT_IN_ORIGINS, ...list(process.env.CORS_ORIGINS)].map(origin))],
   bcryptRounds: Number(process.env.BCRYPT_SALT_ROUNDS) || 12,
   // Lets "Upgrade" activate premium without a payment (testing). On by default outside production;
   // turn it off once real in-app purchases are connected in premium.service.js.
