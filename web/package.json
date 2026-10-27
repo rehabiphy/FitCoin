@@ -1,0 +1,25 @@
+{
+  "name": "axyio-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "axyio website: landing page, help center, contact and legal pages",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lucide-react": "^0.468.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router": "^7.6.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "vite": "^8.3.5"
+  },
+  "engines": {
+    "node": ">= 22.11.0"
+  }
+}
