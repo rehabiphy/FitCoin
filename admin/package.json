@@ -2,7 +2,7 @@
   "name": "fitcoin-admin",
   "version": "1.0.0",
   "private": true,
-  "description": "Fitcoin admin panel: habit coin values, premium plan and members",
+  "description": "axyio admin panel: habit coin values, premium plan and members",
   "type": "module",
   "scripts": {
     "dev": "vite",

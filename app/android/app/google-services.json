@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "768551395156",
+    "project_id": "newfithabit",
+    "storage_bucket": "newfithabit.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:768551395156:android:a371174050327e480cf2c1",
+        "android_client_info": {
+          "package_name": "com.rehabiphy.axiyo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "768551395156-jfovnr28qim56sec769e5ikamq1ttlc7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rehabiphy.axiyo",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "768551395156-odr0pvimubganiauoskluqg6l7654oap.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rehabiphy.axiyo",
+            "certificate_hash": "38832dda366831ea34cc43635b90de18240c492c"
+          }
+        },
+        {
+          "client_id": "768551395156-ldls2nu0ncp3j868f6tje7n1tf4t6nsl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASx4DRSVhPNaKheaUJ3gtSwNc_RvPAUAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "768551395156-ldls2nu0ncp3j868f6tje7n1tf4t6nsl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

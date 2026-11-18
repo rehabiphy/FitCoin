@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { API_LABEL, login } from '../api.js';
+import logo from '../assets/logo-wordmark.png';
 
 export default function Login({ onSignedIn }) {
   const [email, setEmail] = useState('');
@@ -24,9 +25,8 @@ export default function Login({ onSignedIn }) {
     <div className="center-screen">
       <form className="card login" onSubmit={submit}>
         <div className="brand" style={{ padding: 0 }}>
-          <div className="brand-mark">F</div>
+          <img className="brand-logo" src={logo} alt="axyio" />
           <div>
-            Fitcoin
             <small>Admin panel</small>
           </div>
         </div>

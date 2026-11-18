@@ -45,7 +45,7 @@ export default function ReferralScreen() {
 
   const share = () =>
     Share.share({
-      message: `Join me on Fitcoin and earn rewards for staying active! Use my code ${code} when you sign up to get ${rules.refereeReward} FIT.`,
+      message: `Join me on axyio and earn rewards for staying active! Use my code ${code} when you sign up to get ${rules.refereeReward} FIT.`,
     });
 
   return (

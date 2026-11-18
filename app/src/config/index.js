@@ -22,4 +22,7 @@ export const API_TIMEOUT_MS = 15000;
  * (APIs & Services → Credentials). Google signs the ID token for this client,
  * so the backend's GOOGLE_CLIENT_IDS must contain the same value.
  */
-export const GOOGLE_WEB_CLIENT_ID = '694391739606-tul7mvb2muc18brnmc95kc7gr7jopcdv.apps.googleusercontent.com';
+export const GOOGLE_WEB_CLIENT_ID = '768551395156-ldls2nu0ncp3j868f6tje7n1tf4t6nsl.apps.googleusercontent.com';
+
+// Shows "Continue with Google" on the login screen.
+export const GOOGLE_SIGN_IN_ENABLED = true;

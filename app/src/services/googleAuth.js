@@ -23,6 +23,13 @@ export async function getGoogleIdToken() {
   configure();
   try {
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    // Forget the last account so Google always shows the account chooser
+    // instead of silently reusing it.
+    try {
+      await GoogleSignin.signOut();
+    } catch {
+      // no previous Google session
+    }
     const response = await GoogleSignin.signIn();
     if (isCancelledResponse(response)) {
       return null;

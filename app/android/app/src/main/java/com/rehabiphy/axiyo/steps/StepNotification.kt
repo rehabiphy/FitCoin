@@ -1,4 +1,4 @@
-package com.fitcoin.steps
+package com.rehabiphy.axiyo.steps
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -12,7 +12,7 @@ import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.ColorUtils
-import com.fitcoin.R
+import com.rehabiphy.axiyo.R
 import java.text.NumberFormat
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -25,7 +25,7 @@ object StepNotification {
     const val NOTIFICATION_ID = 9001
     const val CHANNEL_ID = "fitcoin_step_tracking"
 
-    // The bar blends orange -> gold -> mint as the day's steps climb (Fitcoin palette)
+    // The bar blends orange -> gold -> mint as the day's steps climb (axyio palette)
     private const val LOW_COLOR = 0xFFFF8A3D.toInt()
     private const val MID_COLOR = 0xFFFFC94D.toInt()
     private const val HIGH_COLOR = 0xFF34F5B4.toInt()

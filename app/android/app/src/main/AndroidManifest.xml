@@ -2,7 +2,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Step counting (see java/com/fitcoin/steps). The step sensor needs
+    <!-- Step counting (see java/com/rehabiphy/axiyo/steps). The step sensor needs
          ACTIVITY_RECOGNITION; a "health" foreground service keeps the process
          alive so the sensor keeps counting while the app is closed. -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />

@@ -1,4 +1,4 @@
-package com.fitcoin
+package com.rehabiphy.axiyo
 
 import android.app.Application
 import com.facebook.react.PackageList
@@ -6,8 +6,8 @@ import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
-import com.fitcoin.steps.StepCounterPackage
-import com.fitcoin.steps.StepEngine
+import com.rehabiphy.axiyo.steps.StepCounterPackage
+import com.rehabiphy.axiyo.steps.StepEngine
 
 class MainApplication : Application(), ReactApplication {
 

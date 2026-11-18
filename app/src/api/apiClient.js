@@ -52,7 +52,7 @@ async function rawRequest(method, path, { body, token, signal } = {}) {
       code: timedOut ? 'TIMEOUT' : 'NETWORK_ERROR',
       message: timedOut
         ? 'The server took too long to respond. Please try again.'
-        : 'Unable to reach Fitcoin servers. Check your internet connection.',
+        : 'Unable to reach axyio servers. Check your internet connection.',
     });
   } finally {
     clearTimeout(timer);

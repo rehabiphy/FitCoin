@@ -1,6 +1,6 @@
-# Fitcoin Admin
+# axyio Admin
 
-Web panel for running Fitcoin: set how many FIT coins each habit pays, configure the Premium plan
+Web panel for running axyio: set how many FIT coins each habit pays, configure the Premium plan
 (reward multiplier, price, length, pop-up) and give or end premium for members.
 
 React + Vite. It talks to the backend's `/api/v1/admin` endpoints.

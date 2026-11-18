@@ -17,7 +17,7 @@ export const SITE = {
   partnersEmail: 'partners@axyio.app',
   // Google Play listing. Leave empty to show "Coming soon".
   playStoreUrl: '',
-  packageName: 'com.rehabiphy.axyio',
+  packageName: 'com.rehabiphy.axiyo',
   legalUpdated: '27 October 2026',
 };
 

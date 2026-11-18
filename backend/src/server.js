@@ -9,7 +9,7 @@ async function start() {
 
   // 0.0.0.0 so phones / emulators on the same network can reach it
   const server = app.listen(env.port, '0.0.0.0', () => {
-    console.log(`Fitcoin API running on http://localhost:${env.port}/api/v1 (${env.nodeEnv})`);
+    console.log(`axyio API running on http://localhost:${env.port}/api/v1 (${env.nodeEnv})`);
   });
 
   const shutdown = signal => {

@@ -103,15 +103,10 @@ textarea {
   font-size: 16px;
 }
 
-.brand-mark {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--primary), var(--cyan));
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-  color: #fff;
+.brand-logo {
+  height: 30px;
+  width: auto;
+  display: block;
 }
 
 .brand small {

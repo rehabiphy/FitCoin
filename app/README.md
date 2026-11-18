@@ -1,4 +1,4 @@
-# Fitcoin — Crypto Rewards App (Frontend)
+# axyio — Crypto Rewards App (Frontend)
 
 React Native CLI app (JavaScript only) for earning FIT reward points from healthy habits. This is the **UI only**; all data comes from `src/data/mock.js`.
 

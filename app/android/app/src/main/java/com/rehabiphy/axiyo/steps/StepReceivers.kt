@@ -1,4 +1,4 @@
-package com.fitcoin.steps
+package com.rehabiphy.axiyo.steps
 
 import android.content.BroadcastReceiver
 import android.content.Context

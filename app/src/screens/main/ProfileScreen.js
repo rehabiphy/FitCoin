@@ -141,7 +141,7 @@ export default function ProfileScreen({ navigation }) {
             last
           />
         </Card>
-        <Text style={styles.version}>Fitcoin v1.0.0</Text>
+        <Text style={styles.version}>axyio v1.0.0</Text>
       </Animated.View>
     </Screen>
   );

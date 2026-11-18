@@ -80,7 +80,7 @@ export default function StepsCard({ onPress }) {
           <View style={styles.flex}>
             <Text style={type.h3}>Start earning from your steps</Text>
             <Text style={type.caption}>
-              Allow physical activity access. Steps are counted even when Fitcoin is closed — {STEP_RATE}.
+              Allow physical activity access. Steps are counted even when axyio is closed — {STEP_RATE}.
             </Text>
           </View>
         </View>

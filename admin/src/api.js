@@ -62,7 +62,7 @@ async function raw(method, path, { body, token } = {}) {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch {
-    throw new ApiError({ code: 'NETWORK_ERROR', message: 'Can’t reach the Fitcoin API. Is the backend running?' });
+    throw new ApiError({ code: 'NETWORK_ERROR', message: 'Can’t reach the axyio API. Is the backend running?' });
   }
   let json = null;
   try {

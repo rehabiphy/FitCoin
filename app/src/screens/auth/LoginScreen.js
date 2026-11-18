@@ -8,6 +8,7 @@ import PressableScale from '../../components/PressableScale';
 import Icon from '../../components/Icon';
 import { LogoMark } from '../../components/Logo';
 import { useAuth } from '../../context/AuthContext';
+import { GOOGLE_SIGN_IN_ENABLED } from '../../config';
 import { colors, radius, type } from '../../theme';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -81,7 +82,7 @@ export default function LoginScreen({ navigation }) {
     <Screen scroll edges={['top', 'bottom']} contentContainerStyle={styles.content}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <Animated.View entering={FadeInDown.duration(600)} style={styles.hero}>
-          <LogoMark size={64} />
+          <LogoMark size={48} />
           <Text style={[type.h1, styles.title]}>Welcome back</Text>
           <Text style={type.body}>Sign in to keep your streak alive and collect today’s rewards.</Text>
         </Animated.View>
@@ -129,23 +130,27 @@ export default function LoginScreen({ navigation }) {
 
         <Animated.View entering={FadeInUp.delay(240).duration(600)} style={styles.actions}>
           <GradientButton title="Sign In" onPress={submit} loading={loading} disabled={googleLoading} />
-          <View style={styles.dividerRow}>
-            <View style={styles.divider} />
-            <Text style={type.caption}>or continue with</Text>
-            <View style={styles.divider} />
-          </View>
-          <PressableScale style={styles.social} onPress={google} disabled={busy}>
-            {googleLoading ? (
-              <Text style={styles.socialText}>Connecting…</Text>
-            ) : (
-              <>
-                <Icon name="Globe" size={20} color={colors.text} />
-                <Text style={styles.socialText}>Continue with Google</Text>
-              </>
-            )}
-          </PressableScale>
+          {GOOGLE_SIGN_IN_ENABLED ? (
+            <>
+              <View style={styles.dividerRow}>
+                <View style={styles.divider} />
+                <Text style={type.caption}>or continue with</Text>
+                <View style={styles.divider} />
+              </View>
+              <PressableScale style={styles.social} onPress={google} disabled={busy}>
+                {googleLoading ? (
+                  <Text style={styles.socialText}>Connecting…</Text>
+                ) : (
+                  <>
+                    <Icon name="Globe" size={20} color={colors.text} />
+                    <Text style={styles.socialText}>Continue with Google</Text>
+                  </>
+                )}
+              </PressableScale>
+            </>
+          ) : null}
           <Text style={styles.footer}>
-            New to Fitcoin?{' '}
+            New to axyio?{' '}
             <Text style={styles.link} onPress={() => !busy && navigation.navigate('Register')}>
               Create account
             </Text>

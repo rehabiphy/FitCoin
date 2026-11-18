@@ -5,6 +5,7 @@ import Overview from './pages/Overview.jsx';
 import HabitCoins from './pages/HabitCoins.jsx';
 import Premium from './pages/Premium.jsx';
 import Members from './pages/Members.jsx';
+import logo from './assets/logo-wordmark.png';
 
 const PAGES = [
   { id: 'overview', label: 'Overview', icon: '◎' },
@@ -101,9 +102,8 @@ export default function App() {
     <div className="shell">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-mark">F</div>
+          <img className="brand-logo" src={logo} alt="axyio" />
           <div>
-            Fitcoin
             <small>Admin</small>
           </div>
           <span className={`badge ${API_LABEL === 'Live' ? 'gold' : 'mint'}`} style={{ marginLeft: 'auto' }} title="Which API this panel is editing">

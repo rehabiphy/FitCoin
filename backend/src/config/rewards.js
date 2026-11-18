@@ -38,7 +38,7 @@ export const groupOf = habitId => HABIT_GROUP_IDS.find(g => HABIT_GROUPS[g].ids.
 /** Default premium plan, used until an admin changes it. */
 export const PREMIUM_DEFAULTS = {
   enabled: true,
-  title: 'Fitcoin Premium',
+  title: 'axyio Premium',
   tagline: 'Earn 2x FIT on every healthy habit',
   // Habit rewards are multiplied by this for premium members
   multiplier: 2,

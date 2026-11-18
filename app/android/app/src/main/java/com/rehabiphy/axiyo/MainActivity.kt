@@ -1,4 +1,4 @@
-package com.fitcoin
+package com.rehabiphy.axiyo
 
 import android.os.Bundle
 import androidx.lifecycle.Lifecycle

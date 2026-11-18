@@ -1,4 +1,4 @@
-package com.fitcoin.steps
+package com.rehabiphy.axiyo.steps
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule

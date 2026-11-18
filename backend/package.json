@@ -2,7 +2,7 @@
   "name": "fitcoin-backend",
   "version": "1.0.0",
   "private": true,
-  "description": "Fitcoin REST API",
+  "description": "axyio REST API",
   "type": "module",
   "main": "src/server.js",
   "scripts": {

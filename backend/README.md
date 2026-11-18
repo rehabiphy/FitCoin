@@ -1,4 +1,4 @@
-# Fitcoin Backend
+# axyio Backend
 
 Node.js (ES modules) + Express 5 + MongoDB (Mongoose). JWT authentication with email/password and Google sign-in.
 

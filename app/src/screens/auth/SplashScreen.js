@@ -54,13 +54,10 @@ export default function SplashScreen({ onFinish }) {
         <Pulse delay={700} size={180} />
         <Pulse delay={1400} size={180} />
         <Animated.View style={logoStyle}>
-          <LogoMark size={96} />
+          <LogoMark size={80} />
         </Animated.View>
       </View>
       <Animated.View entering={FadeInDown.delay(500).duration(700)} style={styles.textWrap}>
-        <Text style={styles.brand}>
-          Fit<Text style={{ color: colors.cyan }}>coin</Text>
-        </Text>
         <Text style={type.body}>Move. Earn. Redeem.</Text>
       </Animated.View>
       <Animated.Text entering={FadeIn.delay(1200)} style={styles.footer}>
@@ -75,6 +72,5 @@ const styles = StyleSheet.create({
   center: { alignItems: 'center', justifyContent: 'center', width: 200, height: 200 },
   pulse: { position: 'absolute', borderWidth: 1.5, borderColor: colors.cyan },
   textWrap: { alignItems: 'center', marginTop: 28, gap: 6 },
-  brand: { ...type.display, fontSize: 40 },
   footer: { position: 'absolute', bottom: 56, color: colors.textMuted, fontSize: 12, letterSpacing: 1 },
 });

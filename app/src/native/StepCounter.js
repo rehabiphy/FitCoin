@@ -1,7 +1,7 @@
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 
 /**
- * JS wrapper for the native step ledger (android/app/src/main/java/com/fitcoin/steps).
+ * JS wrapper for the native step ledger (android/app/src/main/java/com/rehabiphy/axiyo/steps).
  * Counting happens entirely in native code; this only reads it and switches tracking on/off.
  * On platforms without the module (iOS for now) every call resolves to a safe "unsupported" value.
  */

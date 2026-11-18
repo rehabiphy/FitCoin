@@ -25,7 +25,7 @@ async function sendAuth(res, req, user, status = 200) {
   if (isNew) {
     await notify(user._id, {
       type: 'system',
-      title: 'Welcome to Fitcoin!',
+      title: 'Welcome to axyio!',
       body: 'Walk, hydrate, sleep and breathe your way to FIT rewards. Start by enabling step tracking.',
       icon: 'Sparkles',
       color: 'primary',
