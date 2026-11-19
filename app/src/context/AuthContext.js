@@ -4,6 +4,7 @@ import { setSessionExpiredHandler } from '../api/apiClient';
 import { clearSession, getRefreshToken, loadSession, saveSession } from '../services/tokenStorage';
 import { getGoogleIdToken, googleSignOut } from '../services/googleAuth';
 import StepCounter from '../native/StepCounter';
+import { currentPushToken, registerForPush, stopPush } from '../services/push';
 
 const AuthContext = createContext(null);
 
@@ -32,6 +33,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     setSessionExpiredHandler(() => {
       StepCounter.stopTracking().catch(() => {});
+      stopPush();
       setUser(null);
       setStatus('signedOut');
     });
@@ -62,6 +64,13 @@ export function AuthProvider({ children }) {
     return () => setSessionExpiredHandler(() => {});
   }, [endSessionLocally]);
 
+  // Save this phone's push token whenever someone is signed in (fresh sign-in or restored session)
+  useEffect(() => {
+    if (status === 'signedIn' && user?.id) {
+      registerForPush();
+    }
+  }, [status, user?.id]);
+
   const signIn = useCallback(async ({ email, password }) => startSession(await authApi.login({ email, password })), [startSession]);
 
   const signUp = useCallback(async form => startSession(await authApi.register(form)), [startSession]);
@@ -77,10 +86,13 @@ export function AuthProvider({ children }) {
 
   const signOut = useCallback(async () => {
     const refreshToken = getRefreshToken();
+    const fcmToken = await currentPushToken();
     if (refreshToken) {
-      // Best effort: sign out locally even if the server can't be reached
-      authApi.logout(refreshToken).catch(() => {});
+      // Best effort: sign out locally even if the server can't be reached.
+      // Sending the push token removes it, so this phone stops getting this account's notifications.
+      authApi.logout(refreshToken, fcmToken).catch(() => {});
     }
+    stopPush();
     googleSignOut();
     // Stop the step service + notification; the ledger keeps its data
     StepCounter.stopTracking().catch(() => {});

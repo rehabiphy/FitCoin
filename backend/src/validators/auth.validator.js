@@ -44,3 +44,8 @@ export const googleSchema = z.object({
 export const refreshSchema = z.object({
   refreshToken: z.string({ error: 'Refresh token is required' }).min(20).max(512),
 });
+
+// fcmToken: this phone's push token, removed so the signed-out account stops getting notifications
+export const logoutSchema = refreshSchema.extend({
+  fcmToken: z.string().min(20).max(4096).optional(),
+});

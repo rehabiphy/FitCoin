@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { StyleSheet, Text, View } from 'react-native';
+import { DeviceEventEmitter, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
   FadeInDown,
@@ -35,6 +35,7 @@ import useApi from '../../hooks/useApi';
 import { activitiesApi, challengesApi, notificationsApi, statsApi } from '../../api/engagementApi';
 import { withVisuals } from '../../constants/activities';
 import { timeLeft } from '../../utils/format';
+import { PUSH_RECEIVED_EVENT } from '../../services/push';
 
 const EMPTY_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => ({ day, value: 0 }));
 import { colors, gradients, radius, type, TOKEN } from '../../theme';
@@ -198,6 +199,11 @@ export default function HomeScreen({ navigation }) {
       reloadWallet();
     }, [reloadWallet]),
   );
+  // A push arrived while the app is open: show the unread dot straight away
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener(PUSH_RECEIVED_EVENT, () => reloadUnread());
+    return () => sub.remove();
+  }, [reloadUnread]);
 
   // Upgrade offer once per launch, after Home has settled in
   useEffect(() => {

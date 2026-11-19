@@ -147,4 +147,6 @@ export const api = {
     request('GET', `/admin/users?${new URLSearchParams({ q, premium, page, limit })}`),
   grantPremium: (id, days) => request('POST', `/admin/users/${id}/premium`, { days }),
   revokePremium: id => request('DELETE', `/admin/users/${id}/premium`),
+  notifications: () => request('GET', '/admin/notifications'),
+  sendAnnouncement: ({ title, body, audience, route }) => request('POST', '/admin/notifications', { title, body, audience, route }),
 };

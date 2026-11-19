@@ -56,6 +56,12 @@ export const notificationsApi = {
   read: id => apiClient.patch(`/notifications/${id}/read`),
   readAll: () => apiClient.post('/notifications/read-all'),
   remove: id => apiClient.delete(`/notifications/${id}`),
+  /** Saves this phone's FCM token for the signed-in user (push notifications) */
+  registerDevice: ({ token, platform }) => apiClient.post('/notifications/devices', { token, platform }),
+  removeDevice: token => apiClient.delete('/notifications/devices', { body: { token } }),
+  /** { preferences: { reminders, tips, rewards } } */
+  preferences: () => apiClient.get('/notifications/preferences'),
+  updatePreferences: changes => apiClient.patch('/notifications/preferences', changes),
 };
 
 export const transactionsApi = {

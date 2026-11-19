@@ -1,5 +1,32 @@
 import ApiError from '../utils/ApiError.js';
+import { notificationPrefsOf } from '../models/User.js';
 import * as notifications from '../services/notification.service.js';
+import { registerDevice, unregisterDevice } from '../services/push.service.js';
+
+/** POST /notifications/devices — { token, platform, appVersion? }. Called after sign-in and on every launch. */
+export async function addDevice(req, res) {
+  await registerDevice(req.user._id, req.body);
+  res.json({ success: true, data: { registered: true } });
+}
+
+/** DELETE /notifications/devices — { token }. Stops push to this phone. */
+export async function removeDevice(req, res) {
+  await unregisterDevice(req.body.token, req.user._id);
+  res.json({ success: true, data: { removed: true } });
+}
+
+/** GET /notifications/preferences */
+export async function getPrefs(req, res) {
+  res.json({ success: true, data: { preferences: notificationPrefsOf(req.user) } });
+}
+
+/** PATCH /notifications/preferences — { reminders?, tips?, rewards? } */
+export async function updatePrefs(req, res) {
+  const preferences = { ...notificationPrefsOf(req.user), ...req.body };
+  req.user.notificationPrefs = preferences;
+  await req.user.save();
+  res.json({ success: true, data: { preferences } });
+}
 
 /** GET /notifications */
 export async function list(req, res) {

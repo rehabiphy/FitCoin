@@ -1,3 +1,5 @@
 <resources>
     <color name="app_bg">#060912</color>
+    <!-- Tint for push notification icons (axyio primary) -->
+    <color name="notification_accent">#7C5CFF</color>
 </resources>

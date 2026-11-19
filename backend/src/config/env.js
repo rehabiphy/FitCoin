@@ -38,6 +38,15 @@ const env = {
   googleClientIds: list(process.env.GOOGLE_CLIENT_IDS),
   corsOrigins: [...new Set([...BUILT_IN_ORIGINS, ...list(process.env.CORS_ORIGINS)].map(origin))],
   bcryptRounds: Number(process.env.BCRYPT_SALT_ROUNDS) || 12,
+  // Push notifications (FCM). Either the service account JSON itself (raw or base64),
+  // or a path to the downloaded key file. Without either, push is switched off.
+  firebase: {
+    serviceAccount: process.env.FIREBASE_SERVICE_ACCOUNT || '',
+    serviceAccountPath: process.env.FIREBASE_SERVICE_ACCOUNT_PATH || '',
+  },
+  // Habit reminders and health tips run on a timer inside the API process. Set to false
+  // on extra instances if you scale out (sends are de-duplicated either way).
+  pushScheduler: process.env.PUSH_SCHEDULER !== 'false',
   // Lets "Upgrade" activate premium without a payment (testing). On by default outside production;
   // turn it off once real in-app purchases are connected in premium.service.js.
   premiumTestPurchases: process.env.PREMIUM_TEST_PURCHASES

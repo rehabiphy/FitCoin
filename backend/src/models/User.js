@@ -46,9 +46,23 @@ const userSchema = new mongoose.Schema(
     // Bumped to invalidate every outstanding token for this user (e.g. password change)
     tokenVersion: { type: Number, default: 0, select: false },
     lastLoginAt: { type: Date },
+    // Which push notifications the member wants (in-app notifications are always kept).
+    // Important app announcements ignore these.
+    notificationPrefs: {
+      reminders: { type: Boolean, default: true }, // personalised habit + streak reminders
+      tips: { type: Boolean, default: true }, // daily stay-healthy tips
+      rewards: { type: Boolean, default: true }, // rewards, badges, challenges, referrals
+    },
   },
   { timestamps: true },
 );
+
+/** { reminders, tips, rewards } with every switch on unless the member turned it off. */
+export const notificationPrefsOf = user => ({
+  reminders: user?.notificationPrefs?.reminders !== false,
+  tips: user?.notificationPrefs?.tips !== false,
+  rewards: user?.notificationPrefs?.rewards !== false,
+});
 
 userSchema.pre('save', async function hashPassword() {
   if (this.isModified('password') && this.password) {
@@ -88,6 +102,7 @@ userSchema.methods.toPublicJSON = function toPublicJSON() {
     stepGoal: this.stepGoal ?? 10000,
     isPremium: this.isPremium,
     premiumUntil: this.isPremium ? this.premiumUntil : null,
+    notificationPrefs: notificationPrefsOf(this),
     createdAt: this.createdAt,
   };
 };

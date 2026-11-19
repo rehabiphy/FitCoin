@@ -25,6 +25,8 @@ class MainApplication : Application(), ReactApplication {
     super.onCreate()
     // Any time the process starts (app, service, alarm or boot), get back onto the step sensor
     StepEngine.start(this)
+    // Push notifications land in these channels; create them before any message arrives
+    PushChannels.create(this)
     loadReactNative(this)
   }
 }

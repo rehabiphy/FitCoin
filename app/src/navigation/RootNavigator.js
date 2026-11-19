@@ -15,6 +15,7 @@ import MarketplaceScreen from '../screens/detail/MarketplaceScreen';
 import RewardDetailScreen from '../screens/detail/RewardDetailScreen';
 import ReferralScreen from '../screens/detail/ReferralScreen';
 import NotificationsScreen from '../screens/detail/NotificationsScreen';
+import NotificationSettingsScreen from '../screens/detail/NotificationSettingsScreen';
 import BadgesScreen from '../screens/detail/BadgesScreen';
 import TransactionsScreen from '../screens/detail/TransactionsScreen';
 import TransactionDetailScreen from '../screens/detail/TransactionDetailScreen';
@@ -50,6 +51,7 @@ export default function RootNavigator() {
           <Stack.Screen name="RewardDetail" component={RewardDetailScreen} options={{ animation: 'fade_from_bottom' }} />
           <Stack.Screen name="Referral" component={ReferralScreen} />
           <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
           <Stack.Screen name="Badges" component={BadgesScreen} />
           <Stack.Screen name="Transactions" component={TransactionsScreen} />
           <Stack.Screen

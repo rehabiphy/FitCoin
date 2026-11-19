@@ -54,3 +54,13 @@ export const usersQuerySchema = z.object({
 export const grantPremiumSchema = z.object({
   days: z.number().int().min(1).max(3650),
 });
+
+// Screens an announcement can open when tapped (must exist in the app's navigator)
+export const ANNOUNCEMENT_ROUTES = ['Notifications', 'Home', 'Activity', 'Challenges', 'Wallet', 'Marketplace', 'Premium', 'Referral', 'Leaderboard'];
+
+export const announcementSchema = z.object({
+  title: z.string({ error: 'Title is required' }).trim().min(3, { error: 'Title is too short' }).max(80),
+  body: z.string({ error: 'Message is required' }).trim().min(5, { error: 'Message is too short' }).max(300),
+  audience: z.enum(['all', 'premium', 'free']).default('all'),
+  route: z.enum(ANNOUNCEMENT_ROUTES).default('Notifications'),
+});

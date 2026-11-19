@@ -1,5 +1,5 @@
-import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { DeviceEventEmitter, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeOutLeft, LinearTransition } from 'react-native-reanimated';
 import Screen from '../../components/Screen';
 import Header from '../../components/Header';
@@ -8,13 +8,19 @@ import IconBubble from '../../components/IconBubble';
 import Icon from '../../components/Icon';
 import useApi from '../../hooks/useApi';
 import { notificationsApi } from '../../api/engagementApi';
+import { PUSH_RECEIVED_EVENT } from '../../services/push';
 import { isToday, themeColor, timeAgo } from '../../utils/format';
 import { colors, type } from '../../theme';
 
 const withGroup = n => ({ ...n, color: themeColor(n.color), time: timeAgo(n.createdAt), group: isToday(n.createdAt) ? 'Today' : 'Earlier' });
 
-export default function NotificationsScreen() {
+export default function NotificationsScreen({ navigation }) {
   const { data, loading, setData, reload } = useApi(() => notificationsApi.list(), []);
+  // New push while this screen is open: show it in the list
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener(PUSH_RECEIVED_EVENT, () => reload());
+    return () => sub.remove();
+  }, [reload]);
   const items = (data?.items || []).map(withGroup);
   const groups = ['Today', 'Earlier'];
 
@@ -46,9 +52,14 @@ export default function NotificationsScreen() {
         <Header
           title="Notifications"
           right={
-            <Pressable onPress={markAll} hitSlop={10}>
-              <Icon name="CircleCheck" size={22} color={colors.cyan} />
-            </Pressable>
+            <View style={styles.actions}>
+              <Pressable onPress={markAll} hitSlop={10}>
+                <Icon name="CircleCheck" size={22} color={colors.cyan} />
+              </Pressable>
+              <Pressable onPress={() => navigation.navigate('NotificationSettings')} hitSlop={10}>
+                <Icon name="Settings" size={22} color={colors.textSecondary} />
+              </Pressable>
+            </View>
           }
         />
       }
@@ -99,6 +110,7 @@ export default function NotificationsScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingHorizontal: 20 },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   flex: { flex: 1 },
   group: { marginTop: 18, marginBottom: 10, marginLeft: 4 },
   item: { flexDirection: 'row', gap: 12, marginBottom: 10, alignItems: 'flex-start' },

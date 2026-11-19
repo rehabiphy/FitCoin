@@ -104,8 +104,12 @@ export async function rotateRefreshToken(token, meta) {
   return { userId: stored.user, refreshToken: newToken };
 }
 
+/** Revokes one refresh token; returns its owner's id (null if it wasn't found). */
 export async function revokeRefreshToken(token) {
-  await RefreshToken.updateOne({ tokenHash: hashToken(token), revokedAt: null }, { revokedAt: new Date() });
+  const tokenHash = hashToken(token);
+  const row = await RefreshToken.findOne({ tokenHash }).select('user').lean();
+  await RefreshToken.updateOne({ tokenHash, revokedAt: null }, { revokedAt: new Date() });
+  return row?.user ?? null;
 }
 
 export async function revokeAllForUser(userId) {

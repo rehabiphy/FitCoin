@@ -38,7 +38,7 @@ src/
 | POST   | `/auth/login`        | –      | `email, password`                                 |
 | POST   | `/auth/google`       | –      | `idToken` (from Google Sign-In on the device)     |
 | POST   | `/auth/refresh`      | –      | `refreshToken`                                    |
-| POST   | `/auth/logout`       | –      | `refreshToken`                                    |
+| POST   | `/auth/logout`       | –      | `refreshToken, fcmToken?` (also removes this phone's push token) |
 | POST   | `/auth/logout-all`   | Bearer |                                                   |
 | GET    | `/auth/me`           | Bearer |                                                   |
 | GET    | `/users/me`          | Bearer |                                                   |
@@ -75,9 +75,15 @@ src/
 | PATCH  | `/notifications/:id/read` | Bearer |                                              |
 | POST   | `/notifications/read-all` | Bearer |                                              |
 | DELETE | `/notifications/:id` | Bearer |                                                   |
+| POST   | `/notifications/devices` | Bearer | `token, platform?` — save this phone's FCM token (after sign-in / each launch) |
+| DELETE | `/notifications/devices` | Bearer | `token` — stop push to this phone                |
+| GET    | `/notifications/preferences` | Bearer | `{ reminders, tips, rewards }`               |
+| PATCH  | `/notifications/preferences` | Bearer | any of `reminders, tips, rewards` (booleans)  |
 | GET    | `/premium`           | Bearer | plan (from admin panel), user's status, free vs premium rates |
 | POST   | `/premium/upgrade`   | Bearer | activates/extends premium (test purchases only for now, see below) |
 | GET    | `/admin/overview`    | Admin  | members, premium members, FIT issued in 24 h       |
+| GET    | `/admin/notifications` | Admin | phones registered for push + recent announcements |
+| POST   | `/admin/notifications` | Admin | `title, body, audience (all/premium/free), route` — send an announcement |
 | GET    | `/admin/config`      | Admin  | live coin values + premium plan, defaults         |
 | PUT    | `/admin/config`      | Admin  | `dailyCap, habits{id: {perUnit, maxReward, goal}}, premium{…}` |
 | GET    | `/admin/users`       | Admin  | query: `q?, premium = all, premium, free, page, limit` |
@@ -139,3 +145,20 @@ Errors: `{ success: false, error: { code, message, details? } }`
 - Changing password or "logout all" invalidates every existing access and refresh token.
 - Google ID tokens verified with Google's public keys against `GOOGLE_CLIENT_IDS`; only verified emails accepted.
 - Helmet headers, CORS allow-list, 10 KB body limit, rate limits (strict on login/register), zod input validation, Mongo filter sanitising.
+
+
+## Push notifications (FCM)
+
+Set `FIREBASE_SERVICE_ACCOUNT_PATH` (local) or `FIREBASE_SERVICE_ACCOUNT` (base64 of the key, for hosting) — see `.env.example`.
+Without them the API runs normally and only in-app notifications are saved.
+
+- **Device tokens** (`DeviceToken`): saved by the app after sign-in, removed on sign-out (`/auth/logout` with `fcmToken`),
+  all removed on `/auth/logout-all`, deleted when FCM reports them dead, and forgotten after 90 days unused.
+- **Event notifications**: every `notify()` (rewards, streaks, badges, challenges, referrals, premium) is saved in the app and pushed.
+- **Scheduled** (`src/jobs/pushScheduler.js`, copy in `src/config/pushMessages.js`), in each member's local time:
+  habit reminders only for their active habits that aren't done yet (max 4 a day, plus streak/steps/comeback nudges),
+  one stay-healthy tip a day, and a heads-up before Premium ends. Each is sent at most once (`PushLog`).
+- **Announcements**: admin panel → Notifications (`POST /admin/notifications`), saved in the app and pushed; ignores member settings.
+- **Member settings**: `notificationPrefs` (`reminders`, `tips`, `rewards`); announcements and account messages always go out.
+
+The scheduler runs inside the API process, so it only sends while the server is awake (a sleeping free-tier host sends late or skips).

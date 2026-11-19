@@ -1,6 +1,7 @@
 import { defaultRewardConfig, getRewardConfig, rewardConfigMeta, saveRewardConfig } from '../services/rewardConfig.service.js';
 import { grantPremium, revokePremium } from '../services/premium.service.js';
 import { getOverview, listUsers, toUserRow } from '../services/admin.service.js';
+import { broadcast, broadcastInfo } from '../services/broadcast.service.js';
 import { ACTIVITIES, ACTIVITY_IDS } from '../config/activities.js';
 import { HABIT_GROUPS, HABIT_GROUP_IDS, groupOf } from '../config/rewards.js';
 
@@ -37,6 +38,16 @@ export async function users(req, res) {
 export async function grant(req, res) {
   const user = await grantPremium(req.params.id, req.body.days);
   res.json({ success: true, data: { user: toUserRow(user) } });
+}
+
+/** GET /admin/notifications — phones registered for push + recent announcements */
+export async function notificationsInfo(req, res) {
+  res.json({ success: true, data: await broadcastInfo() });
+}
+
+/** POST /admin/notifications — { title, body, audience, route } sends an announcement */
+export async function sendAnnouncement(req, res) {
+  res.json({ success: true, data: { result: await broadcast(req.body, req.user) } });
 }
 
 /** DELETE /admin/users/:id/premium */

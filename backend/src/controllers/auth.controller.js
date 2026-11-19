@@ -4,6 +4,7 @@ import User from '../models/User.js';
 import ApiError from '../utils/ApiError.js';
 import { verifyGoogleIdToken } from '../services/google.service.js';
 import { notify } from '../services/notification.service.js';
+import { unregisterAllDevices, unregisterDevice } from '../services/push.service.js';
 import {
   issueTokens,
   revokeAllForUser,
@@ -126,9 +127,12 @@ export async function refresh(req, res) {
   });
 }
 
-/** POST /auth/logout — body: { refreshToken }. Ends this device's session. */
+/** POST /auth/logout — body: { refreshToken, fcmToken? }. Ends this device's session and stops its push notifications. */
 export async function logout(req, res) {
-  await revokeRefreshToken(req.body.refreshToken);
+  const userId = await revokeRefreshToken(req.body.refreshToken);
+  if (req.body.fcmToken && userId) {
+    await unregisterDevice(req.body.fcmToken, userId);
+  }
   res.json({ success: true, data: { message: 'Logged out' } });
 }
 
@@ -136,7 +140,7 @@ export async function logout(req, res) {
 export async function logoutAll(req, res) {
   req.user.tokenVersion += 1;
   await req.user.save();
-  await revokeAllForUser(req.user._id);
+  await Promise.all([revokeAllForUser(req.user._id), unregisterAllDevices(req.user._id)]);
   res.json({ success: true, data: { message: 'Logged out from all devices' } });
 }
 

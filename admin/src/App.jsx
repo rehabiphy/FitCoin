@@ -5,6 +5,7 @@ import Overview from './pages/Overview.jsx';
 import HabitCoins from './pages/HabitCoins.jsx';
 import Premium from './pages/Premium.jsx';
 import Members from './pages/Members.jsx';
+import Notifications from './pages/Notifications.jsx';
 import logo from './assets/logo-wordmark.png';
 
 const PAGES = [
@@ -12,6 +13,7 @@ const PAGES = [
   { id: 'coins', label: 'Habit coins', icon: '◉' },
   { id: 'premium', label: 'Premium', icon: '♛' },
   { id: 'members', label: 'Members', icon: '☺' },
+  { id: 'notifications', label: 'Notifications', icon: '✉' },
 ];
 
 function Toast({ toast }) {
@@ -136,6 +138,7 @@ export default function App() {
         {page === 'coins' && <HabitCoins {...shared} />}
         {page === 'premium' && <Premium {...shared} />}
         {page === 'members' && <Members {...shared} />}
+        {page === 'notifications' && <Notifications {...shared} />}
       </main>
       <Toast toast={toast} />
     </div>

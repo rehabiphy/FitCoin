@@ -35,3 +35,21 @@ export const marketQuerySchema = z.object({
 });
 
 export const idParam = z.string().trim().min(1).max(64).regex(/^[a-zA-Z0-9_-]+$/, { error: 'Invalid id' });
+
+const fcmToken = z.string({ error: 'Push token is required' }).trim().min(20).max(4096);
+
+export const registerDeviceSchema = z.object({
+  token: fcmToken,
+  platform: z.enum(['android', 'ios', 'web']).default('android'),
+  appVersion: z.string().trim().max(32).optional(),
+});
+
+export const removeDeviceSchema = z.object({ token: fcmToken });
+
+export const notificationPrefsSchema = z
+  .object({
+    reminders: z.boolean().optional(),
+    tips: z.boolean().optional(),
+    rewards: z.boolean().optional(),
+  })
+  .refine(p => Object.keys(p).length > 0, { error: 'Nothing to update' });

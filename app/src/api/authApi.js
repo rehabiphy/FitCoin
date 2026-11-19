@@ -10,7 +10,9 @@ export const authApi = {
 
   google: idToken => apiClient.post('/auth/google', { idToken }, { auth: false }),
 
-  logout: refreshToken => apiClient.post('/auth/logout', { refreshToken }, { auth: false }),
+  /** fcmToken: this phone's push token, so the server stops sending it notifications */
+  logout: (refreshToken, fcmToken) =>
+    apiClient.post('/auth/logout', fcmToken ? { refreshToken, fcmToken } : { refreshToken }, { auth: false }),
 
   logoutAll: () => apiClient.post('/auth/logout-all'),
 

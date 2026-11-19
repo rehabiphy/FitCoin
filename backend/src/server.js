@@ -2,10 +2,17 @@ import env from './config/env.js';
 import app from './app.js';
 import { connectDB, disconnectDB } from './config/db.js';
 import { ensureSeedData } from './seed/index.js';
+import { getFcm } from './config/firebase.js';
+import { startPushScheduler } from './jobs/pushScheduler.js';
 
 async function start() {
   await connectDB();
   await ensureSeedData();
+
+  // Habit reminders + health tips (needs Firebase credentials)
+  if (getFcm() && env.pushScheduler) {
+    startPushScheduler();
+  }
 
   // 0.0.0.0 so phones / emulators on the same network can reach it
   const server = app.listen(env.port, '0.0.0.0', () => {
