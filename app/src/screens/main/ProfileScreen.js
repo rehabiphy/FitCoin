@@ -13,6 +13,7 @@ import { TAB_BAR_SPACE } from '../../components/TabBar';
 import useApi from '../../hooks/useApi';
 import { statsApi } from '../../api/engagementApi';
 import { colors, gradients, type } from '../../theme';
+import { MARKETPLACE_ENABLED } from '../../config';
 
 function Row({ icon, color, label, value, onPress, right, last }) {
   return (
@@ -99,8 +100,8 @@ export default function ProfileScreen({ navigation }) {
         <Text style={[type.label, styles.groupLabel]}>Rewards</Text>
         <Card padded={false}>
           <Row icon="Medal" color={colors.pink} label="Achievements" value="5 / 8" onPress={go('Badges')} />
-          <Row icon="Users" color={colors.mint} label="Refer & earn" value="+100 FIT" onPress={go('Referral')} />
-          <Row icon="ShoppingBag" color={colors.gold} label="Marketplace" onPress={go('Marketplace')} />
+          <Row icon="Users" color={colors.mint} label="Refer & earn" value="Earn FIT" onPress={go('Referral')} />
+          {MARKETPLACE_ENABLED ? <Row icon="ShoppingBag" color={colors.gold} label="Marketplace" onPress={go('Marketplace')} /> : null}
           <Row icon="Info" color={colors.primary} label="Token & reward rules" onPress={go('TokenRules')} last />
         </Card>
       </Animated.View>

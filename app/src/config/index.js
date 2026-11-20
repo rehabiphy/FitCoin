@@ -26,3 +26,6 @@ export const GOOGLE_WEB_CLIENT_ID = '768551395156-ldls2nu0ncp3j868f6tje7n1tf4t6n
 
 // Shows "Continue with Google" on the login screen.
 export const GOOGLE_SIGN_IN_ENABLED = true;
+
+// Marketplace (spending FIT on vouchers). Hidden for now: its screens aren't registered and every link to it is hidden.
+export const MARKETPLACE_ENABLED = false;

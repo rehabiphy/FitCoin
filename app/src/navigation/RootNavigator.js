@@ -13,6 +13,7 @@ import ChallengeDetailScreen from '../screens/detail/ChallengeDetailScreen';
 import ActivityScreen from '../screens/main/ActivityScreen';
 import MarketplaceScreen from '../screens/detail/MarketplaceScreen';
 import RewardDetailScreen from '../screens/detail/RewardDetailScreen';
+import { MARKETPLACE_ENABLED } from '../config';
 import ReferralScreen from '../screens/detail/ReferralScreen';
 import NotificationsScreen from '../screens/detail/NotificationsScreen';
 import NotificationSettingsScreen from '../screens/detail/NotificationSettingsScreen';
@@ -47,8 +48,12 @@ export default function RootNavigator() {
           <Stack.Screen name="ActivityDetail" component={ActivityDetailScreen} />
           <Stack.Screen name="ChallengeDetail" component={ChallengeDetailScreen} />
           <Stack.Screen name="Activity" component={ActivityScreen} />
-          <Stack.Screen name="Marketplace" component={MarketplaceScreen} />
-          <Stack.Screen name="RewardDetail" component={RewardDetailScreen} options={{ animation: 'fade_from_bottom' }} />
+          {MARKETPLACE_ENABLED ? (
+            <>
+              <Stack.Screen name="Marketplace" component={MarketplaceScreen} />
+              <Stack.Screen name="RewardDetail" component={RewardDetailScreen} options={{ animation: 'fade_from_bottom' }} />
+            </>
+          ) : null}
           <Stack.Screen name="Referral" component={ReferralScreen} />
           <Stack.Screen name="Notifications" component={NotificationsScreen} />
           <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />

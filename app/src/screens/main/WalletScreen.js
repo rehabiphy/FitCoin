@@ -18,6 +18,7 @@ import useApi from '../../hooks/useApi';
 import { transactionsApi } from '../../api/engagementApi';
 import { txView } from '../../utils/format';
 import { colors, gradients, radius, type, TOKEN } from '../../theme';
+import { MARKETPLACE_ENABLED } from '../../config';
 
 const FILTERS = ['All', 'Earned', 'Redeemed', 'Other'];
 // Chip label -> server filter group
@@ -40,7 +41,9 @@ function WalletCard({ wallet }) {
         <AnimatedNumber value={wallet.balance} decimals={2} style={styles.balance} />
         <Text style={styles.unit}>{TOKEN}</Text>
       </View>
-      <Text style={styles.approx}>≈ ₹{(wallet.inrValue ?? wallet.balance * 0.5).toFixed(2)} in marketplace value</Text>
+      {MARKETPLACE_ENABLED ? (
+        <Text style={styles.approx}>≈ ₹{(wallet.inrValue ?? wallet.balance * 0.5).toFixed(2)} in marketplace value</Text>
+      ) : null}
       <View style={styles.cardFoot}>
         <View>
           <Text style={styles.footLabel}>Pending</Text>
@@ -107,12 +110,14 @@ export default function WalletScreen({ navigation }) {
                 Use them before {new Date(wallet.expiryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </Text>
             </View>
-            <PressableScale style={styles.useBtn} onPress={() => navigation.navigate('Marketplace')}>
-              <Text style={styles.useText}>Use now</Text>
-            </PressableScale>
+            {MARKETPLACE_ENABLED ? (
+              <PressableScale style={styles.useBtn} onPress={() => navigation.navigate('Marketplace')}>
+                <Text style={styles.useText}>Use now</Text>
+              </PressableScale>
+            ) : null}
           </Card>
         </Animated.View>
-      ) : (
+      ) : MARKETPLACE_ENABLED ? (
         <Animated.View entering={FadeInDown.delay(220).duration(600)}>
           <Card style={styles.expiry} onPress={() => navigation.navigate('Marketplace')}>
             <IconBubble icon="Gift" color={colors.gold} size={42} />
@@ -123,7 +128,7 @@ export default function WalletScreen({ navigation }) {
             <Icon name="ChevronRight" size={18} color={colors.textMuted} />
           </Card>
         </Animated.View>
-      )}
+      ) : null}
 
       <Animated.View entering={FadeInDown.delay(260).duration(600)}>
         <Card style={styles.soon}>

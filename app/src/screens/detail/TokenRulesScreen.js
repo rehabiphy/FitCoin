@@ -10,6 +10,7 @@ import CoinIcon from '../../components/CoinIcon';
 import { useSteps } from '../../context/StepsContext';
 import { usePremium } from '../../context/PremiumContext';
 import { colors, type, TOKEN } from '../../theme';
+import { MARKETPLACE_ENABLED } from '../../config';
 
 // Free-member rates from the server (set in the admin panel), one line per habit
 const habitPoints = premium =>
@@ -65,11 +66,13 @@ const sections = (dailyCap, premium) => [
     icon: 'Gift',
     color: colors.mint,
     title: 'Redemption rules',
-    points: [
-      'Redeem FIT for partner vouchers, passes and offers.',
-      'A 2% platform fee applies to marketplace redemptions.',
-      'FIT has no cash value and can’t be transferred between users.',
-    ],
+    points: MARKETPLACE_ENABLED
+      ? [
+          'Redeem FIT for partner vouchers, passes and offers.',
+          'A 2% platform fee applies to marketplace redemptions.',
+          'FIT has no cash value and can’t be transferred between users.',
+        ]
+      : ['FIT has no cash value and can’t be transferred between users.'],
   },
   {
     icon: 'ShieldCheck',
@@ -121,7 +124,9 @@ export default function TokenRulesScreen() {
         <CoinIcon size={56} />
         <Text style={[type.h1, styles.introTitle]}>About {TOKEN} points</Text>
         <Text style={[type.body, styles.center]}>
-          FIT are in-app reward points you earn for healthy habits and spend in the marketplace.
+          {MARKETPLACE_ENABLED
+            ? 'FIT are in-app reward points you earn for healthy habits and spend in the marketplace.'
+            : 'FIT are in-app reward points you earn for healthy habits.'}
         </Text>
       </Animated.View>
       {SECTIONS.map((s, i) => (
