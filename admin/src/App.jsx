@@ -4,6 +4,7 @@ import Login from './pages/Login.jsx';
 import Overview from './pages/Overview.jsx';
 import HabitCoins from './pages/HabitCoins.jsx';
 import Premium from './pages/Premium.jsx';
+import Halving from './pages/Halving.jsx';
 import Members from './pages/Members.jsx';
 import Notifications from './pages/Notifications.jsx';
 import logo from './assets/logo-wordmark.png';
@@ -11,6 +12,7 @@ import logo from './assets/logo-wordmark.png';
 const PAGES = [
   { id: 'overview', label: 'Overview', icon: '◎' },
   { id: 'coins', label: 'Habit coins', icon: '◉' },
+  { id: 'halving', label: 'Halving', icon: '½' },
   { id: 'premium', label: 'Premium', icon: '♛' },
   { id: 'members', label: 'Members', icon: '☺' },
   { id: 'notifications', label: 'Notifications', icon: '✉' },
@@ -136,6 +138,7 @@ export default function App() {
       <main className="main">
         {page === 'overview' && <Overview {...shared} />}
         {page === 'coins' && <HabitCoins {...shared} />}
+        {page === 'halving' && <Halving {...shared} />}
         {page === 'premium' && <Premium {...shared} />}
         {page === 'members' && <Members {...shared} />}
         {page === 'notifications' && <Notifications {...shared} />}

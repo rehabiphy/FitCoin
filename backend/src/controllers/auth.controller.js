@@ -4,6 +4,7 @@ import User from '../models/User.js';
 import ApiError from '../utils/ApiError.js';
 import { verifyGoogleIdToken } from '../services/google.service.js';
 import { notify } from '../services/notification.service.js';
+import { checkAutoHalving } from '../services/halving.service.js';
 import { unregisterAllDevices, unregisterDevice } from '../services/push.service.js';
 import {
   issueTokens,
@@ -32,6 +33,8 @@ async function sendAuth(res, req, user, status = 200) {
       color: 'primary',
       dedupeKey: `welcome:${user._id}`,
     });
+    // Halves rewards if this sign-up reached the admin's member target (never fails sign-up)
+    checkAutoHalving();
   }
   const tokens = await issueTokens(user, requestMeta(req));
   res.status(status).json({ success: true, data: { user: user.toPublicJSON(), tokens } });

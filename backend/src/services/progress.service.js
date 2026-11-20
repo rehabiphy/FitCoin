@@ -2,6 +2,7 @@ import User from '../models/User.js';
 import { STREAK_RULES } from '../config/progression.js';
 import { activeDates, creditOnce } from './rewards.service.js';
 import { notify } from './notification.service.js';
+import { coinAmount } from './halving.service.js';
 import { checkReferralReward } from './referral.service.js';
 import { refreshUserChallenges } from './challenge.service.js';
 import { evaluateBadges } from './badge.service.js';
@@ -48,20 +49,25 @@ async function updateStreak(user, date) {
 
   const streakOnDate = streakEndingOn(set, date);
   if (streakOnDate > 0 && streakOnDate % STREAK_RULES.bonusEvery === 0) {
-    const tx = await creditOnce({
-      userId: user._id,
-      refKey: `streak:${user._id}:${date}`,
-      amount: STREAK_RULES.bonusAmount,
-      category: 'streak',
-      title: `${streakOnDate}-day streak bonus`,
-      subtitle: 'Streak reward',
-      activityDate: date,
-    });
+    const bonus = await coinAmount('streak.bonus', STREAK_RULES.bonusAmount);
+    // An admin can set the bonus to 0 to switch it off
+    const tx =
+      bonus > 0
+        ? await creditOnce({
+            userId: user._id,
+            refKey: `streak:${user._id}:${date}`,
+            amount: bonus,
+            category: 'streak',
+            title: `${streakOnDate}-day streak bonus`,
+            subtitle: 'Streak reward',
+            activityDate: date,
+          })
+        : null;
     if (tx) {
       await notify(user._id, {
         type: 'streak',
         title: `${streakOnDate}-day streak!`,
-        body: `You've been active ${streakOnDate} days in a row. +${STREAK_RULES.bonusAmount} FIT bonus.`,
+        body: `You've been active ${streakOnDate} days in a row. +${bonus} FIT bonus.`,
         icon: 'Flame',
         color: 'orange',
         dedupeKey: `streak:${user._id}:${date}`,

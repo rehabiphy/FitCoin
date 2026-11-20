@@ -1,6 +1,7 @@
 import AppSetting from '../models/AppSetting.js';
 import { ACTIVITIES, ACTIVITY_IDS } from '../config/activities.js';
 import { HABIT_GROUPS, HABIT_GROUP_IDS, PREMIUM_DEFAULTS, WALLET_RULES } from '../config/rewards.js';
+import { coinValue, getHalvingState } from './halving.service.js';
 
 const KEY = 'rewards';
 // Config changes reach every server process within this time
@@ -32,8 +33,8 @@ function merge(stored = {}) {
   };
 }
 
-/** Live reward config (cached for a few seconds). */
-export async function getRewardConfig() {
+/** The values set on the admin's Habit coins / Premium pages, before halving (cached for a few seconds). */
+export async function getBaseRewardConfig() {
   if (cache && Date.now() - cache.at < CACHE_MS) {
     return cache.value;
   }
@@ -41,6 +42,34 @@ export async function getRewardConfig() {
   const value = merge(doc?.value);
   cache = { value, at: Date.now() };
   return value;
+}
+
+/** Base config with the current halving (and any fixed amounts) applied. */
+export function applyHalving(base, halving) {
+  return {
+    ...base,
+    dailyCap: coinValue(halving, 'cap.free', base.dailyCap),
+    habits: Object.fromEntries(
+      ACTIVITY_IDS.map(id => {
+        const h = base.habits[id];
+        return [
+          id,
+          {
+            ...h,
+            perUnit: coinValue(halving, `habit.${id}.perUnit`, h.perUnit),
+            maxReward: coinValue(halving, `habit.${id}.maxReward`, h.maxReward),
+          },
+        ];
+      }),
+    ),
+    premium: { ...base.premium, dailyCap: coinValue(halving, 'cap.premium', base.premium.dailyCap) },
+  };
+}
+
+/** Live reward config: what members are actually paid right now (halving applied). */
+export async function getRewardConfig() {
+  const [base, halving] = await Promise.all([getBaseRewardConfig(), getHalvingState()]);
+  return applyHalving(base, halving);
 }
 
 /** Saves a full config from the admin panel (already validated). */
@@ -60,16 +89,16 @@ export async function rewardConfigMeta() {
   return doc ? { updatedAt: doc.updatedAt, updatedBy: doc.updatedBy ? { name: doc.updatedBy.name, email: doc.updatedBy.email } : null } : null;
 }
 
+const trim = n => Math.round(n * 100) / 100;
+
 /** Base FIT (before any premium multiplier) a day's value is worth for one habit. */
 export function baseReward(activityId, rule, value) {
   const cfg = ACTIVITIES[activityId];
   if (cfg.rewardMode === 'goal') {
     return value >= rule.goal ? rule.maxReward : 0;
   }
-  return Math.min(rule.maxReward, Math.floor(value / cfg.unitSize) * rule.perUnit);
+  return trim(Math.min(rule.maxReward, Math.floor(value / cfg.unitSize) * rule.perUnit));
 }
-
-const trim = n => Math.round(n * 100) / 100;
 
 /** "6 FIT / 1k steps", "40 FIT / goal met" */
 export function rateLabel(activityId, rule, multiplier = 1) {

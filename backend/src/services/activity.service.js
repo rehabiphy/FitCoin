@@ -15,6 +15,7 @@ import { lastDays, localNow, todayKey } from '../utils/dates.js';
 
 const trusted = mongoose.trusted;
 const round1 = n => Math.round(n * 10) / 10;
+const round2 = n => Math.round(n * 100) / 100;
 
 function config(id) {
   const cfg = ACTIVITIES[id];
@@ -272,10 +273,12 @@ export async function getToday(user, tzOffset) {
 
   // Score, goals and potential count only the habits that can earn
   const counted = activities.filter(a => a.active);
-  const earned = activities.reduce((s, a) => s + a.earned, 0);
-  const potential = Math.min(
-    ctx.dailyCap,
-    counted.reduce((s, a) => s + a.reward, 0),
+  const earned = round2(activities.reduce((s, a) => s + a.earned, 0));
+  const potential = round2(
+    Math.min(
+      ctx.dailyCap,
+      counted.reduce((s, a) => s + a.reward, 0),
+    ),
   );
   return {
     date,
@@ -286,7 +289,7 @@ export async function getToday(user, tzOffset) {
       total: counted.length,
       earned,
       potential,
-      remaining: Math.max(0, potential - earned),
+      remaining: round2(Math.max(0, potential - earned)),
       dailyCap: ctx.dailyCap,
       isPremium: ctx.premium,
       multiplier: ctx.multiplier,

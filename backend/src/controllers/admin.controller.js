@@ -1,4 +1,7 @@
-import { defaultRewardConfig, getRewardConfig, rewardConfigMeta, saveRewardConfig } from '../services/rewardConfig.service.js';
+import { defaultRewardConfig, getBaseRewardConfig, rewardConfigMeta, saveRewardConfig } from '../services/rewardConfig.service.js';
+import { MAX_ERA, coinParts, factorOf, getHalvingState, halve, saveHalvingSettings, undoHalving } from '../services/halving.service.js';
+import Challenge from '../models/Challenge.js';
+import User from '../models/User.js';
 import { grantPremium, revokePremium } from '../services/premium.service.js';
 import { getOverview, listUsers, toUserRow } from '../services/admin.service.js';
 import { broadcast, broadcastInfo } from '../services/broadcast.service.js';
@@ -17,10 +20,61 @@ export async function overview(req, res) {
   res.json({ success: true, data: await getOverview() });
 }
 
-/** GET /admin/config — live coin values + premium plan */
+const halvingSummary = state => ({ era: state.era, factor: factorOf(state.era), fixed: Object.keys(state.overrides).length });
+
+/** GET /admin/config — base coin values (before halving) + premium plan */
 export async function getConfig(req, res) {
-  const [config, meta] = await Promise.all([getRewardConfig(), rewardConfigMeta()]);
-  res.json({ success: true, data: { config, defaults: defaultRewardConfig(), habits: HABITS, groups: GROUPS, meta } });
+  const [config, meta, halving] = await Promise.all([getBaseRewardConfig(), rewardConfigMeta(), getHalvingState()]);
+  res.json({
+    success: true,
+    data: { config, defaults: defaultRewardConfig(), habits: HABITS, groups: GROUPS, meta, halving: halvingSummary(halving) },
+  });
+}
+
+/** Everything the Halving page shows. */
+async function halvingView(state) {
+  const [base, challenges, users] = await Promise.all([
+    getBaseRewardConfig(),
+    Challenge.find({ active: true }).sort({ sort: 1 }).select('slug title period reward').lean(),
+    User.estimatedDocumentCount(),
+  ]);
+  return {
+    era: state.era,
+    factor: factorOf(state.era),
+    maxEra: MAX_ERA,
+    autoAtUsers: state.autoAtUsers,
+    users,
+    parts: coinParts(base, challenges, state),
+    history: state.history,
+  };
+}
+
+async function halvingKeys() {
+  const [base, challenges] = await Promise.all([getBaseRewardConfig(), Challenge.find({ active: true }).select('slug title period reward').lean()]);
+  return new Set(coinParts(base, challenges, { era: 0, overrides: {} }).map(p => p.key));
+}
+
+/** GET /admin/halving */
+export async function getHalving(req, res) {
+  res.json({ success: true, data: await halvingView(await getHalvingState({ fresh: true })) });
+}
+
+/** POST /admin/halving/halve — { fromEra } */
+export async function halveNow(req, res) {
+  const state = await halve({ fromEra: req.body.fromEra, admin: req.user });
+  res.json({ success: true, data: await halvingView(state) });
+}
+
+/** POST /admin/halving/undo — { fromEra } */
+export async function undoHalve(req, res) {
+  const state = await undoHalving({ fromEra: req.body.fromEra, admin: req.user });
+  res.json({ success: true, data: await halvingView(state) });
+}
+
+/** PUT /admin/halving — { fromEra, overrides, autoAtUsers } */
+export async function updateHalving(req, res) {
+  const state = await saveHalvingSettings({ ...req.body, validKeys: await halvingKeys(), admin: req.user });
+  res.json({ success: true, data: await halvingView(state) });
 }
 
 /** PUT /admin/config — replaces the whole config */

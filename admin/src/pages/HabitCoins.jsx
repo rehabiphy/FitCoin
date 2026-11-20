@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LastSaved, Loading, bestFreeTotal, fmt, isValidAmount, toNumber } from './common.jsx';
+import { HalvingNotice, LastSaved, Loading, bestFreeTotal, fmt, isValidAmount, toNumber } from './common.jsx';
 
 const FIELDS = ['perUnit', 'maxReward', 'goal'];
 
@@ -22,7 +22,7 @@ function fromDraft(draft) {
   };
 }
 
-export default function HabitCoins({ configData, configError, reloadConfig, saveConfig }) {
+export default function HabitCoins({ configData, configError, reloadConfig, saveConfig, goTo }) {
   const [draft, setDraft] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -94,6 +94,8 @@ export default function HabitCoins({ configData, configError, reloadConfig, save
           </button>
         </div>
       </div>
+
+      <HalvingNotice halving={configData.halving} goTo={goTo} />
 
       <div className="card">
         <div className="table-wrap">

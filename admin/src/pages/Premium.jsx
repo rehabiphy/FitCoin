@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LastSaved, Loading, Switch, fmt, isValidAmount, toNumber } from './common.jsx';
+import { HalvingNotice, LastSaved, Loading, Switch, fmt, isValidAmount, toNumber } from './common.jsx';
 
 function toDraft(p) {
   return {
@@ -57,7 +57,7 @@ function Field({ id, label, error, hint, children }) {
   );
 }
 
-export default function Premium({ configData, configError, reloadConfig, saveConfig }) {
+export default function Premium({ configData, configError, reloadConfig, saveConfig, goTo }) {
   const [draft, setDraft] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -106,6 +106,8 @@ export default function Premium({ configData, configError, reloadConfig, saveCon
           </button>
         </div>
       </div>
+
+      <HalvingNotice halving={configData.halving} goTo={goTo} />
 
       <div className="grid-2" style={{ alignItems: 'start' }}>
         <div>

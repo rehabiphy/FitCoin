@@ -7,6 +7,7 @@ import ActivitySession from '../models/ActivitySession.js';
 import ApiError from '../utils/ApiError.js';
 import { creditOnce } from './rewards.service.js';
 import { notify } from './notification.service.js';
+import { coinValue, getHalvingState } from './halving.service.js';
 import { addDays, localMidnightUtc, mondayOf, todayKey } from '../utils/dates.js';
 
 const trusted = mongoose.trusted;
@@ -52,29 +53,36 @@ async function measure(metric, userId, start, end) {
 }
 
 /** Recomputes progress for an enrollment and pays the prize the first time it is completed. */
+/** A challenge's prize today: its seeded reward, halved (or the admin's fixed amount). */
+const prizeOf = (challenge, halving) => coinValue(halving, `challenge.${challenge.slug}`, challenge.reward);
+
 async function updateProgress(enrollment, challenge, run, tzOffset) {
   const value = await measure(challenge.metric, enrollment.user, run.start, run.end);
   enrollment.progress = Math.min(value, challenge.target);
 
   if (value >= challenge.target && !enrollment.rewarded) {
-    const tx = await creditOnce({
-      userId: enrollment.user,
-      refKey: `challenge:${enrollment.user}:${challenge._id}:${run.periodKey}`,
-      amount: challenge.reward,
-      type: 'bonus',
-      category: 'challenge',
-      title: `${challenge.title} complete`,
-      subtitle: 'Challenge reward',
-      activityDate: todayKey(tzOffset),
-      meta: { challenge: challenge.slug, periodKey: run.periodKey },
-    });
+    const prize = prizeOf(challenge, await getHalvingState());
+    const tx =
+      prize > 0
+        ? await creditOnce({
+            userId: enrollment.user,
+            refKey: `challenge:${enrollment.user}:${challenge._id}:${run.periodKey}`,
+            amount: prize,
+            type: 'bonus',
+            category: 'challenge',
+            title: `${challenge.title} complete`,
+            subtitle: 'Challenge reward',
+            activityDate: todayKey(tzOffset),
+            meta: { challenge: challenge.slug, periodKey: run.periodKey },
+          })
+        : null;
     enrollment.completedAt = enrollment.completedAt || new Date();
     enrollment.rewarded = true;
     if (tx) {
       await notify(enrollment.user, {
         type: 'challenge',
         title: 'Challenge complete!',
-        body: `You finished ${challenge.title} and earned ${challenge.reward} FIT.`,
+        body: `You finished ${challenge.title} and earned ${prize} FIT.`,
         icon: 'Trophy',
         color: 'gold',
         dedupeKey: `challenge:${enrollment._id}`,
@@ -87,7 +95,7 @@ async function updateProgress(enrollment, challenge, run, tzOffset) {
   return enrollment;
 }
 
-function toPublic(challenge, run, { enrollment, participants, percentile, top } = {}) {
+function toPublic(challenge, run, { enrollment, participants, percentile, top, halving } = {}) {
   const joined = !!enrollment;
   const progressValue = enrollment?.progress || 0;
   return {
@@ -99,7 +107,7 @@ function toPublic(challenge, run, { enrollment, participants, percentile, top } 
     gradient: challenge.gradient,
     target: challenge.target,
     unitLabel: challenge.unitLabel,
-    reward: challenge.reward,
+    reward: halving ? prizeOf(challenge, halving) : challenge.reward,
     participants: participants ?? 0,
     endsAt: run.endsAt,
     joined,
@@ -123,7 +131,7 @@ async function findChallenge(idOrSlug) {
 }
 
 export async function listChallenges(userId, tzOffset) {
-  const challenges = await Challenge.find({ active: true }).sort({ sort: 1 });
+  const [challenges, halving] = await Promise.all([Challenge.find({ active: true }).sort({ sort: 1 }), getHalvingState()]);
   return Promise.all(
     challenges.map(async c => {
       const run = currentRun(c, tzOffset);
@@ -134,7 +142,7 @@ export async function listChallenges(userId, tzOffset) {
       if (enrollment) {
         enrollment = await updateProgress(enrollment, c, run, tzOffset);
       }
-      return toPublic(c, run, { enrollment, participants });
+      return toPublic(c, run, { enrollment, participants, halving });
     }),
   );
 }
@@ -177,7 +185,7 @@ export async function getChallenge(userId, idOrSlug, tzOffset) {
       isMe: r.user._id.toString() === userId.toString(),
     }));
 
-  return toPublic(c, run, { enrollment, participants, percentile, top });
+  return toPublic(c, run, { enrollment, participants, percentile, top, halving: await getHalvingState() });
 }
 
 export async function joinChallenge(userId, idOrSlug, tzOffset) {

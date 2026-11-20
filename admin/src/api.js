@@ -143,6 +143,10 @@ export const api = {
   overview: () => request('GET', '/admin/overview'),
   config: () => request('GET', '/admin/config'),
   saveConfig: config => request('PUT', '/admin/config', config),
+  halving: () => request('GET', '/admin/halving'),
+  saveHalving: ({ fromEra, overrides, autoAtUsers }) => request('PUT', '/admin/halving', { fromEra, overrides, autoAtUsers }),
+  halve: fromEra => request('POST', '/admin/halving/halve', { fromEra }),
+  undoHalving: fromEra => request('POST', '/admin/halving/undo', { fromEra }),
   users: ({ q = '', premium = 'all', page = 1, limit = 20 } = {}) =>
     request('GET', `/admin/users?${new URLSearchParams({ q, premium, page, limit })}`),
   grantPremium: (id, days) => request('POST', `/admin/users/${id}/premium`, { days }),

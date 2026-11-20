@@ -64,3 +64,24 @@ export function LastSaved({ meta }) {
     </span>
   );
 }
+
+/** Shown on pages that edit base coin values once rewards have been halved. */
+export function HalvingNotice({ halving, goTo }) {
+  if (!halving?.era) {
+    return null;
+  }
+  return (
+    <div className="notice" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'space-between', flexWrap: 'wrap' }}>
+      <span>
+        Rewards have been halved {halving.era} time{halving.era === 1 ? '' : 's'}: members get{' '}
+        <b className="coin">{Math.round(halving.factor * 10000) / 100}%</b> of the base values shown here
+        {halving.fixed ? `, except ${halving.fixed} fixed amount${halving.fixed === 1 ? '' : 's'}` : ''}.
+      </span>
+      {goTo ? (
+        <button className="btn sm" onClick={() => goTo('halving')}>
+          Open Halving
+        </button>
+      ) : null}
+    </div>
+  );
+}

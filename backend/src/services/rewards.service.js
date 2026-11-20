@@ -3,6 +3,7 @@ import Transaction from '../models/Transaction.js';
 import { notify } from './notification.service.js';
 
 const trusted = mongoose.trusted;
+const round2 = n => Math.round(n * 100) / 100;
 
 // Rewards for daily habits; these count toward the daily earning cap and toward "active days"
 export const ACTIVITY_CATEGORIES = ['steps', 'activity'];
@@ -15,7 +16,7 @@ async function habitRewardsOn(userId, date, excludeRefKey) {
     category: trusted({ $in: ACTIVITY_CATEGORIES }),
     refKey: trusted({ $ne: excludeRefKey }),
   }).select('amount');
-  return rows.reduce((sum, r) => sum + r.amount, 0);
+  return round2(rows.reduce((sum, r) => sum + r.amount, 0));
 }
 
 /**
@@ -45,7 +46,7 @@ export async function creditDailyReward({
   }
   const refKey = `${key}:${userId}:${date}`;
   const others = await habitRewardsOn(userId, date, refKey);
-  const allowed = Math.max(0, Math.min(amount, dailyCap - others));
+  const allowed = round2(Math.max(0, Math.min(amount, dailyCap - others)));
   if (allowed <= 0) {
     return 0;
   }
@@ -81,7 +82,7 @@ export async function creditDailyReward({
     await notify(userId, { type: 'reward', ...goalNotification, dedupeKey: `goal:${refKey}` });
   }
 
-  return Math.max(0, allowed - (before?.amount || 0));
+  return round2(Math.max(0, allowed - (before?.amount || 0)));
 }
 
 /**

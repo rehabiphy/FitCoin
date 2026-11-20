@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { Loading, bestFreeTotal, fmt } from './common.jsx';
+import { HalvingNotice, Loading, bestFreeTotal, fmt } from './common.jsx';
 
 export default function Overview({ configData, goTo }) {
   const [stats, setStats] = useState(null);
@@ -56,6 +56,8 @@ export default function Overview({ configData, goTo }) {
       ) : (
         <Loading error={error} onRetry={load} />
       )}
+
+      <HalvingNotice halving={configData?.halving} goTo={goTo} />
 
       {config ? (
         <div className="grid-2">

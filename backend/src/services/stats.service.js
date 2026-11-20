@@ -2,6 +2,7 @@ import Transaction from '../models/Transaction.js';
 import { levelFromXp } from '../config/progression.js';
 import { STREAK_RULES } from '../config/progression.js';
 import { activeDates } from './rewards.service.js';
+import { coinAmount } from './halving.service.js';
 import { liveStreak, userRank } from './leaderboard.service.js';
 import { addDays, mondayOf, todayKey } from '../utils/dates.js';
 
@@ -11,13 +12,14 @@ export async function getStats(user, tzOffset) {
   const monday = mondayOf(today);
   const week = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
 
-  const [lifetimeRow, dates, weekly] = await Promise.all([
+  const [lifetimeRow, dates, weekly, bonusAmount] = await Promise.all([
     Transaction.aggregate([
       { $match: { user: user._id, amount: { $gt: 0 }, status: 'completed' } },
       { $group: { _id: null, total: { $sum: '$amount' } } },
     ]),
     activeDates(user._id),
     userRank(user._id, 'weekly', tzOffset),
+    coinAmount('streak.bonus', STREAK_RULES.bonusAmount),
   ]);
   const lifetime = lifetimeRow[0]?.total || 0;
   const active = new Set(dates);
@@ -33,7 +35,7 @@ export async function getStats(user, tzOffset) {
     activeDays: dates.length,
     // Mon..Sun of the current week: true if active that day
     week: week.map(date => ({ date, active: active.has(date), isToday: date === today, isFuture: date > today })),
-    streakBonus: { every: STREAK_RULES.bonusEvery, amount: STREAK_RULES.bonusAmount, daysToBonus },
+    streakBonus: { every: STREAK_RULES.bonusEvery, amount: bonusAmount, daysToBonus },
     weeklyRank: weekly.rank,
     weeklyPoints: weekly.points,
     pointsToNextRank: weekly.pointsToNext,

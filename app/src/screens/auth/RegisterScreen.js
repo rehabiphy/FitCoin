@@ -125,7 +125,7 @@ export default function RegisterScreen({ navigation }) {
       contentContainerStyle={styles.content}>
       <Animated.View entering={FadeInDown.duration(500)} style={styles.intro}>
         <Text style={type.h1}>Start earning today</Text>
-        <Text style={type.body}>Join and get a 50 FIT welcome bonus after your first activity.</Text>
+        <Text style={type.body}>Join with a friend’s code and get a FIT welcome bonus once you’re active.</Text>
       </Animated.View>
 
       {fields.map(({ key, ...f }, i) => (

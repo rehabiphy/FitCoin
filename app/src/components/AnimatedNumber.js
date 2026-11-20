@@ -3,10 +3,11 @@ import { Text } from 'react-native';
 
 const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
 
-export function formatNumber(n, decimals = 0) {
+/** Fixed `decimals` when given; otherwise whole numbers stay whole and fractions (e.g. 2.5 FIT after halving) keep up to 2 places. */
+export function formatNumber(n, decimals) {
   return Number(n).toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
+    minimumFractionDigits: decimals ?? 0,
+    maximumFractionDigits: decimals ?? 2,
   });
 }
 

@@ -64,3 +64,18 @@ export const announcementSchema = z.object({
   audience: z.enum(['all', 'premium', 'free']).default('all'),
   route: z.enum(ANNOUNCEMENT_ROUTES).default('Notifications'),
 });
+
+// The era the admin was looking at, so a halving can't be applied twice by accident
+export const halvingStepSchema = z.object({
+  fromEra: z.number().int().min(0),
+});
+
+export const halvingSettingsSchema = z.object({
+  fromEra: z.number().int().min(0),
+  // Fixed FIT amounts that ignore halving, by reward key (e.g. "habit.walk.perUnit", "streak.bonus")
+  overrides: z
+    .record(z.string().regex(/^[a-z]+(\.[a-z0-9-]+){1,2}$/i).max(80), coins(100000))
+    .refine(o => Object.keys(o).length <= 200, { error: 'Too many fixed amounts' }),
+  // Halve automatically once this many members have joined (null = off)
+  autoAtUsers: z.number().int().min(1).max(1000000000).nullable(),
+});

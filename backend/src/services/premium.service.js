@@ -32,8 +32,10 @@ export async function rewardContext(userOrId) {
   };
 }
 
-/** Applies the user's multiplier to a base reward. */
-export const applyMultiplier = (ctx, base) => Math.round(base * ctx.multiplier);
+const round2 = n => Math.round(n * 100) / 100;
+
+/** Applies the user's multiplier to a base reward (kept to 2 decimals, since halving makes fractions like 2.5). */
+export const applyMultiplier = (ctx, base) => round2(base * ctx.multiplier);
 
 /** Per-habit free vs premium rates, for the app's premium and rules screens. */
 function habitRates(config) {
@@ -47,7 +49,7 @@ function habitRates(config) {
       rate: rateLabel(id, rule),
       premiumRate: rateLabel(id, rule, m),
       maxReward: rule.maxReward,
-      premiumMaxReward: Math.round(rule.maxReward * m),
+      premiumMaxReward: round2(rule.maxReward * m),
       goal: rule.goal,
     };
   });
@@ -87,8 +89,8 @@ export async function getPremiumInfo(user) {
       totalHabits: ACTIVITY_IDS.length,
       dailyCap: p.dailyCap,
       freeDailyCap: config.dailyCap,
-      maxDaily: habits.reduce((s, h) => s + h.maxReward, 0),
-      premiumMaxDaily: habits.reduce((s, h) => s + h.premiumMaxReward, 0),
+      maxDaily: round2(habits.reduce((s, h) => s + h.maxReward, 0)),
+      premiumMaxDaily: round2(habits.reduce((s, h) => s + h.premiumMaxReward, 0)),
     },
     status: statusOf(user),
     habits,

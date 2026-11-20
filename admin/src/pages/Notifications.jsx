@@ -15,7 +15,6 @@ const ROUTES = [
   { id: 'Activity', label: 'Today’s activity' },
   { id: 'Challenges', label: 'Challenges' },
   { id: 'Wallet', label: 'Wallet' },
-  { id: 'Marketplace', label: 'Marketplace' },
   { id: 'Premium', label: 'Premium' },
   { id: 'Referral', label: 'Invite friends' },
   { id: 'Leaderboard', label: 'Leaderboard' },
