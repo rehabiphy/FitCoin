@@ -8,5 +8,5 @@
       ]
     }
   ],
-  "rewrites": [{ "source": "/((?!assets/|\.well-known/|favicon\.png|og\.png|robots\.txt).*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/((?!assets/|\\.well-known/|favicon\\.png|og\\.png|robots\\.txt).*)", "destination": "/index.html" }]
 }
