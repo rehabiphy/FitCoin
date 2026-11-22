@@ -1,0 +1,15 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.rehabiphy.axiyo",
+      "sha256_cert_fingerprints": [
+        "CA:E0:E8:85:2B:ED:2A:8D:B3:28:FB:93:A7:A5:4B:9D:0E:C7:3E:7E:F7:1A:EF:9E:B5:C8:68:11:B4:CF:4F:7D",
+        "89:6F:D3:A2:ED:91:5C:78:F9:0D:9E:F3:2A:D6:8F:CF:7E:A5:2F:03:BA:BA:1F:85:BB:C8:35:77:1C:4C:D8:28",
+        "11:AE:50:77:DF:B0:C8:AD:CE:16:2A:B4:B1:2C:74:FC:05:18:BA:1C:BE:1B:0F:9A:70:F7:31:55:E0:4E:5A:B9",
+        "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"
+      ]
+    }
+  }
+]

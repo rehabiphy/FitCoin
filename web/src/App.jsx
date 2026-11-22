@@ -14,6 +14,7 @@ import Privacy from './pages/Privacy.jsx';
 import Terms from './pages/Terms.jsx';
 import DeleteAccount from './pages/DeleteAccount.jsx';
 import NotFound from './pages/NotFound.jsx';
+import Invite from './pages/Invite.jsx';
 
 const TITLES = {
   '/': 'axyio: Move. Earn. Redeem.',
@@ -32,7 +33,7 @@ const TITLES = {
 function RouteEffects() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
-    document.title = TITLES[pathname] || 'Page not found · axyio';
+    document.title = TITLES[pathname] || (pathname.startsWith('/invite/') ? 'You’re invited · axyio' : 'Page not found · axyio');
     if (hash) {
       const el = document.getElementById(hash.slice(1));
       if (el) {
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/delete-account" element={<DeleteAccount />} />
+          <Route path="/invite/:code" element={<Invite />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

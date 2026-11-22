@@ -48,6 +48,21 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
+        <!-- Invite links: https://fit-coin-lszq.vercel.app/invite/FIT-XXXX opens the app directly.
+             autoVerify checks web/public/.well-known/assetlinks.json on that domain. -->
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" android:host="fit-coin-lszq.vercel.app" android:pathPrefix="/invite/" />
+        </intent-filter>
+        <!-- axyio://invite/FIT-XXXX: used by the invite page's "open the app" button -->
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="axyio" android:host="invite" />
+        </intent-filter>
       </activity>
 
       <service

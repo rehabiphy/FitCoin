@@ -3217,3 +3217,81 @@ textarea {
     stroke-dashoffset: var(--off);
   }
 }
+
+/* ---------- invite page ---------- */
+
+.invite .bubble {
+  margin: 0 auto;
+}
+
+.invite-title {
+  margin-top: 22px;
+}
+
+.invite-code-wrap {
+  margin: 34px auto 0;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.invite-code-wrap small {
+  color: var(--text-2);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.invite-code {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 14px 14px 20px;
+  border-radius: 16px;
+  border: 1.5px dashed rgba(52, 245, 180, 0.45);
+  background: rgba(52, 245, 180, 0.06);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.invite-code strong {
+  font-size: clamp(1.15rem, 5vw, 1.5rem);
+  letter-spacing: 0.12em;
+  overflow-wrap: anywhere;
+  text-align: left;
+  user-select: all;
+}
+
+.invite-code span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(52, 245, 180, 0.14);
+  color: var(--mint);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.invite-actions {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+}
+
+.invite-steps {
+  margin: 34px auto 0;
+  max-width: 420px;
+  padding-left: 20px;
+  text-align: left;
+  color: var(--text-2);
+  display: grid;
+  gap: 8px;
+}

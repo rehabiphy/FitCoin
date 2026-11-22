@@ -37,10 +37,15 @@ export const STREAK_RULES = {
   bonusAmount: 50,
 };
 
+/**
+ * Referrals. A member adds one friend's code (at sign-up or later from their
+ * profile; it can never be changed) and both are paid straight away: the code's
+ * owner gets `referrerReward`, the new member `refereeReward`. The owner is paid
+ * for at most `maxRewardedPerMonth` friends a month; the friend is always paid.
+ */
 export const REFERRAL_RULES = {
-  referrerReward: 100,
-  refereeReward: 50,
-  activeDaysRequired: 3,
+  referrerReward: 200,
+  refereeReward: 100,
   maxRewardedPerMonth: 20,
 };
 

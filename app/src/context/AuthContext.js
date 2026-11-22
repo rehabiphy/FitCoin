@@ -15,6 +15,8 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [status, setStatus] = useState('loading');
   const [user, setUser] = useState(null);
+  // A brand-new Google account is asked once for a friend's code (email sign-up has the field on the form)
+  const [askReferral, setAskReferral] = useState(false);
 
   const startSession = useCallback(async ({ user: u, tokens }) => {
     await saveSession({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, user: u });
@@ -25,6 +27,7 @@ export function AuthProvider({ children }) {
 
   const endSessionLocally = useCallback(async () => {
     await clearSession();
+    setAskReferral(false);
     setUser(null);
     setStatus('signedOut');
   }, []);
@@ -81,8 +84,12 @@ export function AuthProvider({ children }) {
     if (!idToken) {
       return null;
     }
-    return startSession(await authApi.google(idToken));
+    const result = await authApi.google(idToken);
+    setAskReferral(!!result.isNew && !result.user?.hasReferrer);
+    return startSession(result);
   }, [startSession]);
+
+  const finishReferralPrompt = useCallback(() => setAskReferral(false), []);
 
   const signOut = useCallback(async () => {
     const refreshToken = getRefreshToken();
@@ -113,8 +120,20 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ status, user, isSignedIn: status === 'signedIn', signIn, signUp, signInWithGoogle, signOut, updateProfile, applyUser }),
-    [status, user, signIn, signUp, signInWithGoogle, signOut, updateProfile, applyUser],
+    () => ({
+      status,
+      user,
+      isSignedIn: status === 'signedIn',
+      askReferral,
+      finishReferralPrompt,
+      signIn,
+      signUp,
+      signInWithGoogle,
+      signOut,
+      updateProfile,
+      applyUser,
+    }),
+    [status, user, askReferral, finishReferralPrompt, signIn, signUp, signInWithGoogle, signOut, updateProfile, applyUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

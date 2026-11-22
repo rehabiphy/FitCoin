@@ -200,8 +200,8 @@ export function coinParts(baseConfig, challenges, state) {
   parts.push(part('cap.free', 'caps', 'Daily cap — free', 'Most habit FIT a free member earns a day', baseConfig.dailyCap));
   parts.push(part('cap.premium', 'caps', 'Daily cap — premium', 'Most habit FIT a premium member earns a day', baseConfig.premium.dailyCap));
   parts.push(part('streak.bonus', 'bonuses', 'Streak bonus', `Every ${STREAK_RULES.bonusEvery} active days in a row`, STREAK_RULES.bonusAmount));
-  parts.push(part('referral.referrer', 'bonuses', 'Referral — inviter', 'When an invited friend completes their active days', REFERRAL_RULES.referrerReward));
-  parts.push(part('referral.referee', 'bonuses', 'Referral — welcome bonus', 'The invited friend', REFERRAL_RULES.refereeReward));
+  parts.push(part('referral.referrer', 'bonuses', 'Referral — inviter', 'When a friend joins with their code', REFERRAL_RULES.referrerReward));
+  parts.push(part('referral.referee', 'bonuses', 'Referral — welcome bonus', 'The friend who used the code', REFERRAL_RULES.refereeReward));
   for (const c of challenges) {
     parts.push(part(`challenge.${c.slug}`, 'challenges', c.title, `${periodLabel(c.period)} challenge prize`, c.reward));
   }

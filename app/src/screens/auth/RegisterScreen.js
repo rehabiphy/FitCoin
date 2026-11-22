@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 import Screen from '../../components/Screen';
@@ -9,6 +9,8 @@ import PressableScale from '../../components/PressableScale';
 import Icon from '../../components/Icon';
 import { GradientFill } from '../../components/GradientFill';
 import { useAuth } from '../../context/AuthContext';
+import { CodeOwnerHint, useCodeOwner } from '../../components/ReferralCodeForm';
+import { clearPendingInvite, getPendingInvite, onInvite } from '../../services/invite';
 import { colors, gradients, radius, type } from '../../theme';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,11 +35,28 @@ function validate(form) {
   return e;
 }
 
-export default function RegisterScreen({ navigation }) {
+export default function RegisterScreen({ navigation, route }) {
   const { signUp } = useAuth();
   const [agreed, setAgreed] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', referralCode: '' });
+  // An invite link (or a Play install from one) fills in the friend's code
+  const [form, setForm] = useState(() => ({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    referralCode: route?.params?.code || getPendingInvite()?.code || '',
+  }));
+  const owner = useCodeOwner(form.referralCode);
+
+  // A tapped invite link (route param) replaces the code; a late install-referrer code only fills an empty field
+  useEffect(() => {
+    const code = route?.params?.code;
+    if (code) {
+      setForm(f => ({ ...f, referralCode: code }));
+    }
+  }, [route?.params?.code]);
+  useEffect(() => onInvite(p => p?.code && setForm(f => (f.referralCode ? f : { ...f, referralCode: p.code }))), []);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
 
@@ -66,6 +85,7 @@ export default function RegisterScreen({ navigation }) {
         phone: form.phone.trim() || undefined,
         referralCode: form.referralCode.trim() || undefined,
       });
+      clearPendingInvite();
     } catch (err) {
       const fieldErrors = err.fieldErrors || {};
       if (err.code === 'EMAIL_TAKEN') {
@@ -110,7 +130,7 @@ export default function RegisterScreen({ navigation }) {
     },
     {
       key: 'referralCode',
-      label: 'Referral code (optional)',
+      label: 'Friend’s referral code (optional)',
       icon: 'Gift',
       placeholder: 'e.g. FIT-AISHA21',
       autoCapitalize: 'characters',
@@ -125,12 +145,13 @@ export default function RegisterScreen({ navigation }) {
       contentContainerStyle={styles.content}>
       <Animated.View entering={FadeInDown.duration(500)} style={styles.intro}>
         <Text style={type.h1}>Start earning today</Text>
-        <Text style={type.body}>Join with a friend’s code and get a FIT welcome bonus once you’re active.</Text>
+        <Text style={type.body}>Joining with a friend’s code? Add it below and get a FIT welcome bonus right away.</Text>
       </Animated.View>
 
       {fields.map(({ key, ...f }, i) => (
         <Animated.View key={key} entering={FadeInDown.delay(80 + i * 60).duration(500)}>
           <TextField {...f} value={form[key]} onChangeText={set(key)} error={errors[key]} editable={!loading} />
+          {key === 'referralCode' && !errors.referralCode ? <CodeOwnerHint owner={owner} /> : null}
         </Animated.View>
       ))}
 

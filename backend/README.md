@@ -82,6 +82,8 @@ src/
 | GET    | `/premium`           | Bearer | plan (from admin panel), user's status, free vs premium rates |
 | POST   | `/premium/upgrade`   | Bearer | activates/extends premium (test purchases only for now, see below) |
 | GET    | `/admin/overview`    | Admin  | members, premium members, FIT issued in 24 h       |
+| POST   | `/referrals/apply` | User | `code` — add a friend's code once; pays both immediately |
+| GET    | `/referrals/code/:code` | Public | first name of the code's owner + welcome bonus (invite pages) |
 | GET    | `/admin/challenges` | Admin | every challenge with joins, completions and FIT paid, plus form options |
 | POST   | `/admin/challenges` | Admin | create a challenge (see `challengeSchema` in `admin.validator.js`) |
 | PUT    | `/admin/challenges/:id` | Admin | replace a challenge's settings (its slug/app id never changes) |
@@ -126,7 +128,10 @@ while `PREMIUM_TEST_PURCHASES=true` (the default outside production). Admins can
   between two dates (an event), and tracks one habit as a total, days hitting a daily amount, or one timed session
   (`src/config/challenges.js`). Progress is calculated from real activity and the prize is paid once, as soon as the
   target is reached. Paused and archived challenges are hidden from the app.
-- **Referrals:** when an invited friend has 3 active days, they get 50 FIT and the inviter 100 FIT (max 20/month).
+- **Referrals:** a member adds one friend's code (at sign-up, after a Google sign-up, or later from their profile;
+  never changeable). Both are paid at once: the code's owner 200 FIT (max 20 friends/month), the new member 100 FIT.
+  Own codes and mutual referrals are rejected. Invite links are `https://fit-coin-lszq.vercel.app/invite/<code>`
+  (Android App Links via `web/public/.well-known/assetlinks.json`; the Play install referrer carries the code through installs).
 - **Marketplace** (`src/seed/rewards.js`): 2% fee; a per-user wallet lock stops two redemptions spending the same FIT.
   Voucher codes are generated locally for now (`fulfil()` in `marketplace.service.js` is where a partner API goes).
 - The built-in challenges (`src/seed/challenges.js`) are inserted on startup only if missing, so admin edits stick.

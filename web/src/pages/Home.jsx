@@ -422,8 +422,8 @@ function Referral() {
           <p className="eyebrow">Invite friends</p>
           <h2 className="h2">Better together, and you both get rewarded</h2>
           <p className="lead">
-            Share your referral code. When your friend has been active on {REFERRAL.activeDays} days, they get{' '}
-            <b>{REFERRAL.friendReward} FIT</b> and you get <b>{REFERRAL.inviterReward} FIT</b>.
+            Share your invite link. As soon as your friend joins with your code, they get <b>{REFERRAL.friendReward} FIT</b> and
+            you get <b>{REFERRAL.inviterReward} FIT</b>.
           </p>
           <p className="muted small">Up to {REFERRAL.monthlyCap} rewarded referrals per month.</p>
         </Reveal>
@@ -442,8 +442,8 @@ function Referral() {
             </div>
             <i />
             <div>
-              <IconBubble name="Footprints" color="cyan" size={40} />
-              <small>{REFERRAL.activeDays} active days</small>
+              <IconBubble name="Ticket" color="cyan" size={40} />
+              <small>Adds your code</small>
             </div>
             <i />
             <div>

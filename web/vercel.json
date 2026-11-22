@@ -1,3 +1,12 @@
 {
-  "rewrites": [{ "source": "/((?!assets/|favicon\\.png|og\\.png|robots\\.txt).*)", "destination": "/index.html" }]
+  "headers": [
+    {
+      "source": "/.well-known/assetlinks.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    }
+  ],
+  "rewrites": [{ "source": "/((?!assets/|\.well-known/|favicon\.png|og\.png|robots\.txt).*)", "destination": "/index.html" }]
 }

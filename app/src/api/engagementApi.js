@@ -40,6 +40,10 @@ export const statsApi = {
 
 export const referralsApi = {
   get: () => apiClient.get('/referrals'),
+  /** Adds a friend's code (once, can't be changed). Resolves { user, referredBy, welcomeBonus, info }. */
+  apply: code => apiClient.post('/referrals/apply', { code }),
+  /** Public: whose code this is (first name) and the welcome bonus. 404 when unknown. */
+  lookup: code => apiClient.get(`/referrals/code/${encodeURIComponent(code)}`, { auth: false }),
 };
 
 export const marketplaceApi = {

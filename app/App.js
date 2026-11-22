@@ -7,6 +7,7 @@ import { AuthProvider } from './src/context/AuthContext';
 import { StepsProvider } from './src/context/StepsContext';
 import { PremiumProvider } from './src/context/PremiumContext';
 import PushHandler from './src/components/PushHandler';
+import InviteHandler from './src/components/InviteHandler';
 import { navigationRef } from './src/navigation/navigationRef';
 import { colors } from './src/theme';
 
@@ -34,6 +35,7 @@ export default function App() {
               <RootNavigator />
             </NavigationContainer>
             <PushHandler />
+            <InviteHandler />
           </PremiumProvider>
         </StepsProvider>
       </AuthProvider>

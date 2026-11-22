@@ -1,6 +1,6 @@
 import { getLeaderboard } from '../services/leaderboard.service.js';
 import { evaluateBadges } from '../services/badge.service.js';
-import { getReferralInfo } from '../services/referral.service.js';
+import { applyReferralCode, getReferralInfo, lookupCode } from '../services/referral.service.js';
 import { getStats } from '../services/stats.service.js';
 
 /** GET /leaderboard?period=weekly|monthly|all */
@@ -22,6 +22,17 @@ export async function badges(req, res) {
 /** GET /referrals */
 export async function referrals(req, res) {
   res.json({ success: true, data: await getReferralInfo(req.user) });
+}
+
+/** POST /referrals/apply — { code } adds a friend's code once and pays both of you */
+export async function applyReferral(req, res) {
+  const { user, referredBy, welcomeBonus } = await applyReferralCode(req.user, req.body.code);
+  res.json({ success: true, data: { user: user.toPublicJSON(), referredBy, welcomeBonus, info: await getReferralInfo(user) } });
+}
+
+/** GET /referrals/code/:code — public: whose code this is (first name only), for invite pages */
+export async function referralCode(req, res) {
+  res.json({ success: true, data: await lookupCode(req.params.code) });
 }
 
 /** GET /users/me/stats */

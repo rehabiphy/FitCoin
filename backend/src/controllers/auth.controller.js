@@ -5,6 +5,7 @@ import ApiError from '../utils/ApiError.js';
 import { verifyGoogleIdToken } from '../services/google.service.js';
 import { notify } from '../services/notification.service.js';
 import { checkAutoHalving } from '../services/halving.service.js';
+import { applyReferralCode, resolveReferrer } from '../services/referral.service.js';
 import { unregisterAllDevices, unregisterDevice } from '../services/push.service.js';
 import {
   issueTokens,
@@ -20,10 +21,17 @@ const DUMMY_HASH = bcrypt.hashSync('fitcoin-dummy-password', env.bcryptRounds);
 
 const requestMeta = req => ({ userAgent: req.get('user-agent'), ip: req.ip });
 
-async function sendAuth(res, req, user, status = 200) {
+/**
+ * Saves the user, then sends the session. `afterCreate` runs once a new account
+ * exists (e.g. to add the referral code it signed up with).
+ */
+async function sendAuth(res, req, user, status = 200, { afterCreate } = {}) {
   const isNew = user.isNew;
   user.lastLoginAt = new Date();
   await user.save();
+  if (isNew && afterCreate) {
+    await afterCreate(user);
+  }
   if (isNew) {
     await notify(user._id, {
       type: 'system',
@@ -37,7 +45,8 @@ async function sendAuth(res, req, user, status = 200) {
     checkAutoHalving();
   }
   const tokens = await issueTokens(user, requestMeta(req));
-  res.status(status).json({ success: true, data: { user: user.toPublicJSON(), tokens } });
+  // isNew lets the app ask a Google sign-up for a referral code
+  res.status(status).json({ success: true, data: { user: user.toPublicJSON(), tokens, isNew } });
 }
 
 /** POST /auth/register */
@@ -48,17 +57,29 @@ export async function register(req, res) {
     throw ApiError.conflict('An account with this email already exists', 'EMAIL_TAKEN');
   }
 
-  let referredBy;
+  // Reject a bad code before creating the account, so the form can be fixed
   if (referralCode) {
-    const referrer = await User.findOne({ referralCode }).select('_id');
-    if (!referrer) {
-      throw ApiError.badRequest('Referral code is not valid', 'INVALID_REFERRAL');
-    }
-    referredBy = referrer._id;
+    await resolveReferrer(referralCode);
   }
 
-  const user = new User({ name, email, password, phone, referredBy, authProviders: ['local'] });
-  await sendAuth(res, req, user, 201);
+  const user = new User({ name, email, password, phone, authProviders: ['local'] });
+  await sendAuth(res, req, user, 201, {
+    afterCreate: referralCode
+      ? async created => {
+          try {
+            const { user: referred } = await applyReferralCode(created, referralCode);
+            // Keep the in-memory user in step so the response shows the code as added
+            for (const key of ['referredBy', 'referredAt', 'referralStatus', 'referralRewardedAt']) {
+              created.set(key, referred.get(key));
+            }
+          } catch (err) {
+            // The account exists now; if the code stopped working in the last moment (owner deleted),
+            // still sign them in. They can add a code later from their profile.
+            console.error('Referral code at sign-up failed:', err.message);
+          }
+        }
+      : undefined,
+  });
 }
 
 /** POST /auth/login */

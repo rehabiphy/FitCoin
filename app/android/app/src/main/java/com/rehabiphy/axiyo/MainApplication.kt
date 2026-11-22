@@ -6,6 +6,7 @@ import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
+import com.rehabiphy.axiyo.invite.InstallReferrerPackage
 import com.rehabiphy.axiyo.steps.StepCounterPackage
 import com.rehabiphy.axiyo.steps.StepEngine
 
@@ -17,6 +18,7 @@ class MainApplication : Application(), ReactApplication {
       packageList =
         PackageList(this).packages.apply {
           add(StepCounterPackage())
+          add(InstallReferrerPackage())
         },
     )
   }

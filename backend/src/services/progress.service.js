@@ -3,7 +3,7 @@ import { STREAK_RULES } from '../config/progression.js';
 import { activeDates, creditOnce } from './rewards.service.js';
 import { notify } from './notification.service.js';
 import { coinAmount } from './halving.service.js';
-import { checkReferralReward } from './referral.service.js';
+import { payReferral } from './referral.service.js';
 import { refreshUserChallenges } from './challenge.service.js';
 import { evaluateBadges } from './badge.service.js';
 import { addDays } from '../utils/dates.js';
@@ -87,7 +87,8 @@ export async function afterActivity(userId, date) {
       return;
     }
     await updateStreak(user, date);
-    await checkReferralReward(user);
+    // Pays referrals added before payouts became instant (no-op once paid)
+    await payReferral(user);
     await refreshUserChallenges(user._id, user.tzOffset || 0);
     await evaluateBadges(user);
   } catch (err) {

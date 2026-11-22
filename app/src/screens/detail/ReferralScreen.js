@@ -15,23 +15,28 @@ import { StatusPill } from '../../components/TransactionRow';
 import { useAuth } from '../../context/AuthContext';
 import useApi from '../../hooks/useApi';
 import { referralsApi } from '../../api/engagementApi';
+import ReferralCodeForm from '../../components/ReferralCodeForm';
+import { getPendingInvite } from '../../services/invite';
+import { inviteLink } from '../../config';
 import { avatarColor } from '../../utils/format';
 import { colors, gradients, radius, type, TOKEN } from '../../theme';
 
-export default function ReferralScreen() {
+export default function ReferralScreen({ route }) {
   const { user } = useAuth();
-  const { data, reload } = useApi(() => referralsApi.get(), []);
+  const { data, setData, reload } = useApi(() => referralsApi.get(), []);
+  const [added, setAdded] = useState(null); // { name, bonus } right after adding a code
+  // A tapped invite link opens this screen with the code; otherwise use one from a Play install
+  const invitedCode = route?.params?.code || getPendingInvite()?.code || '';
   const [sent, setSent] = useState(false);
   const code = data?.code || user?.referralCode || '';
-  const rules = data?.rules || { referrerReward: 100, refereeReward: 50, activeDaysRequired: 3, maxRewardedPerMonth: 20 };
+  const rules = data?.rules || { referrerReward: 200, refereeReward: 100, maxRewardedPerMonth: 20 };
   const stats = data?.stats || { invited: 0, rewarded: 0, earned: 0 };
   const referrals = data?.referrals || [];
 
   const STEPS = [
-    { icon: 'Share2', title: 'Share your code', body: 'Send your invite code to friends.' },
-    { icon: 'User', title: 'Friend signs up', body: 'They enter your code when creating their account.' },
-    { icon: 'Activity', title: `${rules.activeDaysRequired} active days`, body: `They earn FIT on ${rules.activeDaysRequired} different days.` },
-    { icon: 'Coins', title: 'You both earn', body: `You get ${rules.referrerReward} ${TOKEN}, they get ${rules.refereeReward} ${TOKEN}.` },
+    { icon: 'Share2', title: 'Share your link', body: 'Send your invite link or code to friends.' },
+    { icon: 'User', title: 'Friend joins', body: 'The link fills in your code when they sign up. They can also add it later from their profile.' },
+    { icon: 'Coins', title: 'You both earn, instantly', body: `You get ${rules.referrerReward} ${TOKEN}, they get ${rules.refereeReward} ${TOKEN}, as soon as the code is added.` },
   ];
 
   // Sends just the code (React Native has no built-in clipboard)
@@ -45,7 +50,7 @@ export default function ReferralScreen() {
 
   const share = () =>
     Share.share({
-      message: `Join me on axyio and earn rewards for staying active! Use my code ${code} when you sign up to get ${rules.refereeReward} FIT.`,
+      message: `Join me on axyio and earn rewards for staying active! Sign up with my code ${code} and get ${rules.refereeReward} ${TOKEN}: ${inviteLink(code)}`,
     });
 
   return (
@@ -102,6 +107,45 @@ export default function ReferralScreen() {
         </Card>
       </Animated.View>
 
+      <Animated.View entering={FadeInDown.delay(190).duration(500)}>
+        {data?.referredBy ? (
+          <Card style={styles.section}>
+            <View style={styles.joinedRow}>
+              <IconBubble icon="Lock" color={colors.mint} size={40} radius={13} />
+              <View style={styles.flex}>
+                <Text style={type.bodyStrong}>You joined with {data.referredBy.name}’s code</Text>
+                <Text style={type.caption}>
+                  {data.referredBy.code ? `${data.referredBy.code} · ` : ''}A referral code can only be added once.
+                </Text>
+              </View>
+            </View>
+            {added?.bonus ? (
+              <Text style={[type.caption, styles.addedNote]}>
+                +{added.bonus} {TOKEN} welcome bonus added to your wallet.
+              </Text>
+            ) : null}
+          </Card>
+        ) : data?.canAddCode ? (
+          <Card style={styles.section}>
+            <Text style={type.h3}>Did a friend invite you?</Text>
+            <Text style={[type.caption, styles.addIntro]}>
+              Add their code to get {rules.refereeReward} {TOKEN} now. Your friend gets {rules.referrerReward} {TOKEN}.
+            </Text>
+            <ReferralCodeForm
+              initialCode={invitedCode !== code ? invitedCode : ''}
+              onApplied={result => {
+                if (result) {
+                  setAdded({ bonus: result.welcomeBonus });
+                  setData(result.info);
+                } else {
+                  reload();
+                }
+              }}
+            />
+          </Card>
+        ) : null}
+      </Animated.View>
+
       <Animated.View entering={FadeInDown.delay(220).duration(500)}>
         <Card style={styles.section}>
           <Text style={type.h3}>How it works</Text>
@@ -122,7 +166,7 @@ export default function ReferralScreen() {
 
       <Animated.View entering={FadeInDown.delay(280).duration(500)}>
         <Card style={styles.section}>
-          <Text style={type.h3}>Your referrals</Text>
+          <Text style={type.h3}>People who used your code</Text>
           {referrals.length === 0 ? (
             <Text style={[type.caption, styles.none]}>No friends have joined with your code yet.</Text>
           ) : null}
@@ -133,7 +177,14 @@ export default function ReferralScreen() {
                 <Text style={type.bodyStrong}>{f.name}</Text>
                 <Text style={type.caption}>{f.note}</Text>
               </View>
-              <StatusPill status={f.status} />
+              {f.reward > 0 ? (
+                <View style={styles.friendReward}>
+                  <CoinIcon size={13} />
+                  <Text style={styles.friendRewardText}>+{f.reward}</Text>
+                </View>
+              ) : (
+                <StatusPill status={f.status} />
+              )}
             </View>
           ))}
         </Card>
@@ -190,4 +241,9 @@ const styles = StyleSheet.create({
   friend: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 14 },
   none: { marginTop: 10 },
   fine: { flexDirection: 'row', gap: 10, marginTop: 18, paddingHorizontal: 4 },
+  joinedRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  addedNote: { marginTop: 12, color: colors.mint },
+  addIntro: { marginTop: 4, marginBottom: 14 },
+  friendReward: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  friendRewardText: { color: colors.gold, fontWeight: '800' },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Alert, StyleSheet, Switch, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import Screen from '../../components/Screen';
@@ -11,7 +11,9 @@ import ProgressBar from '../../components/ProgressBar';
 import PressableScale from '../../components/PressableScale';
 import { TAB_BAR_SPACE } from '../../components/TabBar';
 import useApi from '../../hooks/useApi';
-import { statsApi } from '../../api/engagementApi';
+import { referralsApi, statsApi } from '../../api/engagementApi';
+import CoinIcon from '../../components/CoinIcon';
+import { avatarColor } from '../../utils/format';
 import { colors, gradients, type } from '../../theme';
 import { MARKETPLACE_ENABLED } from '../../config';
 
@@ -40,7 +42,10 @@ export default function ProfileScreen({ navigation }) {
   const joined = account?.createdAt
     ? new Date(account.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
     : '';
-  const { data: me, reload } = useApi(() => statsApi.me().then(d => d.stats), []);
+  const { data: me, reload: reloadStats } = useApi(() => statsApi.me().then(d => d.stats), []);
+  const { data: ref, reload: reloadRef } = useApi(() => referralsApi.get(), []);
+  const reload = useCallback(() => Promise.all([reloadStats(), reloadRef()]), [reloadStats, reloadRef]);
+  const invited = ref?.referrals || [];
   const user = me || { level: 1, levelName: 'Starter', xp: 0, xpLevelStart: 0, xpNext: 100, streak: 0, weeklyRank: null, lifetimeEarned: 0 };
   const earned = user.lifetimeEarned;
   const levelSpan = Math.max(1, user.xpNext - user.xpLevelStart);
@@ -100,9 +105,64 @@ export default function ProfileScreen({ navigation }) {
         <Text style={[type.label, styles.groupLabel]}>Rewards</Text>
         <Card padded={false}>
           <Row icon="Medal" color={colors.pink} label="Achievements" value="5 / 8" onPress={go('Badges')} />
-          <Row icon="Users" color={colors.mint} label="Refer & earn" value="Earn FIT" onPress={go('Referral')} />
           {MARKETPLACE_ENABLED ? <Row icon="ShoppingBag" color={colors.gold} label="Marketplace" onPress={go('Marketplace')} /> : null}
           <Row icon="Info" color={colors.primary} label="Token & reward rules" onPress={go('TokenRules')} last />
+        </Card>
+      </Animated.View>
+
+      <Animated.View entering={FadeInDown.delay(230).duration(500)}>
+        <Text style={[type.label, styles.groupLabel]}>Referrals</Text>
+        <Card padded={false}>
+          <Row
+            icon="Share2"
+            color={colors.mint}
+            label="Refer & earn"
+            value={account?.referralCode || ref?.code || ''}
+            onPress={go('Referral')}
+          />
+          {ref?.referredBy ? (
+            <Row
+              icon="Lock"
+              color={colors.cyan}
+              label={`Referred by ${ref.referredBy.name}`}
+              value={ref.referredBy.code || ''}
+              onPress={go('Referral')}
+              right={<View />}
+            />
+          ) : (
+            <Row icon="Gift" color={colors.gold} label="Add a friend’s referral code" onPress={go('Referral')} />
+          )}
+          <View style={styles.invitedHead}>
+            <Text style={type.bodyStrong}>People who used your code</Text>
+            <Text style={type.caption}>{invited.length}</Text>
+          </View>
+          {invited.length === 0 ? (
+            <Text style={[type.caption, styles.invitedEmpty]}>No one yet. Share your link to earn {ref?.rules?.referrerReward ?? 200} FIT per friend.</Text>
+          ) : (
+            invited.slice(0, 5).map(f => (
+              <View key={f.id} style={styles.invitedRow}>
+                <Avatar initials={initialsOf(f.name)} size={34} color={avatarColor(f.id)} />
+                <View style={styles.flex}>
+                  <Text style={type.bodyStrong} numberOfLines={1}>
+                    {f.name}
+                  </Text>
+                  <Text style={type.caption}>{f.note}</Text>
+                </View>
+                {f.reward > 0 ? (
+                  <View style={styles.invitedReward}>
+                    <CoinIcon size={13} />
+                    <Text style={styles.invitedRewardText}>+{f.reward}</Text>
+                  </View>
+                ) : null}
+              </View>
+            ))
+          )}
+          {invited.length > 5 ? (
+            <PressableScale onPress={go('Referral')} style={styles.seeAll}>
+              <Text style={styles.seeAllText}>See all {invited.length}</Text>
+              <Icon name="ChevronRight" size={16} color={colors.mint} />
+            </PressableScale>
+          ) : null}
         </Card>
       </Animated.View>
 
@@ -177,4 +237,11 @@ const styles = StyleSheet.create({
   rowBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
   rowLabel: { flex: 1, color: colors.text, fontSize: 15, fontWeight: '500' },
   version: { textAlign: 'center', color: colors.textMuted, fontSize: 12, marginTop: 20 },
+  invitedHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 14, paddingTop: 14 },
+  invitedEmpty: { paddingHorizontal: 14, paddingTop: 6, paddingBottom: 14 },
+  invitedRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 10 },
+  invitedReward: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  invitedRewardText: { color: colors.gold, fontWeight: '800' },
+  seeAll: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 12, borderTopWidth: 1, borderTopColor: colors.border },
+  seeAllText: { color: colors.mint, fontWeight: '700' },
 });

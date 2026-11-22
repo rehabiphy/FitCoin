@@ -18,6 +18,8 @@ export const SITE = {
   // Google Play listing. Leave empty to show "Coming soon".
   playStoreUrl: '',
   packageName: 'com.rehabiphy.axiyo',
+  // The live API, used by invite pages to show who sent the invite
+  apiUrl: 'https://fitcoin-7jq7.onrender.com/api/v1',
   legalUpdated: '27 October 2026',
 };
 
@@ -149,7 +151,8 @@ export const PREMIUM = {
   ],
 };
 
-export const REFERRAL = { friendReward: 50, inviterReward: 100, activeDays: 3, monthlyCap: 20 };
+// Paid as soon as a friend adds your code (backend/src/config/progression.js)
+export const REFERRAL = { friendReward: 100, inviterReward: 200, monthlyCap: 20 };
 
 export const STREAK = { every: 7, bonus: 50 };
 
@@ -174,7 +177,7 @@ export const FAQ = [
       },
       {
         q: 'How do I create an account?',
-        a: 'Download the app and sign up with your email and a password, or continue with Google. If a friend invited you, enter their referral code while signing up to get a welcome bonus.',
+        a: 'Download the app and sign up with your email and a password, or continue with Google. If a friend invited you, open their invite link or enter their referral code while signing up to get a welcome bonus. Skipped it? You can add it later from your profile.',
       },
     ],
   },

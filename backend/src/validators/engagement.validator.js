@@ -53,3 +53,16 @@ export const notificationPrefsSchema = z
     rewards: z.boolean().optional(),
   })
   .refine(p => Object.keys(p).length > 0, { error: 'Nothing to update' });
+
+// Referral codes look like FIT-AISHA21A; links and typing may use lower case
+export const referralCodeParam = z.string().trim().min(3).max(32).regex(/^[A-Za-z0-9-]+$/, { error: 'Invite code not found' });
+
+export const applyReferralSchema = z.object({
+  code: z
+    .string({ error: 'Enter a referral code' })
+    .trim()
+    .min(3, { error: 'Enter a referral code' })
+    .max(32, { error: 'That code is too long' })
+    .regex(/^[A-Za-z0-9-]+$/, { error: 'Codes only contain letters, numbers and dashes' })
+    .transform(v => v.toUpperCase()),
+});

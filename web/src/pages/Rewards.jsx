@@ -139,11 +139,12 @@ export default function Rewards() {
 
           <Block id="referrals" icon="UserPlus" color="mint" title="Referrals">
             <ul className="dot-list">
-              <li>Share your personal code. Your friend enters it when they sign up.</li>
+              <li>Share your invite link or code. Your friend adds it when they sign up, or later from their profile.</li>
               <li>
-                Once your friend has been active on {REFERRAL.activeDays} days, they receive <b>{REFERRAL.friendReward} FIT</b> and you
-                receive <b>{REFERRAL.inviterReward} FIT</b>.
+                As soon as the code is added, your friend receives <b>{REFERRAL.friendReward} FIT</b> and you receive{' '}
+                <b>{REFERRAL.inviterReward} FIT</b>.
               </li>
+              <li>Each account can add one friend’s code, once. It can’t be changed later.</li>
               <li>You can earn from up to {REFERRAL.monthlyCap} rewarded referrals each month.</li>
             </ul>
           </Block>

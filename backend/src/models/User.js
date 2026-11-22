@@ -23,6 +23,8 @@ const userSchema = new mongoose.Schema(
     emailVerified: { type: Boolean, default: false },
     referralCode: { type: String, unique: true, sparse: true },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    // When the friend's code was added (set once, never changed)
+    referredAt: { type: Date },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     stepGoal: { type: Number, min: 1000, max: 50000, default: 10000 },
     // Last known phone offset from UTC in minutes (IST = 330), for work done outside a request
@@ -34,6 +36,9 @@ const userSchema = new mongoose.Schema(
     // Set once the referral reward for this user (as the invited friend) has been paid or ruled out
     referralRewardedAt: { type: Date },
     referralStatus: { type: String, enum: ['pending', 'rewarded', 'capped'], default: undefined },
+    // As an inviter: how many friends were paid for in `referralMonth` ("YYYY-MM-01"), claimed atomically for the monthly cap
+    referralMonth: { type: String },
+    referralMonthCount: { type: Number, default: 0 },
     // Habits a free member picked to earn from (premium members earn from all). See habits.service.js
     activeHabits: { type: [String], default: undefined },
     habitsChosenAt: { type: Date },
@@ -75,6 +80,8 @@ userSchema.pre('save', async function hashPassword() {
 });
 
 userSchema.index({ premiumUntil: 1 }, { sparse: true });
+// "People who used your code" and badge counts look users up by their referrer
+userSchema.index({ referredBy: 1 }, { sparse: true });
 
 userSchema.virtual('isPremium').get(function isPremium() {
   return !!this.premiumUntil && this.premiumUntil.getTime() > Date.now();
@@ -97,6 +104,8 @@ userSchema.methods.toPublicJSON = function toPublicJSON() {
     avatar: this.avatar || null,
     emailVerified: this.emailVerified,
     referralCode: this.referralCode,
+    // Whether this member already added a friend's code (it can only be added once)
+    hasReferrer: !!this.referredBy,
     authProviders: this.authProviders,
     role: this.role,
     stepGoal: this.stepGoal ?? 10000,

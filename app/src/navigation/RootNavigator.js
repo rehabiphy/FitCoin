@@ -23,11 +23,12 @@ import TransactionDetailScreen from '../screens/detail/TransactionDetailScreen';
 import TokenRulesScreen from '../screens/detail/TokenRulesScreen';
 import EditProfileScreen from '../screens/detail/EditProfileScreen';
 import PremiumScreen from '../screens/detail/PremiumScreen';
+import ReferralPromptScreen from '../screens/auth/ReferralPromptScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
-  const { status } = useAuth();
+  const { status, askReferral } = useAuth();
   const [splashDone, setSplashDone] = useState(false);
 
   // Keep the splash up until its animation finishes and the saved session has been checked
@@ -44,6 +45,8 @@ export default function RootNavigator() {
       }}>
       {status === 'signedIn' ? (
         <Stack.Group>
+          {/* First screen after a Google sign-up: "Did a friend invite you?" (removed once answered) */}
+          {askReferral ? <Stack.Screen name="ReferralPrompt" component={ReferralPromptScreen} options={{ animation: 'fade' }} /> : null}
           <Stack.Screen name="Main" component={MainTabs} options={{ animation: 'fade' }} />
           <Stack.Screen name="ActivityDetail" component={ActivityDetailScreen} />
           <Stack.Screen name="ChallengeDetail" component={ChallengeDetailScreen} />
