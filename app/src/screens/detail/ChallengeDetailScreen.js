@@ -14,7 +14,8 @@ import CoinIcon from '../../components/CoinIcon';
 import { formatNumber } from '../../components/AnimatedNumber';
 import useApi from '../../hooks/useApi';
 import { challengesApi } from '../../api/engagementApi';
-import { avatarColor, timeLeft } from '../../utils/format';
+import { avatarColor } from '../../utils/format';
+import Countdown from '../../components/Countdown';
 import { colors, type, TOKEN } from '../../theme';
 
 // Which activity screen the "Track" button opens, by challenge icon
@@ -52,7 +53,7 @@ export default function ChallengeDetailScreen({ route, navigation }) {
 
   const rules = [
     'Activity must be auto-tracked or verified to count.',
-    `The prize is credited as soon as you complete it — this ${c.type.toLowerCase()} run ends in ${timeLeft(c.endsAt)}.`,
+    `The prize is credited as soon as you complete it, before this ${c.type.toLowerCase()} run ends.`,
     'Duplicate or suspicious entries are excluded from rankings.',
   ];
 
@@ -102,7 +103,7 @@ export default function ChallengeDetailScreen({ route, navigation }) {
         </Card>
         <Card style={styles.stat}>
           <Icon name="Timer" size={22} color={colors.pink} />
-          <Text style={styles.statValue}>{timeLeft(c.endsAt)}</Text>
+          <Countdown endsAt={c.endsAt} onEnd={reload} style={styles.statValue} />
           <Text style={type.caption}>Ends in</Text>
         </Card>
       </Animated.View>

@@ -14,7 +14,11 @@ function Bar({ value, max, index, highlight, height }) {
 
   return (
     <Animated.View style={[styles.bar, style, !highlight && styles.barDim]}>
-      <GradientFill colors={highlight ? gradients.primary : ['rgba(124,92,255,0.45)', 'rgba(34,211,238,0.25)']} direction="vertical" />
+      {/* Full-height gradient pinned to the bottom: the bar grows to reveal it.
+          (An SVG sized to the animating bar is measured once at 4px and never fills.) */}
+      <View style={[styles.fill, { height }]}>
+        <GradientFill colors={highlight ? gradients.primary : ['rgba(124,92,255,0.75)', 'rgba(34,211,238,0.45)']} direction="vertical" />
+      </View>
     </Animated.View>
   );
 }
@@ -46,7 +50,8 @@ export default function BarChart({ data, height = 110, highlightIndex = data.len
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
   col: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: '100%' },
-  bar: { width: 22, borderRadius: 8, overflow: 'hidden' },
+  bar: { width: 22, borderRadius: 8, overflow: 'hidden', justifyContent: 'flex-end' },
+  fill: { position: 'absolute', left: 0, right: 0, bottom: 0 },
   barDim: { opacity: 0.9 },
   labels: { flexDirection: 'row', marginTop: 10 },
   label: { flex: 1, textAlign: 'center', color: colors.textMuted, fontSize: 11, fontWeight: '600' },

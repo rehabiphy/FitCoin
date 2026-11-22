@@ -19,6 +19,12 @@ import { colors, gradients, type } from '../../theme';
 
 const PERIODS = ['Weekly', 'Monthly', 'All time'];
 
+const PODIUM_FILLS = {
+  1: { bg: colors.gold, text: '#3A2A00' },
+  2: { bg: '#B9C2D3', text: '#2A3142' },
+  3: { bg: '#B8723F', text: '#FFE3CC' },
+};
+
 function Podium({ person, place, height, delay }) {
   if (!person) {
     // Empty spot until enough people have earned FIT this period
@@ -33,7 +39,8 @@ function PodiumColumn({ person, place, height, delay }) {
     h.value = withDelay(delay, withTiming(height, { duration: 700, easing: Easing.out(Easing.back(1.4)) }));
   }, [height, delay, h]);
   const barStyle = useAnimatedStyle(() => ({ height: h.value }));
-  const medal = place === 1 ? gradients.gold : place === 2 ? ['#E3E9F6', '#8D99B3'] : ['#FFB37A', '#B8612A'];
+  // Solid gold / silver / bronze blocks
+  const fill = PODIUM_FILLS[place];
 
   return (
     <View style={styles.podiumCol}>
@@ -45,9 +52,8 @@ function PodiumColumn({ person, place, height, delay }) {
         </Text>
         <Text style={styles.podiumPts}>{formatNumber(person.points)}</Text>
       </Animated.View>
-      <Animated.View style={[styles.podiumBar, barStyle]}>
-        <GradientFill colors={[medal[0] + '66', 'rgba(255,255,255,0.02)']} direction="vertical" />
-        <Text style={[styles.place, { color: medal[0] }]}>{place}</Text>
+      <Animated.View style={[styles.podiumBar, { backgroundColor: fill.bg }, barStyle]}>
+        <Text style={[styles.place, { color: fill.text }]}>{place}</Text>
       </Animated.View>
     </View>
   );
@@ -145,9 +151,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     alignItems: 'center',
     paddingTop: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderBottomWidth: 0,
   },
   place: { fontSize: 28, fontWeight: '900' },
   list: { marginTop: 0 },

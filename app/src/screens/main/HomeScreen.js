@@ -34,7 +34,7 @@ import { usePremium } from '../../context/PremiumContext';
 import useApi from '../../hooks/useApi';
 import { activitiesApi, challengesApi, notificationsApi, statsApi } from '../../api/engagementApi';
 import { withVisuals } from '../../constants/activities';
-import { timeLeft } from '../../utils/format';
+import Countdown from '../../components/Countdown';
 import { PUSH_RECEIVED_EVENT } from '../../services/push';
 
 const EMPTY_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => ({ day, value: 0 }));
@@ -318,7 +318,7 @@ export default function HomeScreen({ navigation }) {
             <View style={styles.flex}>
               <View style={styles.challengeTop}>
                 <Text style={type.bodyStrong}>{c.title}</Text>
-                <Text style={styles.endsIn}>{timeLeft(c.endsAt)}</Text>
+                <Countdown endsAt={c.endsAt} style={styles.endsIn} />
               </View>
               <ProgressBar progress={c.progress} gradient={c.gradient} height={6} style={styles.challengeBar} delay={500} />
               <View style={styles.challengeTop}>

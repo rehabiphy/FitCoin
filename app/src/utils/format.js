@@ -29,19 +29,18 @@ export function timeAgo(date) {
   return days === 1 ? 'Yesterday' : `${days}d ago`;
 }
 
-/** "2d 14h" / "5h 20m" until a date. */
-export function timeLeft(date) {
-  const ms = new Date(date).getTime() - Date.now();
+const pad2 = n => String(n).padStart(2, '0');
+
+/** "00:49:12" / "2d 14:05:09" until a date (see Countdown for a live one). */
+export function timeLeft(date, now = Date.now()) {
+  const ms = new Date(date).getTime() - now;
   if (ms <= 0) {
     return 'Ended';
   }
-  const m = Math.floor(ms / 60000);
-  const d = Math.floor(m / 1440);
-  const h = Math.floor((m % 1440) / 60);
-  if (d > 0) {
-    return `${d}d ${String(h).padStart(2, '0')}h`;
-  }
-  return `${h}h ${String(m % 60).padStart(2, '0')}m`;
+  const s = Math.floor(ms / 1000);
+  const d = Math.floor(s / 86400);
+  const clock = `${pad2(Math.floor((s % 86400) / 3600))}:${pad2(Math.floor((s % 3600) / 60))}:${pad2(s % 60)}`;
+  return d > 0 ? `${d}d ${clock}` : clock;
 }
 
 const CURRENCY_SYMBOLS = { INR: '₹', USD: '$', EUR: '€', GBP: '£' };

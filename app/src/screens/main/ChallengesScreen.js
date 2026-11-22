@@ -15,7 +15,8 @@ import { formatNumber } from '../../components/AnimatedNumber';
 import { TAB_BAR_SPACE } from '../../components/TabBar';
 import useApi from '../../hooks/useApi';
 import { badgesApi, challengesApi, leaderboardApi } from '../../api/engagementApi';
-import { avatarColor, themeColor, timeLeft } from '../../utils/format';
+import { avatarColor, themeColor } from '../../utils/format';
+import Countdown from '../../components/Countdown';
 import { colors, gradients, radius, type } from '../../theme';
 
 const FILTERS = ['All', 'Daily', 'Weekly', 'Joined'];
@@ -77,7 +78,7 @@ function ChallengeCard({ c, onPress }) {
         </View>
         <View style={styles.metaItem}>
           <Icon name="Timer" size={14} color={colors.textMuted} />
-          <Text style={type.caption}>{timeLeft(c.endsAt)}</Text>
+          <Countdown endsAt={c.endsAt} style={type.caption} />
         </View>
         <View style={styles.flex} />
         <View style={styles.prize}>
