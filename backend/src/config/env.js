@@ -15,7 +15,8 @@ const list = value =>
 
 // Browser apps that may always call the API (plus anything in CORS_ORIGINS)
 const BUILT_IN_ORIGINS = [
-  'https://fit-coin-beryl.vercel.app', // admin panel
+  'https://admin-axyio.vercel.app', // admin panel
+  'https://fit-coin-beryl.vercel.app', // admin panel (previous URL)
 ];
 
 // Browsers send the origin without a trailing slash, so compare without one
