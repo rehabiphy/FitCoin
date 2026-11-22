@@ -1,6 +1,7 @@
 /**
- * Recurring challenges. Each runs every day or every week (Mon–Sun, user's local time);
- * joining enrols you in the current run. `metric` is computed in challenge.service.js.
+ * The built-in challenges. Each is inserted once if missing; after that it is
+ * edited (or archived) in the admin panel like any other challenge.
+ * Goal fields are explained in src/config/challenges.js.
  */
 export const CHALLENGES = [
   {
@@ -10,7 +11,9 @@ export const CHALLENGES = [
     period: 'weekly',
     icon: 'Footprints',
     gradient: ['#34F5B4', '#22D3EE'],
-    metric: 'stepGoalDays',
+    activity: 'walk',
+    goalType: 'days',
+    dailyTarget: 10000,
     target: 7,
     unitLabel: 'days',
     reward: 350,
@@ -23,7 +26,8 @@ export const CHALLENGES = [
     period: 'daily',
     icon: 'Droplet',
     gradient: ['#4D8DFF', '#7C5CFF'],
-    metric: 'waterGlasses',
+    activity: 'water',
+    goalType: 'total',
     target: 8,
     unitLabel: 'glasses',
     reward: 40,
@@ -36,7 +40,8 @@ export const CHALLENGES = [
     period: 'weekly',
     icon: 'Bike',
     gradient: ['#22D3EE', '#4D8DFF'],
-    metric: 'cycleKm',
+    activity: 'cycle',
+    goalType: 'total',
     target: 50,
     unitLabel: 'km',
     reward: 500,
@@ -49,7 +54,9 @@ export const CHALLENGES = [
     period: 'daily',
     icon: 'Wind',
     gradient: ['#FF5C9A', '#FF8A3D'],
-    metric: 'morningBreatheMinutes',
+    activity: 'breathe',
+    goalType: 'session',
+    startBefore: 9 * 60,
     target: 5,
     unitLabel: 'min',
     reward: 25,
@@ -62,7 +69,9 @@ export const CHALLENGES = [
     period: 'weekly',
     icon: 'BookOpen',
     gradient: ['#FFD86B', '#FF8A3D'],
-    metric: 'readGoalDays',
+    activity: 'read',
+    goalType: 'days',
+    dailyTarget: 30,
     target: 5,
     unitLabel: 'days',
     reward: 200,

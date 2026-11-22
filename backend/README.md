@@ -82,6 +82,10 @@ src/
 | GET    | `/premium`           | Bearer | plan (from admin panel), user's status, free vs premium rates |
 | POST   | `/premium/upgrade`   | Bearer | activates/extends premium (test purchases only for now, see below) |
 | GET    | `/admin/overview`    | Admin  | members, premium members, FIT issued in 24 h       |
+| GET    | `/admin/challenges` | Admin | every challenge with joins, completions and FIT paid, plus form options |
+| POST   | `/admin/challenges` | Admin | create a challenge (see `challengeSchema` in `admin.validator.js`) |
+| PUT    | `/admin/challenges/:id` | Admin | replace a challenge's settings (its slug/app id never changes) |
+| PATCH  | `/admin/challenges/:id/status` | Admin | `active` (live/paused) and/or `archived` |
 | GET    | `/admin/notifications` | Admin | phones registered for push + recent announcements |
 | POST   | `/admin/notifications` | Admin | `title, body, audience (all/premium/free), route` — send an announcement |
 | GET    | `/admin/config`      | Admin  | live coin values + premium plan, defaults         |
@@ -118,12 +122,15 @@ while `PREMIUM_TEST_PURCHASES=true` (the default outside production). Admins can
 - Habit rewards across a day are capped at 300 FIT (600 for premium) by default.
 - **Streaks:** a day counts if any habit earned FIT; every 7th day in a row pays +50 FIT.
 - **Levels:** XP = lifetime FIT earned; level L needs 50·L·(L−1) XP.
-- **Challenges** (`src/seed/challenges.js`) run daily or weekly (Mon–Sun). Progress is calculated from real activity
-  and the prize is paid once, as soon as the target is reached.
+- **Challenges** are created and edited in the admin panel → Challenges. Each runs daily, weekly (Mon–Sun) or once
+  between two dates (an event), and tracks one habit as a total, days hitting a daily amount, or one timed session
+  (`src/config/challenges.js`). Progress is calculated from real activity and the prize is paid once, as soon as the
+  target is reached. Paused and archived challenges are hidden from the app.
 - **Referrals:** when an invited friend has 3 active days, they get 50 FIT and the inviter 100 FIT (max 20/month).
 - **Marketplace** (`src/seed/rewards.js`): 2% fee; a per-user wallet lock stops two redemptions spending the same FIT.
   Voucher codes are generated locally for now (`fulfil()` in `marketplace.service.js` is where a partner API goes).
-- Challenges and marketplace items are seeded automatically on startup (stock is never reset).
+- The built-in challenges (`src/seed/challenges.js`) are inserted on startup only if missing, so admin edits stick.
+  Marketplace items are seeded on startup too (stock is never reset).
 
 ## Steps & rewards
 

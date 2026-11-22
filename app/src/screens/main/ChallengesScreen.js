@@ -20,6 +20,7 @@ import Countdown from '../../components/Countdown';
 import { colors, gradients, radius, type } from '../../theme';
 
 const FILTERS = ['All', 'Daily', 'Weekly', 'Joined'];
+const FILTERS_WITH_EVENTS = ['All', 'Event', 'Daily', 'Weekly', 'Joined'];
 
 function RankCard({ onPress, board }) {
   const top = (board?.entries || []).slice(0, 3);
@@ -49,6 +50,9 @@ function RankCard({ onPress, board }) {
   );
 }
 
+const TAG_BG = { Daily: 'rgba(34,211,238,0.14)', Weekly: 'rgba(124,92,255,0.18)', Event: 'rgba(255,201,77,0.14)' };
+const TAG_COLOR = { Daily: colors.cyan, Weekly: '#B6A4FF', Event: colors.gold };
+
 function ChallengeCard({ c, onPress }) {
   return (
     <Card onPress={onPress} style={styles.card}>
@@ -56,8 +60,8 @@ function ChallengeCard({ c, onPress }) {
         <IconBubble icon={c.icon} gradient={c.gradient} size={52} radius={17} />
         <View style={styles.flex}>
           <View style={styles.tagRow}>
-            <View style={[styles.tag, { backgroundColor: c.type === 'Daily' ? 'rgba(34,211,238,0.14)' : 'rgba(124,92,255,0.18)' }]}>
-              <Text style={[styles.tagText, { color: c.type === 'Daily' ? colors.cyan : '#B6A4FF' }]}>{c.type}</Text>
+            <View style={[styles.tag, { backgroundColor: TAG_BG[c.type] || TAG_BG.Weekly }]}>
+              <Text style={[styles.tagText, { color: TAG_COLOR[c.type] || TAG_COLOR.Weekly }]}>{c.type}</Text>
             </View>
             {c.joined ? (
               <View style={[styles.tag, styles.joinedTag]}>
@@ -138,7 +142,7 @@ export default function ChallengesScreen({ navigation }) {
 
       <Text style={[type.h2, styles.section]}>Explore</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bleed} contentContainerStyle={styles.chips}>
-        {FILTERS.map(f => (
+        {(challenges.some(c => c.type === 'Event') ? FILTERS_WITH_EVENTS : FILTERS).map(f => (
           <Chip key={f} label={f} active={filter === f} onPress={() => setFilter(f)} />
         ))}
       </ScrollView>

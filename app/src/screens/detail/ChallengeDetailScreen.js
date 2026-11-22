@@ -18,7 +18,7 @@ import { avatarColor } from '../../utils/format';
 import Countdown from '../../components/Countdown';
 import { colors, type, TOKEN } from '../../theme';
 
-// Which activity screen the "Track" button opens, by challenge icon
+// Fallback for the "Track" button when the server doesn't send the challenge's habit
 const TRACK_BY_ICON = { Footprints: 'walk', Droplet: 'water', Bike: 'cycle', Wind: 'breathe', BookOpen: 'read' };
 
 export default function ChallengeDetailScreen({ route, navigation }) {
@@ -47,7 +47,8 @@ export default function ChallengeDetailScreen({ route, navigation }) {
   };
 
   const track = () => {
-    const activity = TRACK_BY_ICON[c.icon];
+    // The server says which habit counts; older servers only had the icon to go by
+    const activity = c.activity || TRACK_BY_ICON[c.icon];
     navigation.navigate(activity ? 'ActivityDetail' : 'Activity', activity ? { id: activity } : undefined);
   };
 

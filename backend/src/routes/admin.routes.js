@@ -6,6 +6,9 @@ import { validateParam } from '../middlewares/params.middleware.js';
 import { idParam } from '../validators/engagement.validator.js';
 import {
   announcementSchema,
+  challengeSchema,
+  challengeStatusSchema,
+  objectIdParam,
   grantPremiumSchema,
   halvingSettingsSchema,
   halvingStepSchema,
@@ -27,6 +30,10 @@ router.post('/halving/undo', validate(halvingStepSchema), admin.undoHalve);
 router.get('/users', validateQuery(usersQuerySchema), admin.users);
 router.post('/users/:id/premium', validateParam('id', idParam), validate(grantPremiumSchema), admin.grant);
 router.delete('/users/:id/premium', validateParam('id', idParam), admin.revoke);
+router.get('/challenges', admin.challenges);
+router.post('/challenges', validate(challengeSchema), admin.createChallenge);
+router.put('/challenges/:id', validateParam('id', objectIdParam), validate(challengeSchema), admin.updateChallenge);
+router.patch('/challenges/:id/status', validateParam('id', objectIdParam), validate(challengeStatusSchema), admin.setChallengeStatus);
 router.get('/notifications', admin.notificationsInfo);
 router.post('/notifications', validate(announcementSchema), admin.sendAnnouncement);
 

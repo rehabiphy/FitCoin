@@ -26,7 +26,7 @@ export const leaderboardQuerySchema = z.object({
 });
 
 export const challengesQuerySchema = z.object({
-  filter: z.enum(['all', 'daily', 'weekly', 'joined']).default('all'),
+  filter: z.enum(['all', 'daily', 'weekly', 'event', 'joined']).default('all'),
 });
 
 export const marketQuerySchema = z.object({

@@ -151,6 +151,10 @@ export const api = {
     request('GET', `/admin/users?${new URLSearchParams({ q, premium, page, limit })}`),
   grantPremium: (id, days) => request('POST', `/admin/users/${id}/premium`, { days }),
   revokePremium: id => request('DELETE', `/admin/users/${id}/premium`),
+  challenges: () => request('GET', '/admin/challenges'),
+  createChallenge: challenge => request('POST', '/admin/challenges', challenge),
+  updateChallenge: (id, challenge) => request('PUT', `/admin/challenges/${id}`, challenge),
+  setChallengeStatus: (id, { active, archived }) => request('PATCH', `/admin/challenges/${id}/status`, { active, archived }),
   notifications: () => request('GET', '/admin/notifications'),
   sendAnnouncement: ({ title, body, audience, route }) => request('POST', '/admin/notifications', { title, body, audience, route }),
 };

@@ -1,5 +1,7 @@
 import { z } from 'zod';
-import { ACTIVITY_IDS } from '../config/activities.js';
+import { ACTIVITIES, ACTIVITY_IDS } from '../config/activities.js';
+import { CHALLENGE_ICONS, GOAL_TYPES, GOAL_TYPE_IDS, PERIODS } from '../config/challenges.js';
+import { daysBetween } from '../utils/dates.js';
 import { HABIT_GROUPS, HABIT_GROUP_IDS } from '../config/rewards.js';
 
 const coins = (max = 10000) => z.number({ error: 'Enter a number' }).min(0, { error: 'Can’t be negative' }).max(max);
@@ -79,3 +81,65 @@ export const halvingSettingsSchema = z.object({
   // Halve automatically once this many members have joined (null = off)
   autoAtUsers: z.number().int().min(1).max(1000000000).nullable(),
 });
+
+/* ---------- challenges ---------- */
+
+const dateKey = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { error: 'Pick a date' });
+const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, { error: 'Use a colour like #7C5CFF' });
+const runDays = c => (c.period === 'daily' ? 1 : c.period === 'weekly' ? 7 : daysBetween(c.startDate, c.endDate) + 1);
+
+export const challengeSchema = z
+  .object({
+    title: z.string({ error: 'Title is required' }).trim().min(3, { error: 'Title is too short' }).max(60),
+    description: z.string({ error: 'Description is required' }).trim().min(5, { error: 'Description is too short' }).max(200),
+    period: z.enum(PERIODS),
+    startDate: dateKey.optional(),
+    endDate: dateKey.optional(),
+    icon: z.enum(CHALLENGE_ICONS, { error: 'Pick an icon' }),
+    gradient: z.array(hexColor).length(2),
+    activity: z.enum(ACTIVITY_IDS, { error: 'Pick a habit' }),
+    goalType: z.enum(GOAL_TYPE_IDS),
+    dailyTarget: z.number({ error: 'Enter a daily amount' }).positive({ error: 'Daily amount must be above 0' }).max(100000).optional(),
+    // Minute of the day a session must start before (e.g. 540 = 9 AM); empty = any time
+    startBefore: z.number().int().min(1).max(1440).nullable().optional(),
+    target: z.number({ error: 'Enter a target' }).positive({ error: 'Target must be above 0' }).max(10000000),
+    unitLabel: z.string().trim().max(20).default(''),
+    reward: coins(100000),
+    active: z.boolean().default(true),
+    sort: z.number().int().min(0).max(100000).optional(),
+  })
+  .superRefine((c, ctx) => {
+    const issue = (path, message) => ctx.addIssue({ code: 'custom', path: [path], message });
+    if (!GOAL_TYPES[c.goalType].activities.includes(c.activity)) {
+      issue('goalType', `${ACTIVITIES[c.activity].name} has no timed sessions — pick another goal`);
+    }
+    if (c.period === 'custom') {
+      if (!c.startDate || !c.endDate) {
+        issue('startDate', 'An event needs a start and an end date');
+        return;
+      }
+      if (c.endDate < c.startDate) {
+        issue('endDate', 'The end date is before the start date');
+        return;
+      }
+      if (runDays(c) > 366) {
+        issue('endDate', 'An event can last at most a year');
+      }
+    }
+    if (c.goalType === 'days') {
+      if (!c.dailyTarget) {
+        issue('dailyTarget', 'Enter the amount needed each day');
+      }
+      if (!Number.isInteger(c.target)) {
+        issue('target', 'Days must be a whole number');
+      } else if (c.target > runDays(c)) {
+        issue('target', `This run only has ${runDays(c)} day${runDays(c) === 1 ? '' : 's'}`);
+      }
+    }
+  });
+
+export const challengeStatusSchema = z
+  .object({ active: z.boolean().optional(), archived: z.boolean().optional() })
+  .refine(s => s.active !== undefined || s.archived !== undefined, { error: 'Nothing to update' });
+
+export const objectIdParam = z.string().regex(/^[a-f0-9]{24}$/i, { error: 'Challenge not found' });

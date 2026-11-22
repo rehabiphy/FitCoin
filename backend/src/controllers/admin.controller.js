@@ -1,10 +1,18 @@
 import { defaultRewardConfig, getBaseRewardConfig, rewardConfigMeta, saveRewardConfig } from '../services/rewardConfig.service.js';
 import { MAX_ERA, coinParts, factorOf, getHalvingState, halve, saveHalvingSettings, undoHalving } from '../services/halving.service.js';
+import mongoose from 'mongoose';
 import Challenge from '../models/Challenge.js';
 import User from '../models/User.js';
 import { grantPremium, revokePremium } from '../services/premium.service.js';
 import { getOverview, listUsers, toUserRow } from '../services/admin.service.js';
 import { broadcast, broadcastInfo } from '../services/broadcast.service.js';
+import {
+  challengeOptions,
+  createChallenge as create,
+  listAdminChallenges,
+  setChallengeStatus as setStatus,
+  updateChallenge as update,
+} from '../services/challengeAdmin.service.js';
 import { ACTIVITIES, ACTIVITY_IDS } from '../config/activities.js';
 import { HABIT_GROUPS, HABIT_GROUP_IDS, groupOf } from '../config/rewards.js';
 
@@ -13,6 +21,9 @@ const HABITS = ACTIVITY_IDS.map(id => {
   const a = ACTIVITIES[id];
   return { id, name: a.name, unit: a.unit, rateUnit: a.rateUnit, rewardMode: a.rewardMode, unitSize: a.unitSize, group: groupOf(id) };
 });
+// Halving lists every challenge that isn't archived (paused ones too, so their fixed amounts can be kept)
+const NOT_ARCHIVED = () => ({ archived: mongoose.trusted({ $ne: true }) });
+
 const GROUPS = HABIT_GROUP_IDS.map(g => ({ id: g, name: HABIT_GROUPS[g].name, ids: HABIT_GROUPS[g].ids }));
 
 /** GET /admin/overview */
@@ -35,7 +46,7 @@ export async function getConfig(req, res) {
 async function halvingView(state) {
   const [base, challenges, users] = await Promise.all([
     getBaseRewardConfig(),
-    Challenge.find({ active: true }).sort({ sort: 1 }).select('slug title period reward').lean(),
+    Challenge.find(NOT_ARCHIVED()).sort({ sort: 1 }).select('slug title period reward').lean(),
     User.estimatedDocumentCount(),
   ]);
   return {
@@ -50,7 +61,7 @@ async function halvingView(state) {
 }
 
 async function halvingKeys() {
-  const [base, challenges] = await Promise.all([getBaseRewardConfig(), Challenge.find({ active: true }).select('slug title period reward').lean()]);
+  const [base, challenges] = await Promise.all([getBaseRewardConfig(), Challenge.find(NOT_ARCHIVED()).select('slug title period reward').lean()]);
   return new Set(coinParts(base, challenges, { era: 0, overrides: {} }).map(p => p.key));
 }
 
@@ -108,4 +119,24 @@ export async function sendAnnouncement(req, res) {
 export async function revoke(req, res) {
   const user = await revokePremium(req.params.id);
   res.json({ success: true, data: { user: toUserRow(user) } });
+}
+
+/** GET /admin/challenges — every challenge with stats, plus the form's options */
+export async function challenges(req, res) {
+  res.json({ success: true, data: { challenges: await listAdminChallenges(), options: challengeOptions() } });
+}
+
+/** POST /admin/challenges */
+export async function createChallenge(req, res) {
+  res.status(201).json({ success: true, data: { challenge: await create(req.body, req.user) } });
+}
+
+/** PUT /admin/challenges/:id — replaces the challenge's settings (its id/slug never changes) */
+export async function updateChallenge(req, res) {
+  res.json({ success: true, data: { challenge: await update(req.params.id, req.body, req.user) } });
+}
+
+/** PATCH /admin/challenges/:id/status — { active?, archived? } */
+export async function setChallengeStatus(req, res) {
+  res.json({ success: true, data: { challenge: await setStatus(req.params.id, req.body, req.user) } });
 }

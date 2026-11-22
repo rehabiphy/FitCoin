@@ -9,55 +9,71 @@ import { creditOnce } from './rewards.service.js';
 import { notify } from './notification.service.js';
 import { coinValue, getHalvingState } from './halving.service.js';
 import { addDays, localMidnightUtc, mondayOf, todayKey } from '../utils/dates.js';
+import { periodLabel } from '../config/challenges.js';
 
 const trusted = mongoose.trusted;
 
-/** The run of a challenge happening now: { periodKey, start, end (inclusive), endsAt }. */
+/**
+ * The run of a challenge happening now: { periodKey, start, end (inclusive), endsAt, live }.
+ * Daily and weekly challenges are always live; a custom event only between its dates.
+ * An event has a single run, so its periodKey is fixed (editing its dates keeps enrollments).
+ */
 export function currentRun(challenge, tzOffset) {
   const today = todayKey(tzOffset);
+  if (challenge.period === 'custom') {
+    const { startDate: start, endDate: end } = challenge;
+    return { periodKey: 'event', start, end, endsAt: localMidnightUtc(addDays(end, 1), tzOffset), live: today >= start && today <= end };
+  }
   const start = challenge.period === 'weekly' ? mondayOf(today) : today;
   const end = challenge.period === 'weekly' ? addDays(start, 6) : start;
-  return { periodKey: start, start, end, endsAt: localMidnightUtc(addDays(end, 1), tzOffset) };
+  return { periodKey: start, start, end, endsAt: localMidnightUtc(addDays(end, 1), tzOffset), live: true };
 }
 
 const inRange = (start, end) => trusted({ $gte: start, $lte: end });
+const round1 = n => Math.round(n * 10) / 10;
 
-/** Progress toward a challenge between two local dates, from the user's real activity. */
-async function measure(metric, userId, start, end) {
-  switch (metric) {
-    case 'stepGoalDays':
-      return StepDay.countDocuments({ user: userId, date: inRange(start, end), steps: trusted({ $gte: 10000 }) });
-    case 'waterGlasses': {
-      const rows = await DailyActivity.find({ user: userId, activity: 'water', date: inRange(start, end) });
-      return rows.reduce((s, r) => s + r.value, 0);
-    }
-    case 'cycleKm': {
-      const rows = await DailyActivity.find({ user: userId, activity: 'cycle', date: inRange(start, end) });
-      return Math.round(rows.reduce((s, r) => s + r.value, 0) * 10) / 10;
-    }
-    case 'readGoalDays':
-      return DailyActivity.countDocuments({ user: userId, activity: 'read', date: inRange(start, end), value: trusted({ $gte: 30 }) });
-    case 'morningBreatheMinutes': {
-      const best = await ActivitySession.findOne({
-        user: userId,
-        activity: 'breathe',
-        status: 'completed',
-        date: inRange(start, end),
-        startMinuteOfDay: trusted({ $lt: 9 * 60 }),
-      }).sort({ creditedValue: -1 });
-      return best?.creditedValue || 0;
-    }
-    default:
-      return 0;
+// Challenges members can see (paused and archived ones are hidden)
+const VISIBLE = () => ({ active: true, archived: trusted({ $ne: true }) });
+
+/** The member's daily totals for one habit between two local dates: [{ date, value }]. */
+async function dailyValues(activity, userId, start, end) {
+  if (activity === 'walk') {
+    const rows = await StepDay.find({ user: userId, date: inRange(start, end) }).select('date steps').lean();
+    return rows.map(r => ({ date: r.date, value: r.steps }));
   }
+  return DailyActivity.find({ user: userId, activity, date: inRange(start, end) }).select('date value').lean();
 }
 
-/** Recomputes progress for an enrollment and pays the prize the first time it is completed. */
-/** A challenge's prize today: its seeded reward, halved (or the admin's fixed amount). */
-const prizeOf = (challenge, halving) => coinValue(halving, `challenge.${challenge.slug}`, challenge.reward);
+/** Progress toward a challenge's goal during a run, from the member's real activity. */
+async function measure(challenge, userId, start, end) {
+  const { activity, goalType } = challenge;
+  if (goalType === 'session') {
+    const best = await ActivitySession.findOne({
+      user: userId,
+      activity,
+      status: 'completed',
+      date: inRange(start, end),
+      ...(challenge.startBefore ? { startMinuteOfDay: trusted({ $lt: challenge.startBefore }) } : {}),
+    })
+      .sort({ creditedValue: -1 })
+      .select('creditedValue')
+      .lean();
+    return round1(best?.creditedValue || 0);
+  }
+  const rows = await dailyValues(activity, userId, start, end);
+  if (goalType === 'days') {
+    const need = challenge.dailyTarget || 0;
+    return rows.filter(r => r.value > 0 && r.value >= need).length;
+  }
+  return round1(rows.reduce((s, r) => s + r.value, 0));
+}
 
+/** A challenge's prize today: its base reward, halved (or the admin's fixed amount). */
+export const prizeOf = (challenge, halving) => coinValue(halving, `challenge.${challenge.slug}`, challenge.reward);
+
+/** Recomputes progress for an enrollment and pays the prize the first time it is completed. */
 async function updateProgress(enrollment, challenge, run, tzOffset) {
-  const value = await measure(challenge.metric, enrollment.user, run.start, run.end);
+  const value = await measure(challenge, enrollment.user, run.start, run.end);
   enrollment.progress = Math.min(value, challenge.target);
 
   if (value >= challenge.target && !enrollment.rewarded) {
@@ -102,7 +118,8 @@ function toPublic(challenge, run, { enrollment, participants, percentile, top, h
     id: challenge.slug,
     title: challenge.title,
     description: challenge.description,
-    type: challenge.period === 'daily' ? 'Daily' : 'Weekly',
+    type: periodLabel(challenge.period),
+    activity: challenge.activity,
     icon: challenge.icon,
     gradient: challenge.gradient,
     target: challenge.target,
@@ -121,17 +138,18 @@ function toPublic(challenge, run, { enrollment, participants, percentile, top, h
   };
 }
 
-async function findChallenge(idOrSlug) {
+async function findChallenge(idOrSlug, tzOffset) {
   const query = mongoose.isValidObjectId(idOrSlug) ? { _id: idOrSlug } : { slug: String(idOrSlug) };
-  const challenge = await Challenge.findOne({ ...query, active: true });
-  if (!challenge) {
+  const challenge = await Challenge.findOne({ ...query, ...VISIBLE() });
+  if (!challenge || !currentRun(challenge, tzOffset).live) {
     throw ApiError.notFound('Challenge not found');
   }
   return challenge;
 }
 
 export async function listChallenges(userId, tzOffset) {
-  const [challenges, halving] = await Promise.all([Challenge.find({ active: true }).sort({ sort: 1 }), getHalvingState()]);
+  const [all, halving] = await Promise.all([Challenge.find(VISIBLE()).sort({ sort: 1, createdAt: 1 }), getHalvingState()]);
+  const challenges = all.filter(c => currentRun(c, tzOffset).live);
   return Promise.all(
     challenges.map(async c => {
       const run = currentRun(c, tzOffset);
@@ -148,7 +166,7 @@ export async function listChallenges(userId, tzOffset) {
 }
 
 export async function getChallenge(userId, idOrSlug, tzOffset) {
-  const c = await findChallenge(idOrSlug);
+  const c = await findChallenge(idOrSlug, tzOffset);
   const run = currentRun(c, tzOffset);
   let enrollment = await ChallengeEnrollment.findOne({ user: userId, challenge: c._id, periodKey: run.periodKey });
   if (enrollment) {
@@ -189,7 +207,7 @@ export async function getChallenge(userId, idOrSlug, tzOffset) {
 }
 
 export async function joinChallenge(userId, idOrSlug, tzOffset) {
-  const c = await findChallenge(idOrSlug);
+  const c = await findChallenge(idOrSlug, tzOffset);
   const run = currentRun(c, tzOffset);
   try {
     await ChallengeEnrollment.create({ user: userId, challenge: c._id, periodKey: run.periodKey });
@@ -203,9 +221,12 @@ export async function joinChallenge(userId, idOrSlug, tzOffset) {
 
 /** Called after any activity: refreshes progress (and pays prizes) for the user's current runs. */
 export async function refreshUserChallenges(userId, tzOffset) {
-  const challenges = await Challenge.find({ active: true });
+  const challenges = await Challenge.find(VISIBLE());
   for (const c of challenges) {
     const run = currentRun(c, tzOffset);
+    if (!run.live) {
+      continue;
+    }
     const enrollment = await ChallengeEnrollment.findOne({ user: userId, challenge: c._id, periodKey: run.periodKey });
     if (enrollment && !enrollment.rewarded) {
       await updateProgress(enrollment, c, run, tzOffset);

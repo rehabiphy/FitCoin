@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import ApiError from '../utils/ApiError.js';
 import { ACTIVITIES, ACTIVITY_IDS } from '../config/activities.js';
 import { REFERRAL_RULES, STREAK_RULES } from '../config/progression.js';
+import { periodLabel } from '../config/challenges.js';
 
 /**
  * Coin halving. Every FIT amount the app pays (habit rates and daily maxes,
@@ -202,7 +203,7 @@ export function coinParts(baseConfig, challenges, state) {
   parts.push(part('referral.referrer', 'bonuses', 'Referral — inviter', 'When an invited friend completes their active days', REFERRAL_RULES.referrerReward));
   parts.push(part('referral.referee', 'bonuses', 'Referral — welcome bonus', 'The invited friend', REFERRAL_RULES.refereeReward));
   for (const c of challenges) {
-    parts.push(part(`challenge.${c.slug}`, 'challenges', c.title, `${c.period === 'daily' ? 'Daily' : 'Weekly'} challenge prize`, c.reward));
+    parts.push(part(`challenge.${c.slug}`, 'challenges', c.title, `${periodLabel(c.period)} challenge prize`, c.reward));
   }
   return parts;
 }
