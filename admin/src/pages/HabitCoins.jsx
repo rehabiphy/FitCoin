@@ -75,7 +75,7 @@ export default function HabitCoins({ configData, configError, reloadConfig, save
       <div className="page-head">
         <div>
           <h1>Habit coins</h1>
-          <p>How much FIT each habit pays. Premium members get these × {multiplier}.</p>
+          <p>How much axyio each habit pays. Premium members get these × {multiplier}.</p>
         </div>
         <div className="actions">
           <LastSaved meta={meta} />
@@ -103,8 +103,8 @@ export default function HabitCoins({ configData, configError, reloadConfig, save
             <thead>
               <tr>
                 <th>Habit</th>
-                <th>Rate (FIT)</th>
-                <th>Max FIT / day</th>
+                <th>Rate (axyio)</th>
+                <th>Max axyio / day</th>
                 <th>Daily goal</th>
                 <th>Premium max / day</th>
               </tr>
@@ -132,7 +132,7 @@ export default function HabitCoins({ configData, configError, reloadConfig, save
                             min="0"
                             step="any"
                             value={row.perUnit}
-                            aria-label={`${h.name} FIT per ${h.rateUnit}`}
+                            aria-label={`${h.name} axyio per ${h.rateUnit}`}
                             onChange={e => setHabit(h.id, 'perUnit', e.target.value)}
                           />
                           <span className="muted small">per {h.rateUnit}</span>
@@ -146,7 +146,7 @@ export default function HabitCoins({ configData, configError, reloadConfig, save
                         min="0"
                         step="any"
                         value={row.maxReward}
-                        aria-label={`${h.name} max FIT per day`}
+                        aria-label={`${h.name} max axyio per day`}
                         onChange={e => setHabit(h.id, 'maxReward', e.target.value)}
                       />
                     </td>
@@ -165,7 +165,7 @@ export default function HabitCoins({ configData, configError, reloadConfig, save
                       </div>
                     </td>
                     <td>
-                      <span className="coin num">{fmt(Math.round((parsed.habits[h.id].maxReward || 0) * multiplier))} FIT</span>
+                      <span className="coin num">{fmt(Math.round((parsed.habits[h.id].maxReward || 0) * multiplier))} axyio</span>
                     </td>
                   </tr>
                 );
@@ -178,7 +178,7 @@ export default function HabitCoins({ configData, configError, reloadConfig, save
       <div className="card">
         <div className="grid-2">
           <div className="field">
-            <label htmlFor="cap">Daily cap for free members (FIT)</label>
+            <label htmlFor="cap">Daily cap for free members (axyio)</label>
             <input
               id="cap"
               className={`input num ${!isValidAmount(draft.dailyCap) ? 'invalid' : ''}`}
@@ -187,7 +187,7 @@ export default function HabitCoins({ configData, configError, reloadConfig, save
               value={draft.dailyCap}
               onChange={e => setDraft(d => ({ ...d, dailyCap: e.target.value }))}
             />
-            <span className="muted small">Most FIT a free member can earn from all habits in one day. Premium has its own cap on the Premium page.</span>
+            <span className="muted small">Most axyio a free member can earn from all habits in one day. Premium has its own cap on the Premium page.</span>
           </div>
           {groups.map(g => (
             <div className="field" key={g.id}>
@@ -215,7 +215,7 @@ export default function HabitCoins({ configData, configError, reloadConfig, save
             </div>
           ))}
           <div className="notice">
-            Free members can earn up to <b className="coin">{fmt(Math.min(freeTotal, Number.isFinite(parsed.dailyCap) ? parsed.dailyCap : freeTotal))} FIT</b> a
+            Free members can earn up to <b className="coin">{fmt(Math.min(freeTotal, Number.isFinite(parsed.dailyCap) ? parsed.dailyCap : freeTotal))} axyio</b> a
             day if they pick the best-paying habits in each group
             {Number.isFinite(parsed.dailyCap) && freeTotal > parsed.dailyCap ? ` (${fmt(freeTotal)}, limited by the cap)` : ''}. Premium members earn from
             all {habits.length} habits. Changes apply to new activity right away (today’s rewards only ever go up, never down).

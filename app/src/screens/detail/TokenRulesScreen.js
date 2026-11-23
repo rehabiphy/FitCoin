@@ -38,9 +38,9 @@ const sections = (dailyCap, premium) => [
   {
     icon: 'Coins',
     color: colors.gold,
-    title: 'How FIT is issued',
+    title: 'How axyio is issued',
     points: [
-      'FIT is credited only after activities are verified on our servers.',
+      'axyio is credited only after activities are verified on our servers.',
       ...habitPoints(premium),
       `Every 7th day in a row you’re active earns a 50 ${TOKEN} streak bonus; challenges pay their prize when completed.`,
     ],
@@ -60,7 +60,7 @@ const sections = (dailyCap, premium) => [
     icon: 'Hourglass',
     color: colors.orange,
     title: 'Expiry policy',
-    points: ['FIT expires 6 months after it is earned.', 'You’ll be notified 14 days before any FIT expires.', 'Oldest FIT is always spent first.'],
+    points: ['axyio expires 6 months after it is earned.', 'You’ll be notified 14 days before any axyio expires.', 'Oldest axyio is always spent first.'],
   },
   {
     icon: 'Gift',
@@ -68,11 +68,11 @@ const sections = (dailyCap, premium) => [
     title: 'Redemption rules',
     points: MARKETPLACE_ENABLED
       ? [
-          'Redeem FIT for partner vouchers, passes and offers.',
+          'Redeem axyio for partner vouchers, passes and offers.',
           'A 2% platform fee applies to marketplace redemptions.',
-          'FIT has no cash value and can’t be transferred between users.',
+          'axyio has no cash value and can’t be transferred between users.',
         ]
-      : ['FIT has no cash value and can’t be transferred between users.'],
+      : ['axyio has no cash value and can’t be transferred between users.'],
   },
   {
     icon: 'ShieldCheck',
@@ -125,8 +125,8 @@ export default function TokenRulesScreen() {
         <Text style={[type.h1, styles.introTitle]}>About {TOKEN} points</Text>
         <Text style={[type.body, styles.center]}>
           {MARKETPLACE_ENABLED
-            ? 'FIT are in-app reward points you earn for healthy habits and spend in the marketplace.'
-            : 'FIT are in-app reward points you earn for healthy habits.'}
+            ? 'axyio points are in-app rewards you earn for healthy habits and spend in the marketplace.'
+            : 'axyio points are in-app rewards you earn for healthy habits.'}
         </Text>
       </Animated.View>
       {SECTIONS.map((s, i) => (

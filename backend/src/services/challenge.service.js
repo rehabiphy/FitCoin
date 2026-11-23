@@ -98,7 +98,7 @@ async function updateProgress(enrollment, challenge, run, tzOffset) {
       await notify(enrollment.user, {
         type: 'challenge',
         title: 'Challenge complete!',
-        body: `You finished ${challenge.title} and earned ${prize} FIT.`,
+        body: `You finished ${challenge.title} and earned ${prize} axyio.`,
         icon: 'Trophy',
         color: 'gold',
         dedupeKey: `challenge:${enrollment._id}`,

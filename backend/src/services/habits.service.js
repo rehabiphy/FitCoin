@@ -117,7 +117,7 @@ export async function setActiveHabits(user, ctx, habits, date) {
     const missing = (await lockedHabits(user._id, date)).filter(id => !picks.includes(id));
     if (missing.length) {
       const names = missing.map(id => ACTIVITIES[id].name).join(', ');
-      throw ApiError.badRequest(`${names} already earned FIT or has a session running today, so it stays active until tomorrow.`, 'HABIT_LOCKED');
+      throw ApiError.badRequest(`${names} already earned axyio or has a session running today, so it stays active until tomorrow.`, 'HABIT_LOCKED');
     }
   }
   user.activeHabits = picks;

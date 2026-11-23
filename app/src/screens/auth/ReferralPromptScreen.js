@@ -51,7 +51,7 @@ export default function ReferralPromptScreen() {
         <IconBubble icon="Gift" gradient={gradients.mint} size={72} radius={24} />
         <Text style={[type.h1, styles.title]}>Did a friend invite you?</Text>
         <Text style={[type.body, styles.centerText]}>
-          Enter their referral code to get a {TOKEN} welcome bonus right now. Your friend earns {TOKEN} too.
+          Enter their referral code to get an {TOKEN} welcome bonus right now. Your friend earns {TOKEN} too.
         </Text>
       </Animated.View>
 

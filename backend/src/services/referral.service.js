@@ -150,7 +150,7 @@ export async function payReferral(user) {
       await notify(claimed._id, {
         type: 'referral',
         title: 'Welcome bonus credited',
-        body: `+${refereeReward} FIT for joining with ${referrerName}’s code.`,
+        body: `+${refereeReward} axyio for joining with ${referrerName}’s code.`,
         icon: 'Gift',
         color: 'mint',
         dedupeKey: `referral-welcome:${claimed._id}`,
@@ -178,7 +178,7 @@ export async function payReferral(user) {
       await notify(referrer._id, {
         type: 'referral',
         title: 'Referral reward',
-        body: `${claimed.name} joined with your code. +${referrerReward} FIT for you!`,
+        body: `${claimed.name} joined with your code. +${referrerReward} axyio for you!`,
         icon: 'Users',
         color: 'cyan',
         dedupeKey: `referral:${claimed._id}`,

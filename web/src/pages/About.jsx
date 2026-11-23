@@ -7,7 +7,7 @@ import logo from '../assets/logo-wordmark.png';
 
 const VALUES = [
   { icon: 'Heart', color: 'pink', t: 'Wellbeing first', d: 'We reward balance, not extremes. Every habit has a sensible daily limit, so axyio never pushes you to overdo it.' },
-  { icon: 'ShieldCheck', color: 'mint', t: 'Honest rewards', d: 'Every FIT is verified and recorded. No hidden rules. Our reward rules are public and the same for everyone.' },
+  { icon: 'ShieldCheck', color: 'mint', t: 'Honest rewards', d: 'Every axyio is verified and recorded. No hidden rules. Our reward rules are public and the same for everyone.' },
   { icon: 'Lock', color: 'primary', t: 'Privacy by design', d: 'We collect only what we need to run the app and reward you. We never sell your data.' },
   { icon: 'Users', color: 'cyan', t: 'Better together', d: 'Challenges, leaderboards and referrals make healthy living something you share.' },
 ];
@@ -39,7 +39,7 @@ export default function About() {
               more of them.
             </p>
             <p>
-              So we turned six everyday habits into FIT points that you can spend on vouchers, fitness passes, food, lifestyle deals and
+              So we turned six everyday habits into axyio points that you can spend on vouchers, fitness passes, food, lifestyle deals and
               charity. We check every reward on our servers so the system stays fair, and we added streaks, challenges, badges and
               leaderboards to keep the momentum going.
             </p>

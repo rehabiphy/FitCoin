@@ -91,7 +91,7 @@ function HomeScreen() {
       </div>
       <div className="ps-balance">
         <div>
-          <small>FIT balance</small>
+          <small>axyio balance</small>
           <strong>1,284</strong>
         </div>
         <span className="ps-chip">+42 today</span>
@@ -122,7 +122,7 @@ function WalletScreen() {
     <div className="ps-body">
       <div className="ps-wallet-card">
         <small>Total balance</small>
-        <strong>1,284 FIT</strong>
+        <strong>1,284 axyio</strong>
         <span>Level 6 · 1,940 XP</span>
       </div>
       <p className="ps-title">Recent activity</p>
@@ -184,7 +184,7 @@ function MarketScreen() {
               <Icon name={i} size={16} />
             </span>
             <b>{t}</b>
-            <small>{c} FIT</small>
+            <small>{c} axyio</small>
           </div>
         ))}
       </div>

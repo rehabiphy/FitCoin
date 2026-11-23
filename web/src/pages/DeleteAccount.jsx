@@ -46,7 +46,7 @@ export default function DeleteAccount() {
                 <li>Step history and habit logs (water, sleep, reading, breathing, rides)</li>
                 <li>Challenge entries, badges, streaks and leaderboard entries</li>
                 <li>Notifications and active sessions on every device</li>
-                <li>Your FIT balance. Unspent FIT is lost and can’t be restored</li>
+                <li>Your axyio balance. Unspent axyio is lost and can’t be restored</li>
               </ul>
             </Reveal>
             <Reveal className="card rule-block" variant="right" delay={0.08}>
@@ -66,7 +66,7 @@ export default function DeleteAccount() {
           <Reveal className="note-card">
             <Icon name="Gift" size={20} />
             <p>
-              <b>Before you go:</b> spend your FIT in the marketplace, and save any voucher codes you haven’t used. Uninstalling the app does
+              <b>Before you go:</b> spend your axyio in the marketplace, and save any voucher codes you haven’t used. Uninstalling the app does
               not delete your account. If you have Premium, deleting your account ends it without a refund for the remaining days unless the
               law requires one.
             </p>

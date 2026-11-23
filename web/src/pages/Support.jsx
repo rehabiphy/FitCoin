@@ -9,7 +9,7 @@ import { FAQ, SITE } from '../site.js';
 const CAT_ICONS = {
   'Getting started': ['Sparkles', 'primary'],
   'Steps & tracking': ['Footprints', 'mint'],
-  'FIT & rewards': ['Coins', 'gold'],
+  'axyio & rewards': ['Coins', 'gold'],
   Premium: ['Crown', 'orange'],
   'Account & security': ['ShieldCheck', 'cyan'],
 };

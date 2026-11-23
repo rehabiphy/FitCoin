@@ -98,7 +98,7 @@ async function processUser(entry, progress, config) {
       await notify(user._id, {
         type: 'system',
         title: 'Your Premium ends soon',
-        body: `Premium ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. Renew to keep earning ${config.premium.multiplier}x FIT on every habit.`,
+        body: `Premium ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. Renew to keep earning ${config.premium.multiplier}x axyio on every habit.`,
         icon: 'Crown',
         color: 'gold',
         route: 'Premium',

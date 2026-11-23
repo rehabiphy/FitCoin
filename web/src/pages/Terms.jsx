@@ -40,29 +40,29 @@ const SECTIONS = [
     ),
   },
   {
-    id: 'fit',
-    title: 'FIT reward points',
+    id: 'axyio-points',
+    title: 'axyio reward points',
     body: (
       <>
         <ul>
           <li>
-            FIT are promotional reward points that we give you, at our discretion, for qualifying activity. <b>FIT have no cash value</b>,
+            axyio points are promotional reward points that we give you, at our discretion, for qualifying activity. <b>axyio points have no cash value</b>,
             are not a currency, cryptocurrency, security or other financial product, and are not your property.
           </li>
-          <li>FIT can’t be bought, sold, traded, transferred between accounts, exchanged for cash or withdrawn.</li>
+          <li>axyio can’t be bought, sold, traded, transferred between accounts, exchanged for cash or withdrawn.</li>
           <li>
-            Each activity has a rate and daily maximum, and habit rewards are capped each day (by default {CAPS.free} FIT for free members and{' '}
-            {CAPS.premium} FIT for Premium members). Rates, caps, challenges and rewards are shown in the app and may change over time.
+            Each activity has a rate and daily maximum, and habit rewards are capped each day (by default {CAPS.free} axyio for free members and{' '}
+            {CAPS.premium} axyio for Premium members). Rates, caps, challenges and rewards are shown in the app and may change over time.
           </li>
-          <li>FIT expire 6 months after they are earned. We notify you 14 days before, and your oldest FIT are spent first.</li>
+          <li>axyio points expire 6 months after they are earned. We notify you 14 days before, and your oldest axyio points are spent first.</li>
           <li>
-            We may hold, correct or remove FIT that were credited by mistake, through a technical error, or through activity that breaks these
+            We may hold, correct or remove axyio points that were credited by mistake, through a technical error, or through activity that breaks these
             Terms.
           </li>
-          <li>Unspent FIT are lost when your account is closed.</li>
+          <li>Unspent axyio points are lost when your account is closed.</li>
         </ul>
         <p>
-          The current earning rules are explained on our <Link to="/rewards">FIT & rewards</Link> page.
+          The current earning rules are explained on our <Link to="/rewards">axyio & rewards</Link> page.
         </p>
       </>
     ),
@@ -72,10 +72,10 @@ const SECTIONS = [
     title: 'Marketplace & redemptions',
     body: (
       <ul>
-        <li>You can redeem FIT for rewards in the marketplace while they are available. Stock is limited for some rewards.</li>
-        <li>A 2% platform fee, in FIT, is added to each redemption.</li>
+        <li>You can redeem axyio for rewards in the marketplace while they are available. Stock is limited for some rewards.</li>
+        <li>A 2% platform fee, in axyio, is added to each redemption.</li>
         <li>Rewards are provided by third-party partners and are subject to their own terms, validity dates and conditions.</li>
-        <li>Redemptions are final once the voucher is issued, unless the reward can’t be fulfilled, in which case we return your FIT.</li>
+        <li>Redemptions are final once the voucher is issued, unless the reward can’t be fulfilled, in which case we return your axyio.</li>
         <li>We are not responsible for a partner’s products or services, but we will help if there is a problem with a voucher you redeemed.</li>
       </ul>
     ),
@@ -86,7 +86,7 @@ const SECTIONS = [
     body: (
       <ul>
         <li>
-          {PREMIUM.title} gives you extra benefits, such as earning from all habits, {PREMIUM.multiplier}x FIT on habit rewards and a higher daily
+          {PREMIUM.title} gives you extra benefits, such as earning from all habits, {PREMIUM.multiplier}x axyio on habit rewards and a higher daily
           cap, for the period you buy (currently {PREMIUM.durationDays} days for {PREMIUM.currency}
           {PREMIUM.price}).
         </li>
@@ -117,13 +117,13 @@ const SECTIONS = [
         <ul>
           <li>fake, manipulate or automate step counts or activity, for example with shaking devices, emulators, modified apps or scripts;</li>
           <li>create multiple accounts or use someone else’s account;</li>
-          <li>exploit bugs or errors to earn FIT, and you agree to report any you find;</li>
+          <li>exploit bugs or errors to earn axyio, and you agree to report any you find;</li>
           <li>reverse engineer, scrape, overload or interfere with the Services or their security;</li>
           <li>upload offensive, unlawful or misleading content, such as in your name or profile photo; or</li>
           <li>use the Services for any unlawful purpose.</li>
         </ul>
         <p>
-          We may reject impossible data, hold unusual activity for review, remove FIT and suspend or close accounts that break these rules.
+          We may reject impossible data, hold unusual activity for review, remove axyio and suspend or close accounts that break these rules.
         </p>
       </>
     ),
@@ -144,8 +144,8 @@ const SECTIONS = [
     body: (
       <p>
         We are always improving axyio. We may add, change or remove features, rewards, challenges or earning rules, or pause the Services for
-        maintenance. We will give reasonable notice of significant changes where we can. We may also end the FIT programme. If we do, we will
-        give you at least 30 days’ notice to redeem your FIT.
+        maintenance. We will give reasonable notice of significant changes where we can. We may also end the axyio programme. If we do, we will
+        give you at least 30 days’ notice to redeem your axyio.
       </p>
     ),
   },
@@ -155,7 +155,7 @@ const SECTIONS = [
     body: (
       <p>
         You can stop using axyio and <Link to="/delete-account">delete your account</Link> at any time. We may suspend or close your account
-        if you break these Terms, if required by law, or to protect other members. When an account is closed, its FIT and any unused
+        if you break these Terms, if required by law, or to protect other members. When an account is closed, its axyio points and any unused
         benefits end.
       </p>
     ),

@@ -55,7 +55,7 @@ async function creditActivity(userId, activityId, date) {
     meta: { activity: activityId, value, multiplier: ctx.multiplier },
     goalNotification: {
       title: `${cfg.name} goal met!`,
-      body: `You hit today's ${cfg.name.toLowerCase()} goal and earned ${amount} FIT.`,
+      body: `You hit today's ${cfg.name.toLowerCase()} goal and earned ${amount} axyio.`,
       icon: 'Coins',
       color: 'gold',
     },

@@ -6,7 +6,7 @@ import { REFERRAL_RULES, STREAK_RULES } from '../config/progression.js';
 import { periodLabel } from '../config/challenges.js';
 
 /**
- * Coin halving. Every FIT amount the app pays (habit rates and daily maxes,
+ * Coin halving. Every axyio amount the app pays (habit rates and daily maxes,
  * daily caps, streak bonus, referral bonuses, challenge prizes) is its base
  * value × ½^era. Era 0 pays the full base values, era 1 pays half, era 2 a
  * quarter, and so on. Admins halve manually or at a member-count target.
@@ -191,14 +191,14 @@ export function coinParts(baseConfig, challenges, state) {
     const a = ACTIVITIES[id];
     const h = baseConfig.habits[id];
     if (a.rewardMode === 'perUnit') {
-      parts.push(part(`habit.${id}.perUnit`, 'habits', `${a.name} rate`, `FIT per ${a.rateUnit}`, h.perUnit));
+      parts.push(part(`habit.${id}.perUnit`, 'habits', `${a.name} rate`, `axyio per ${a.rateUnit}`, h.perUnit));
     }
     parts.push(
-      part(`habit.${id}.maxReward`, 'habits', `${a.name} daily max`, a.rewardMode === 'goal' ? 'FIT once the goal is met' : 'Most FIT a day', h.maxReward),
+      part(`habit.${id}.maxReward`, 'habits', `${a.name} daily max`, a.rewardMode === 'goal' ? 'axyio once the goal is met' : 'Most axyio a day', h.maxReward),
     );
   }
-  parts.push(part('cap.free', 'caps', 'Daily cap — free', 'Most habit FIT a free member earns a day', baseConfig.dailyCap));
-  parts.push(part('cap.premium', 'caps', 'Daily cap — premium', 'Most habit FIT a premium member earns a day', baseConfig.premium.dailyCap));
+  parts.push(part('cap.free', 'caps', 'Daily cap — free', 'Most habit axyio a free member earns a day', baseConfig.dailyCap));
+  parts.push(part('cap.premium', 'caps', 'Daily cap — premium', 'Most habit axyio a premium member earns a day', baseConfig.premium.dailyCap));
   parts.push(part('streak.bonus', 'bonuses', 'Streak bonus', `Every ${STREAK_RULES.bonusEvery} active days in a row`, STREAK_RULES.bonusAmount));
   parts.push(part('referral.referrer', 'bonuses', 'Referral — inviter', 'When a friend joins with their code', REFERRAL_RULES.referrerReward));
   parts.push(part('referral.referee', 'bonuses', 'Referral — welcome bonus', 'The friend who used the code', REFERRAL_RULES.refereeReward));

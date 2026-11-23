@@ -105,7 +105,7 @@ export function StepsProvider({ children }) {
     if (Platform.Version >= 29 && !s.permissionGranted) {
       result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACTIVITY_RECOGNITION, {
         title: 'Count your steps',
-        message: 'axyio uses your phone’s step sensor to count steps and reward you with FIT.',
+        message: 'axyio uses your phone’s step sensor to count steps and reward you with axyio.',
         buttonPositive: 'Allow',
       });
     }

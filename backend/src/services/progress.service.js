@@ -67,7 +67,7 @@ async function updateStreak(user, date) {
       await notify(user._id, {
         type: 'streak',
         title: `${streakOnDate}-day streak!`,
-        body: `You've been active ${streakOnDate} days in a row. +${bonus} FIT bonus.`,
+        body: `You've been active ${streakOnDate} days in a row. +${bonus} axyio bonus.`,
         icon: 'Flame',
         color: 'orange',
         dedupeKey: `streak:${user._id}:${date}`,

@@ -384,7 +384,7 @@ function Editor({ initial, options, halving, onCancel, onSaved, notify }) {
           <h3 className="ch-section">Prize</h3>
           <div className="grid-2">
             <div className="field">
-              <label htmlFor="c-reward">Base prize (FIT)</label>
+              <label htmlFor="c-reward">Base prize (axyio)</label>
               <input id="c-reward" className={`input ${err('reward') ? 'invalid' : ''}`} inputMode="decimal" value={f.reward} onChange={e => set('reward', e.target.value)} placeholder="200" />
               {err('reward') ? <span className="error-text">{err('reward')}</span> : null}
             </div>
@@ -561,7 +561,7 @@ export default function Challenges({ notify, goTo }) {
         <div className="card stat">
           <div className="label">Prizes paid</div>
           <div className="value coin">{fmt(data.challenges.reduce((s, c) => s + c.paid, 0))}</div>
-          <div className="hint">FIT · {fmt(data.challenges.reduce((s, c) => s + c.completions, 0))} completions</div>
+          <div className="hint">axyio · {fmt(data.challenges.reduce((s, c) => s + c.completions, 0))} completions</div>
         </div>
       </div>
 

@@ -131,15 +131,15 @@ export default function Premium({ configData, configError, reloadConfig, saveCon
           <div className="card">
             <h2 style={{ marginBottom: 14 }}>Rewards</h2>
             <div className="grid-2">
-              <Field id="mult" label="Reward multiplier" error={errors.multiplier} hint="2 = double FIT on every habit">
+              <Field id="mult" label="Reward multiplier" error={errors.multiplier} hint="2 = double axyio on every habit">
                 <input id="mult" className={`input num ${errors.multiplier ? 'invalid' : ''}`} type="number" min="1" max="10" step="0.1" value={draft.multiplier} onChange={set('multiplier')} />
               </Field>
-              <Field id="pcap" label="Premium daily cap (FIT)" error={errors.dailyCap} hint={`Free members: ${fmt(config.dailyCap)}`}>
+              <Field id="pcap" label="Premium daily cap (axyio)" error={errors.dailyCap} hint={`Free members: ${fmt(config.dailyCap)}`}>
                 <input id="pcap" className={`input num ${errors.dailyCap ? 'invalid' : ''}`} type="number" min="0" value={draft.dailyCap} onChange={set('dailyCap')} />
               </Field>
             </div>
             <p className="notice" style={{ marginTop: 14 }}>
-              With {m}x, habits pay premium members up to <b className="coin">{fmt(premiumTotal)} FIT</b> a day
+              With {m}x, habits pay premium members up to <b className="coin">{fmt(premiumTotal)} axyio</b> a day
               {Number.isFinite(plan.dailyCap) && premiumTotal > plan.dailyCap ? `, limited to ${fmt(plan.dailyCap)} by the cap` : ''}.
             </p>
           </div>

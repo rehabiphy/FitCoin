@@ -36,7 +36,7 @@ async function sendAuth(res, req, user, status = 200, { afterCreate } = {}) {
     await notify(user._id, {
       type: 'system',
       title: 'Welcome to axyio!',
-      body: 'Walk, hydrate, sleep and breathe your way to FIT rewards. Start by enabling step tracking.',
+      body: 'Walk, hydrate, sleep and breathe your way to axyio rewards. Start by enabling step tracking.',
       icon: 'Sparkles',
       color: 'primary',
       dedupeKey: `welcome:${user._id}`,

@@ -97,10 +97,10 @@ export default function Halving({ notify, reloadConfig }) {
     }
     const sample = parts.find(p => p.key === 'habit.walk.perUnit');
     const ok = window.confirm(
-      `Halve all FIT rewards now?\n\nMembers will get ${fractionLabel(era + 1)} of the base values (${pct(nextFactor)}).` +
-        (sample ? `\nExample: ${sample.label} ${fmt(sample.halved)} → ${fmt(round2(sample.base * nextFactor))} FIT.` : '') +
+      `Halve all axyio rewards now?\n\nMembers will get ${fractionLabel(era + 1)} of the base values (${pct(nextFactor)}).` +
+        (sample ? `\nExample: ${sample.label} ${fmt(sample.halved)} → ${fmt(round2(sample.base * nextFactor))} axyio.` : '') +
         (fixedCount ? `\n\n${fixedCount} fixed amount${fixedCount === 1 ? '' : 's'} won’t change.` : '') +
-        '\n\nThis applies to new rewards within a few seconds. FIT already earned is not touched.',
+        '\n\nThis applies to new rewards within a few seconds. axyio already earned is not touched.',
     );
     if (ok) {
       run(() => api.halve(era), `Rewards halved — members now get ${pct(nextFactor)} of base values.`);
@@ -124,7 +124,7 @@ export default function Halving({ notify, reloadConfig }) {
       <div className="page-head">
         <div>
           <h1>Halving</h1>
-          <p>Halve every FIT reward at once as the community grows. Pin any reward to a fixed amount below.</p>
+          <p>Halve every axyio reward at once as the community grows. Pin any reward to a fixed amount below.</p>
         </div>
         <div className="actions">
           <button className="btn" disabled={busy || era === 0} onClick={undo}>
@@ -213,7 +213,7 @@ export default function Halving({ notify, reloadConfig }) {
             <thead>
               <tr>
                 <th>Reward</th>
-                <th>Base (FIT)</th>
+                <th>Base (axyio)</th>
                 <th>Halved now</th>
                 <th>Fixed amount</th>
                 <th>Members get</th>
@@ -265,7 +265,7 @@ export default function Halving({ notify, reloadConfig }) {
                           </div>
                         </td>
                         <td>
-                          <span className="coin num">{fmt(live)} FIT</span> {fixed !== null ? <span className="badge gold">Fixed</span> : null}
+                          <span className="coin num">{fmt(live)} axyio</span> {fixed !== null ? <span className="badge gold">Fixed</span> : null}
                         </td>
                         <td className="num muted">{fmt(next)}</td>
                       </tr>

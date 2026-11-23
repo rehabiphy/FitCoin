@@ -21,17 +21,17 @@ function Block({ id, icon, color, title, children }) {
 export default function Rewards() {
   return (
     <>
-      <PageHero eyebrow="FIT & rewards" title={<>How you earn and spend <span className="grad-text">FIT</span></>}>
+      <PageHero eyebrow="axyio & rewards" title={<>How you earn and spend <span className="grad-text">axyio</span></>}>
         <p>
-          FIT are in-app reward points you earn for healthy habits and spend in the marketplace. Here is exactly how they work, with no
+          axyio points are in-app rewards you earn for healthy habits and spend in the marketplace. Here is exactly how they work, with no
           small print.
         </p>
       </PageHero>
 
       <section className="section pt-0">
         <div className="container rules">
-          <Block id="earning" icon="Coins" color="gold" title="Earning FIT from habits">
-            <p>FIT is credited only after an activity is verified on our servers. Each habit has its own rate and daily maximum:</p>
+          <Block id="earning" icon="Coins" color="gold" title="Earning axyio from habits">
+            <p>axyio is credited only after an activity is verified on our servers. Each habit has its own rate and daily maximum:</p>
             <div className="table-wrap">
               <table className="table">
                 <thead>
@@ -52,7 +52,7 @@ export default function Rewards() {
                       </td>
                       <td>{h.verified}</td>
                       <td>{h.rate}</td>
-                      <td>{h.max} FIT</td>
+                      <td>{h.max} axyio</td>
                     </tr>
                   ))}
                 </tbody>
@@ -64,7 +64,7 @@ export default function Rewards() {
           <Block id="limits" icon="Target" color="cyan" title="Daily caps & habit picks">
             <ul className="dot-list">
               <li>
-                Habit rewards are capped at <b>{CAPS.free} FIT a day</b> for free members and <b>{CAPS.premium} FIT a day</b> for Premium
+                Habit rewards are capped at <b>{CAPS.free} axyio a day</b> for free members and <b>{CAPS.premium} axyio a day</b> for Premium
                 members.
               </li>
               <li>
@@ -78,11 +78,11 @@ export default function Rewards() {
 
           <Block id="streaks" icon="Flame" color="orange" title="Streaks & levels">
             <ul className="dot-list">
-              <li>A day counts towards your streak if any habit earned you FIT that day.</li>
+              <li>A day counts towards your streak if any habit earned you axyio that day.</li>
               <li>
-                Every {STREAK.every}th day in a row earns a <b>+{STREAK.bonus} FIT</b> streak bonus.
+                Every {STREAK.every}th day in a row earns a <b>+{STREAK.bonus} axyio</b> streak bonus.
               </li>
-              <li>XP equals the lifetime FIT you’ve earned. Levels get a little further apart as you climb.</li>
+              <li>XP equals the lifetime axyio you’ve earned. Levels get a little further apart as you climb.</li>
             </ul>
             <div className="level-row">
               {LEVELS.map((l, i) => (
@@ -117,7 +117,7 @@ export default function Rewards() {
                       </td>
                       <td>{c.desc}</td>
                       <td>{c.period}</td>
-                      <td>{c.reward} FIT</td>
+                      <td>{c.reward} axyio</td>
                     </tr>
                   ))}
                 </tbody>
@@ -141,8 +141,8 @@ export default function Rewards() {
             <ul className="dot-list">
               <li>Share your invite link or code. Your friend adds it when they sign up, or later from their profile.</li>
               <li>
-                As soon as the code is added, your friend receives <b>{REFERRAL.friendReward} FIT</b> and you receive{' '}
-                <b>{REFERRAL.inviterReward} FIT</b>.
+                As soon as the code is added, your friend receives <b>{REFERRAL.friendReward} axyio</b> and you receive{' '}
+                <b>{REFERRAL.inviterReward} axyio</b>.
               </li>
               <li>Each account can add one friend’s code, once. It can’t be changed later.</li>
               <li>You can earn from up to {REFERRAL.monthlyCap} rewarded referrals each month.</li>
@@ -152,7 +152,7 @@ export default function Rewards() {
           <Block id="premium" icon="Crown" color="orange" title="Premium earning">
             <ul className="dot-list">
               <li>
-                Premium members earn <b>{PREMIUM.multiplier}x FIT</b> on every habit and have a {CAPS.premium} FIT daily cap.
+                Premium members earn <b>{PREMIUM.multiplier}x axyio</b> on every habit and have a {CAPS.premium} axyio daily cap.
               </li>
               <li>Streak bonuses, challenges and referrals pay the same for everyone.</li>
             </ul>
@@ -160,9 +160,9 @@ export default function Rewards() {
 
           <Block id="redeeming" icon="Gift" color="mint" title="Redeeming & expiry">
             <ul className="dot-list">
-              <li>Redeem FIT for partner vouchers, passes and offers in the marketplace.</li>
+              <li>Redeem axyio for partner vouchers, passes and offers in the marketplace.</li>
               <li>A 2% platform fee is added to marketplace redemptions.</li>
-              <li>FIT expire 6 months after they’re earned. We notify you 14 days before, and your oldest FIT are always spent first.</li>
+              <li>axyio points expire 6 months after they’re earned. We notify you 14 days before, and your oldest axyio points are always spent first.</li>
               <li>Some rewards have limited stock. Availability is shown before you redeem.</li>
             </ul>
           </Block>
@@ -174,7 +174,7 @@ export default function Rewards() {
                 Uploads that look impossible are rejected. That includes more than 100,000 steps a day, steps rising faster than 250 a
                 minute, rides averaging over 45 km/h, or water logged less than 10 minutes apart.
               </li>
-              <li>Manipulated sensor data, automation or fake referrals lead to lost FIT and account suspension.</li>
+              <li>Manipulated sensor data, automation or fake referrals lead to lost axyio and account suspension.</li>
               <li>Unusual activity may be held for review before it’s credited. All reward events are kept in an audit log.</li>
             </ul>
           </Block>
@@ -182,14 +182,14 @@ export default function Rewards() {
           <Reveal className="note-card">
             <Icon name="Lock" size={20} />
             <p>
-              <b>FIT is not money.</b> FIT has no cash value, is not a cryptocurrency or security, and cannot be bought, sold, transferred
+              <b>axyio is not money.</b> axyio has no cash value, is not a cryptocurrency or security, and cannot be bought, sold, transferred
               between users or withdrawn. Blockchain tokens, transfers, deposits, withdrawals and trading are not part of axyio and would only
               ever be introduced after technical, security and regulatory review.
             </p>
           </Reveal>
         </div>
       </section>
-      <CtaBand title="Start earning your first FIT today." />
+      <CtaBand title="Start earning your first axyio today." />
     </>
   );
 }

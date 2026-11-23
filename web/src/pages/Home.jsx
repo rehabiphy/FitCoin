@@ -24,13 +24,13 @@ function Hero() {
             Move. Earn. <span className="grad-text">Redeem.</span>
           </Reveal>
           <Reveal as="p" className="lead" delay={0.16}>
-            axyio pays you for healthy habits. Walk, cycle, drink water, sleep well, read and breathe to earn <b>FIT</b> points, then
+            axyio pays you for healthy habits. Walk, cycle, drink water, sleep well, read and breathe to earn <b>axyio</b> points, then
             spend them on vouchers, gym passes, food and more.
           </Reveal>
           <Reveal className="hero-actions" delay={0.24}>
             <DownloadButton />
             <Link to="/rewards" className="btn btn-ghost">
-              How FIT works <Icon name="ArrowRight" size={18} />
+              How axyio works <Icon name="ArrowRight" size={18} />
             </Link>
           </Reveal>
           <Reveal className="hero-proof" delay={0.32}>
@@ -52,7 +52,7 @@ function Hero() {
           <div className="float-chip chip-1">
             <IconBubble name="Footprints" color="mint" size={34} />
             <div>
-              <b>+6 FIT</b>
+              <b>+6 axyio</b>
               <small>1,000 steps reached</small>
             </div>
           </div>
@@ -60,7 +60,7 @@ function Hero() {
             <IconBubble name="Flame" color="orange" size={34} />
             <div>
               <b>Streak bonus</b>
-              <small>+50 FIT on day 7</small>
+              <small>+50 axyio on day 7</small>
             </div>
           </div>
           <div className="float-chip chip-3">
@@ -82,9 +82,9 @@ function Hero() {
 function Stats() {
   const stats = [
     { n: 6, s: '', label: 'healthy habits that pay' },
-    { n: CAPS.free, s: '', label: 'FIT you can earn daily, free' },
+    { n: CAPS.free, s: '', label: 'axyio you can earn daily, free' },
     { n: CHALLENGES.length, s: '', label: 'challenges every week' },
-    { n: PREMIUM.multiplier, s: 'x', label: 'FIT with Premium' },
+    { n: PREMIUM.multiplier, s: 'x', label: 'axyio with Premium' },
   ];
   return (
     <section className="stats" id="stats">
@@ -119,14 +119,14 @@ const STEPS = [
   },
   {
     icon: 'Coins',
-    title: 'Earn FIT, verified',
+    title: 'Earn axyio, verified',
     text: 'Every reward is checked on our servers before it lands in your wallet. Stack streak bonuses, challenge prizes and referral rewards on top.',
     screen: 'wallet',
   },
   {
     icon: 'Gift',
     title: 'Redeem real rewards',
-    text: 'Spend FIT in the marketplace on vouchers, fitness passes, food, lifestyle deals and charity. Your voucher shows up instantly.',
+    text: 'Spend axyio in the marketplace on vouchers, fitness passes, food, lifestyle deals and charity. Your voucher shows up instantly.',
     screen: 'market',
   },
 ];
@@ -212,7 +212,7 @@ function Habits() {
               <p>{h.how}</p>
               <div className="habit-meta">
                 <span className={`rate c-${h.color}`}>{h.rate}</span>
-                <span className="muted">up to {h.max} FIT/day</span>
+                <span className="muted">up to {h.max} axyio/day</span>
               </div>
             </Reveal>
           ))}
@@ -240,7 +240,7 @@ function Motivation() {
             <IconBubble name="Flame" color="orange" size={48} />
             <h3>Streaks that pay</h3>
             <p>
-              Any day you earn FIT keeps your streak alive. Every {STREAK.every}th day in a row adds a <b>+{STREAK.bonus} FIT</b> bonus.
+              Any day you earn axyio keeps your streak alive. Every {STREAK.every}th day in a row adds a <b>+{STREAK.bonus} axyio</b> bonus.
             </p>
             <div className="streak-row">
               {Array.from({ length: 7 }, (_, i) => (
@@ -253,7 +253,7 @@ function Motivation() {
           <Reveal className="card bento-b" variant="right" delay={0.08}>
             <IconBubble name="TrendingUp" color="cyan" size={48} />
             <h3>Level up</h3>
-            <p>Every FIT you earn is XP. Climb levels as your lifetime earnings grow.</p>
+            <p>Every axyio you earn is XP. Climb levels as your lifetime earnings grow.</p>
             <div className="xp">
               <div className="xp-head">
                 <b>Level 6</b>
@@ -288,7 +288,7 @@ function Motivation() {
                 <li key={n} className={n === 'You' ? 'me' : ''}>
                   <span>{i + 1}</span>
                   <b>{n}</b>
-                  <em>{v} FIT</em>
+                  <em>{v} axyio</em>
                 </li>
               ))}
             </ol>
@@ -318,7 +318,7 @@ function Challenges() {
               <h3>{c.title}</h3>
               <p>{c.desc}</p>
               <div className="prize">
-                <Icon name="Coins" size={16} /> {c.reward} FIT prize
+                <Icon name="Coins" size={16} /> {c.reward} axyio prize
               </div>
             </Reveal>
           ))}
@@ -335,7 +335,7 @@ function Marketplace() {
       <div className="container">
         <Reveal className="section-head center">
           <p className="eyebrow">Marketplace</p>
-          <h2 className="h2">Spend your FIT on things you’ll actually use</h2>
+          <h2 className="h2">Spend your axyio on things you’ll actually use</h2>
           <p className="lead">Partner vouchers, passes and offers across five categories.</p>
         </Reveal>
         <div className="cat-row">
@@ -354,7 +354,7 @@ function Marketplace() {
             <div key={i} className="reward-pill" aria-hidden={i >= SAMPLE_REWARDS.length}>
               <IconBubble name={r.icon} color={r.color} size={36} />
               <span>{r.title}</span>
-              <b>{r.cost} FIT</b>
+              <b>{r.cost} axyio</b>
             </div>
           ))}
         </div>
@@ -389,7 +389,7 @@ function PremiumTeaser() {
             <div className="pc-col">
               <small>Free</small>
               <strong>{CAPS.free}</strong>
-              <span>FIT / day cap</span>
+              <span>axyio / day cap</span>
               <div className="pc-bar">
                 <i style={{ '--h': '50%' }} />
               </div>
@@ -397,7 +397,7 @@ function PremiumTeaser() {
             <div className="pc-col hot">
               <small>Premium</small>
               <strong>{CAPS.premium}</strong>
-              <span>FIT / day cap</span>
+              <span>axyio / day cap</span>
               <div className="pc-bar">
                 <i style={{ '--h': '100%' }} />
               </div>
@@ -422,15 +422,15 @@ function Referral() {
           <p className="eyebrow">Invite friends</p>
           <h2 className="h2">Better together, and you both get rewarded</h2>
           <p className="lead">
-            Share your invite link. As soon as your friend joins with your code, they get <b>{REFERRAL.friendReward} FIT</b> and
-            you get <b>{REFERRAL.inviterReward} FIT</b>.
+            Share your invite link. As soon as your friend joins with your code, they get <b>{REFERRAL.friendReward} axyio</b> and
+            you get <b>{REFERRAL.inviterReward} axyio</b>.
           </p>
           <p className="muted small">Up to {REFERRAL.monthlyCap} rewarded referrals per month.</p>
         </Reveal>
         <Reveal variant="right" className="ref-visual">
           <div className="ref-card">
             <small>Your code</small>
-            <strong>FIT-AARAV42</strong>
+            <strong>AXYIO-AARAV42</strong>
             <span className="btn btn-sm btn-primary">
               <Icon name="Send" size={16} /> Share invite
             </span>
@@ -459,9 +459,9 @@ function Referral() {
 
 function Trust() {
   const items = [
-    { icon: 'ShieldCheck', color: 'mint', t: 'Verified on our servers', d: 'Steps, sessions and logs are checked against sensible limits before any FIT is paid.' },
+    { icon: 'ShieldCheck', color: 'mint', t: 'Verified on our servers', d: 'Steps, sessions and logs are checked against sensible limits before any axyio is paid.' },
     { icon: 'Lock', color: 'primary', t: 'Your account is locked down', d: 'Hashed passwords, rotating sessions and Google sign-in with verified emails only.' },
-    { icon: 'Layers', color: 'cyan', t: 'An honest ledger', d: 'Your balance is always calculated from your transaction history. You can see every FIT in and out.' },
+    { icon: 'Layers', color: 'cyan', t: 'An honest ledger', d: 'Your balance is always calculated from your transaction history. You can see every axyio in and out.' },
     { icon: 'Heart', color: 'pink', t: 'Fair for everyone', d: 'Streaks, challenges and referrals pay the same for free and Premium members.' },
   ];
   return (

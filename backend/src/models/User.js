@@ -74,8 +74,8 @@ userSchema.pre('save', async function hashPassword() {
     this.password = await bcrypt.hash(this.password, env.bcryptRounds);
   }
   if (!this.referralCode) {
-    const base = (this.name || 'FIT').replace(/[^a-z]/gi, '').slice(0, 5).toUpperCase() || 'FIT';
-    this.referralCode = `FIT-${base}${crypto.randomInt(10, 99)}${crypto.randomBytes(1).toString('hex').toUpperCase()}`;
+    const base = (this.name || 'AXYIO').replace(/[^a-z]/gi, '').slice(0, 5).toUpperCase() || 'AXYIO';
+    this.referralCode = `AXYIO-${base}${crypto.randomInt(10, 99)}${crypto.randomBytes(1).toString('hex').toUpperCase()}`;
   }
 });
 

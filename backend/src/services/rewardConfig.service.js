@@ -104,5 +104,5 @@ export function baseReward(activityId, rule, value) {
 export function rateLabel(activityId, rule, multiplier = 1) {
   const cfg = ACTIVITIES[activityId];
   const amount = cfg.rewardMode === 'goal' ? rule.maxReward : rule.perUnit;
-  return `${trim(amount * multiplier)} FIT / ${cfg.rateUnit}`;
+  return `${trim(amount * multiplier)} axyio / ${cfg.rateUnit}`;
 }

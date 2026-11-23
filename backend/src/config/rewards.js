@@ -39,7 +39,7 @@ export const groupOf = habitId => HABIT_GROUP_IDS.find(g => HABIT_GROUPS[g].ids.
 export const PREMIUM_DEFAULTS = {
   enabled: true,
   title: 'axyio Premium',
-  tagline: 'Earn 2x FIT on every healthy habit',
+  tagline: 'Earn 2x axyio on every healthy habit',
   // Habit rewards are multiplied by this for premium members
   multiplier: 2,
   // Daily cap on habit rewards for premium members
@@ -51,7 +51,7 @@ export const PREMIUM_DEFAULTS = {
   showPopup: true,
   benefits: [
     'All 6 habits active — free members pick 1 movement + 2 lifestyle',
-    '2x FIT on walking, cycling, water, sleep, reading and breathing',
+    '2x axyio on walking, cycling, water, sleep, reading and breathing',
     'Higher daily earning cap',
     'Premium badge on your profile',
   ],

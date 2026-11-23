@@ -26,7 +26,7 @@ export default function Overview({ configData, goTo }) {
       <div className="page-head">
         <div>
           <h1>Overview</h1>
-          <p>Members, premium and FIT issued in the last 24 hours.</p>
+          <p>Members, premium and axyio issued in the last 24 hours.</p>
         </div>
         <button className="btn sm" onClick={load}>
           Refresh
@@ -48,7 +48,7 @@ export default function Overview({ configData, goTo }) {
             <div className="hint">{stats.users ? Math.round((stats.premiumUsers / stats.users) * 100) : 0}% of members</div>
           </div>
           <div className="card stat">
-            <div className="label">FIT issued · 24 h</div>
+            <div className="label">axyio issued · 24 h</div>
             <div className="value">{fmt(stats.fitIssued24h)}</div>
             <div className="hint">{fmt(stats.premiumFitIssued24h)} to premium members</div>
           </div>
@@ -69,7 +69,7 @@ export default function Overview({ configData, goTo }) {
               </button>
             </div>
             <p>
-              Up to <span className="coin">{fmt(Math.min(freeMax, config.dailyCap))} FIT</span> a day from habits
+              Up to <span className="coin">{fmt(Math.min(freeMax, config.dailyCap))} axyio</span> a day from habits
             </p>
             <p className="muted small">
               Picks {freePicks} habits · best case {fmt(freeMax)} · daily cap {fmt(config.dailyCap)}
@@ -86,7 +86,7 @@ export default function Overview({ configData, goTo }) {
               </button>
             </div>
             <p>
-              Up to <span className="coin">{fmt(Math.min(premiumMax, config.premium.dailyCap))} FIT</span> a day from habits
+              Up to <span className="coin">{fmt(Math.min(premiumMax, config.premium.dailyCap))} axyio</span> a day from habits
             </p>
             <p className="muted small">
               {config.premium.currency} {fmt(config.premium.price)} for {config.premium.durationDays} days · daily cap {fmt(config.premium.dailyCap)}

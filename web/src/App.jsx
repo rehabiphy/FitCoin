@@ -19,7 +19,7 @@ import Invite from './pages/Invite.jsx';
 const TITLES = {
   '/': 'axyio: Move. Earn. Redeem.',
   '/features': 'Features · axyio',
-  '/rewards': 'FIT & rewards · axyio',
+  '/rewards': 'Rewards · axyio',
   '/premium': 'Premium · axyio',
   '/about': 'About · axyio',
   '/support': 'Help center · axyio',

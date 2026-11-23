@@ -135,7 +135,7 @@ export async function upgrade(user) {
   await notify(updated._id, {
     type: 'system',
     title: `Welcome to ${p.title}!`,
-    body: `You now earn ${p.multiplier}x FIT on every habit, with a daily cap of ${p.dailyCap} FIT.`,
+    body: `You now earn ${p.multiplier}x axyio on every habit, with a daily cap of ${p.dailyCap} axyio.`,
     icon: 'Crown',
     color: 'gold',
     dedupeKey: `premium:${updated._id}:${updated.premiumUntil.getTime()}`,
@@ -154,7 +154,7 @@ export async function grantPremium(userId, days) {
   await notify(user._id, {
     type: 'system',
     title: `You've got ${config.premium.title}!`,
-    body: `Enjoy ${config.premium.multiplier}x FIT on every habit for the next ${days} days.`,
+    body: `Enjoy ${config.premium.multiplier}x axyio on every habit for the next ${days} days.`,
     icon: 'Crown',
     color: 'gold',
     dedupeKey: `premium:${user._id}:${user.premiumUntil.getTime()}`,

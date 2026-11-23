@@ -70,7 +70,7 @@ export default function LeaderboardScreen() {
   const [first, second, third] = entries;
   const rest = entries.slice(3);
   const me = data?.me;
-  let meSub = 'Earn FIT to join the board';
+  let meSub = 'Earn axyio to join the board';
   if (me?.rank) {
     meSub = me.rank === 1 ? 'You’re #1 — stay ahead!' : `${formatNumber(me.pointsToNext)} pts to #${me.rank - 1}`;
   }
@@ -111,7 +111,7 @@ export default function LeaderboardScreen() {
       {!loading && entries.length === 0 ? (
         <View style={styles.empty}>
           <Icon name="Trophy" size={36} color={colors.textMuted} />
-          <Text style={type.body}>No one has earned FIT this period yet. Be the first!</Text>
+          <Text style={type.body}>No one has earned axyio this period yet. Be the first!</Text>
         </View>
       ) : null}
 

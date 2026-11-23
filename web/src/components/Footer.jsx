@@ -8,7 +8,7 @@ const COLS = [
     title: 'Product',
     links: [
       ['/features', 'Features'],
-      ['/rewards', 'FIT & Rewards'],
+      ['/rewards', 'axyio & Rewards'],
       ['/premium', 'Premium'],
       ['/rewards#challenges', 'Challenges'],
     ],
@@ -65,7 +65,7 @@ export default function Footer() {
           </div>
         </div>
         <p className="footer-note">
-          FIT are in-app reward points. They have no cash value, are not a cryptocurrency and cannot be bought, sold, transferred or
+          axyio points are in-app rewards. They have no cash value, are not a cryptocurrency and cannot be bought, sold, transferred or
           withdrawn. axyio is a wellness app and does not give medical advice. Talk to a doctor before starting a new exercise routine.
         </p>
         <div className="footer-bottom">

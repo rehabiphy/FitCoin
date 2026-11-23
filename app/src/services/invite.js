@@ -31,7 +31,7 @@ export function codeFromUrl(url) {
   return custom ? normalize(decodeURIComponent(custom[1])) : null;
 }
 
-/** "invite_code=FIT-AISHA21&utm_source=..." -> "FIT-AISHA21" */
+/** "invite_code=AXYIO-AISHA21&utm_source=..." -> "AXYIO-AISHA21" */
 function codeFromReferrer(referrer) {
   if (!referrer) {
     return null;

@@ -23,7 +23,7 @@ object PushChannels {
                     description = "Personal reminders for your habits and daily stay-healthy tips."
                 },
                 NotificationChannel(UPDATES, "Rewards & updates", NotificationManager.IMPORTANCE_HIGH).apply {
-                    description = "FIT rewards, streaks, badges, challenges and important axyio news."
+                    description = "axyio rewards, streaks, badges, challenges and important axyio news."
                 },
             ),
         )

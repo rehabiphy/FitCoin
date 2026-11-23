@@ -7,10 +7,10 @@ import CtaBand from '../components/CtaBand.jsx';
 import { CAPS, FAQ, HABITS, PREMIUM } from '../site.js';
 
 const ROWS = [
-  ['Earn FIT for healthy habits', true, true],
+  ['Earn axyio for healthy habits', true, true],
   ['Active habits', '1 movement + 2 lifestyle', 'All 6'],
-  ['FIT per habit', 'Standard rate', `${PREMIUM.multiplier}x rate`],
-  ['Daily habit cap', `${CAPS.free} FIT`, `${CAPS.premium} FIT`],
+  ['axyio per habit', 'Standard rate', `${PREMIUM.multiplier}x rate`],
+  ['Daily habit cap', `${CAPS.free} axyio`, `${CAPS.premium} axyio`],
   ['Streaks, challenges & referrals', true, true],
   ['Marketplace & badges', true, true],
   ['Premium badge on your profile', false, true],
@@ -26,7 +26,7 @@ export default function Premium() {
   const premiumFaq = [...FAQ.find(f => f.cat === 'Premium').items, FAQ[0].items[1]];
   return (
     <>
-      <PageHero eyebrow={<><Icon name="Crown" size={14} /> {PREMIUM.title}</>} title={<>Double the FIT. <span className="grad-gold">Every habit.</span></>}>
+      <PageHero eyebrow={<><Icon name="Crown" size={14} /> {PREMIUM.title}</>} title={<>Double the axyio. <span className="grad-gold">Every habit.</span></>}>
         <p>{PREMIUM.tagline}. Unlock all six habits, raise your daily cap and wear the Premium badge.</p>
       </PageHero>
 
@@ -43,7 +43,7 @@ export default function Premium() {
                 <Icon name="Check" size={18} /> Pick 1 movement + 2 lifestyle habits
               </li>
               <li>
-                <Icon name="Check" size={18} /> Up to {CAPS.free} FIT a day from habits
+                <Icon name="Check" size={18} /> Up to {CAPS.free} axyio a day from habits
               </li>
               <li>
                 <Icon name="Check" size={18} /> Streaks, challenges, referrals & badges
@@ -120,7 +120,7 @@ export default function Premium() {
                 <IconBubble name={h.icon} color={h.color} size={44} />
                 <div>
                   <b>{h.name}</b>
-                  <small className="muted">Up to {h.max} FIT free</small>
+                  <small className="muted">Up to {h.max} axyio free</small>
                 </div>
                 <span className="double-v">
                   up to <b>{h.max * PREMIUM.multiplier}</b>
@@ -128,7 +128,7 @@ export default function Premium() {
               </Reveal>
             ))}
           </div>
-          <p className="center muted small mt-md">Totals are still limited by the {CAPS.premium} FIT Premium daily cap.</p>
+          <p className="center muted small mt-md">Totals are still limited by the {CAPS.premium} axyio Premium daily cap.</p>
         </div>
       </section>
 

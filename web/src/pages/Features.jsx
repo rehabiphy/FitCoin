@@ -32,7 +32,7 @@ const ROWS = [
   },
   {
     eyebrow: 'Wallet',
-    title: 'A wallet that shows every FIT in and out',
+    title: 'A wallet that shows every axyio in and out',
     text: 'Your balance is calculated from a full transaction history: habit rewards, streak bonuses, challenge prizes, referrals and redemptions. Tap any entry to see its details.',
     points: ['Full transaction history with filters', 'Level and XP progress on your wallet card', 'Daily cap tracker so you know what’s left today'],
     visual: 'wallet',
@@ -55,9 +55,9 @@ const ROWS = [
 
 const EXTRAS = [
   { icon: 'Medal', color: 'gold', t: 'Badges', d: 'Eight achievements, from First Steps to Champion, each with a progress bar.' },
-  { icon: 'Bell', color: 'primary', t: 'Smart notifications', d: 'Know when you’ve earned FIT, unlocked a badge or finished a challenge.' },
+  { icon: 'Bell', color: 'primary', t: 'Smart notifications', d: 'Know when you’ve earned axyio, unlocked a badge or finished a challenge.' },
   { icon: 'UserPlus', color: 'mint', t: 'Referrals', d: 'Invite friends with your personal code and earn together.' },
-  { icon: 'Crown', color: 'orange', t: 'Premium', d: 'Unlock every habit, earn double FIT and raise your daily cap.' },
+  { icon: 'Crown', color: 'orange', t: 'Premium', d: 'Unlock every habit, earn double axyio and raise your daily cap.' },
   { icon: 'Lock', color: 'cyan', t: 'Secure sign-in', d: 'Email and password, or continue with Google.' },
   { icon: 'Smartphone', color: 'pink', t: 'Built for phones', d: 'Smooth animations, a modern dark design and light on battery.' },
 ];

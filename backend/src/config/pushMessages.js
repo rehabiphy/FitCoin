@@ -26,7 +26,7 @@ export const REMINDER_SLOTS = [
       c.active.has('sleep') && !c.progress.sleep
         ? {
             title: `Good morning, ${c.first}! ☀️`,
-            body: `How did you sleep? Log last night's hours to earn up to ${fmt(c.habits.sleep.maxReward * c.multiplier)} FIT.`,
+            body: `How did you sleep? Log last night's hours to earn up to ${fmt(c.habits.sleep.maxReward * c.multiplier)} axyio.`,
             route: 'ActivityDetail',
             params: { id: 'sleep' },
           }
@@ -39,7 +39,7 @@ export const REMINDER_SLOTS = [
       c.active.has('water') && c.progress.water < 2
         ? {
             title: 'Time for a glass of water 💧',
-            body: `You've had ${c.progress.water} of ${c.habits.water.goal} glasses today. Each glass earns ${fmt(c.habits.water.perUnit * c.multiplier)} FIT.`,
+            body: `You've had ${c.progress.water} of ${c.habits.water.goal} glasses today. Each glass earns ${fmt(c.habits.water.perUnit * c.multiplier)} axyio.`,
             route: 'ActivityDetail',
             params: { id: 'water' },
           }
@@ -65,7 +65,7 @@ export const REMINDER_SLOTS = [
       c.active.has('breathe') && !c.progress.breathe
         ? {
             title: 'Take a 5-minute breather 🧘',
-            body: `A short breathing session lowers stress and resets your focus. Earn up to ${fmt(c.habits.breathe.maxReward * c.multiplier)} FIT today.`,
+            body: `A short breathing session lowers stress and resets your focus. Earn up to ${fmt(c.habits.breathe.maxReward * c.multiplier)} axyio today.`,
             route: 'ActivityDetail',
             params: { id: 'breathe' },
           }
@@ -78,7 +78,7 @@ export const REMINDER_SLOTS = [
       c.active.has('cycle') && !c.progress.cycle
         ? {
             title: 'Perfect evening for a ride 🚴',
-            body: `Every km earns ${fmt(c.habits.cycle.perUnit * c.multiplier)} FIT. Start a ride in axyio before you head out.`,
+            body: `Every km earns ${fmt(c.habits.cycle.perUnit * c.multiplier)} axyio. Start a ride in axyio before you head out.`,
             route: 'ActivityDetail',
             params: { id: 'cycle' },
           }
@@ -93,7 +93,7 @@ export const REMINDER_SLOTS = [
       [3, 7, 14].includes(c.daysSinceActive)
         ? {
             title: `We miss you, ${c.first}! 👋`,
-            body: 'Your habits are waiting. A short walk or a glass of water today gets you earning FIT again.',
+            body: 'Your habits are waiting. A short walk or a glass of water today gets you earning axyio again.',
             route: 'Home',
           }
         : null,
@@ -117,7 +117,7 @@ export const REMINDER_SLOTS = [
           }
         : {
             title: 'Time to get moving 👟',
-            body: `Every 1,000 steps earns ${fmt(c.habits.walk.perUnit * c.multiplier)} FIT. A 20-minute walk is about 2,500 steps.`,
+            body: `Every 1,000 steps earns ${fmt(c.habits.walk.perUnit * c.multiplier)} axyio. A 20-minute walk is about 2,500 steps.`,
             route: 'ActivityDetail',
             params: { id: 'walk' },
           };
@@ -144,7 +144,7 @@ export const REMINDER_SLOTS = [
       c.active.has('read') && !c.progress.read
         ? {
             title: 'Wind down with a book 📖',
-            body: `Swap the scroll for ${c.habits.read.goal} minutes of reading. Earn up to ${fmt(c.habits.read.maxReward * c.multiplier)} FIT.`,
+            body: `Swap the scroll for ${c.habits.read.goal} minutes of reading. Earn up to ${fmt(c.habits.read.maxReward * c.multiplier)} axyio.`,
             route: 'ActivityDetail',
             params: { id: 'read' },
           }

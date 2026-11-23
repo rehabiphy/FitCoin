@@ -12,7 +12,7 @@ export default function CtaBand({ title = 'Your next walk could pay for your cof
           <div className="cta-glow" aria-hidden="true" />
           <img src={appIcon} alt="" className="cta-icon" />
           <h2>{title}</h2>
-          <p>{text || 'Download axyio, pick your habits and start earning FIT today. It’s free.'}</p>
+          <p>{text || 'Download axyio, pick your habits and start earning axyio today. It’s free.'}</p>
           <div className="cta-actions">
             <DownloadButton />
             <Link to="/features" className="btn btn-ghost">

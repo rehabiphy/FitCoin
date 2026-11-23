@@ -93,7 +93,7 @@ export async function redeem(userId, idOrSlug, tzOffset) {
   try {
     const balance = await getBalance(userId);
     if (balance < total) {
-      throw ApiError.badRequest(`You need ${total} FIT but have ${balance}`, 'INSUFFICIENT_FUNDS');
+      throw ApiError.badRequest(`You need ${total} axyio but have ${balance}`, 'INSUFFICIENT_FUNDS');
     }
     if (reward.stock !== null) {
       const taken = await Reward.findOneAndUpdate(

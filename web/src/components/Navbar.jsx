@@ -6,7 +6,7 @@ import DownloadButton from './DownloadButton.jsx';
 
 const LINKS = [
   { to: '/features', label: 'Features' },
-  { to: '/rewards', label: 'FIT & Rewards' },
+  { to: '/rewards', label: 'axyio & Rewards' },
   { to: '/premium', label: 'Premium' },
   { to: '/about', label: 'About' },
   { to: '/support', label: 'Help' },

@@ -125,7 +125,7 @@ export default function Notifications({ notify }) {
         </div>
         <div className="field" style={{ marginTop: 14 }}>
           <label htmlFor="n-body">Message ({form.body.length}/300)</label>
-          <textarea id="n-body" className="input" maxLength={300} value={form.body} onChange={set('body')} placeholder="Join this week’s cycling challenge and earn bonus FIT." />
+          <textarea id="n-body" className="input" maxLength={300} value={form.body} onChange={set('body')} placeholder="Join this week’s cycling challenge and earn bonus axyio." />
         </div>
         <p className="muted small" style={{ marginTop: 12 }}>
           Announcements are saved in every member’s notification list and pushed to their phones, even if they turned off reminders or tips.

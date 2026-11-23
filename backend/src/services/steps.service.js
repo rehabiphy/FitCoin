@@ -78,7 +78,7 @@ async function creditStepReward(userId, date, steps, ctx) {
     meta: { activity: 'walk', steps, multiplier: ctx.multiplier },
     goalNotification: {
       title: 'Step goal reached!',
-      body: `${steps.toLocaleString('en-US')} steps today. You've earned ${amount} FIT — keep going!`,
+      body: `${steps.toLocaleString('en-US')} steps today. You've earned ${amount} axyio — keep going!`,
       icon: 'Footprints',
       color: 'mint',
     },

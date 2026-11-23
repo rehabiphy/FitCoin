@@ -68,4 +68,4 @@ export const shadow = {
   }),
 };
 
-export const TOKEN = 'FIT';
+export const TOKEN = 'axyio';

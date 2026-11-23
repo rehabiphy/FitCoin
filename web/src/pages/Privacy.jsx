@@ -58,7 +58,7 @@ const SECTIONS = [
             <b>Time zone offset:</b> so that “today” means your local day for rewards, streaks and challenges.
           </li>
           <li>
-            <b>Activity and reward records:</b> FIT earned and spent, streaks, levels, badges, leaderboard positions, Premium status and
+            <b>Activity and reward records:</b> axyio earned and spent, streaks, levels, badges, leaderboard positions, Premium status and
             dates, and redemptions.
           </li>
           <li>
@@ -102,7 +102,7 @@ const SECTIONS = [
       <>
         <ul>
           <li>To create and secure your account and keep you signed in.</li>
-          <li>To count your activity, calculate and credit FIT, and run streaks, levels, badges, challenges and leaderboards.</li>
+          <li>To count your activity, calculate and credit axyio, and run streaks, levels, badges, challenges and leaderboards.</li>
           <li>To process marketplace redemptions and Premium memberships.</li>
           <li>To pay referral rewards to you and the friend who invited you.</li>
           <li>To detect and prevent cheating, fraud and abuse, including rejecting impossible step or activity data.</li>
@@ -124,7 +124,7 @@ const SECTIONS = [
       <>
         <ul>
           <li>
-            <b>Other axyio members:</b> your name, profile photo, level, streak and FIT totals may appear on leaderboards and challenge
+            <b>Other axyio members:</b> your name, profile photo, level, streak and axyio totals may appear on leaderboards and challenge
             rankings. Friends you invite can see that you referred them.
           </li>
           <li>

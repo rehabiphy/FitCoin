@@ -119,7 +119,7 @@ function streakHint(stats) {
   }
   const { streakBonus, activeToday, streak } = stats;
   if (!activeToday) {
-    return streak > 0 ? 'Earn FIT from any habit today to keep your streak' : 'Earn FIT from any habit today to start a streak';
+    return streak > 0 ? 'Earn axyio from any habit today to keep your streak' : 'Earn axyio from any habit today to start a streak';
   }
   return streakBonus.daysToBonus === streakBonus.every
     ? `Streak bonus earned! Next +${streakBonus.amount} ${TOKEN} in ${streakBonus.every} days`

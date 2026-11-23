@@ -137,7 +137,7 @@ export default function ProfileScreen({ navigation }) {
             <Text style={type.caption}>{invited.length}</Text>
           </View>
           {invited.length === 0 ? (
-            <Text style={[type.caption, styles.invitedEmpty]}>No one yet. Share your link to earn {ref?.rules?.referrerReward ?? 200} FIT per friend.</Text>
+            <Text style={[type.caption, styles.invitedEmpty]}>No one yet. Share your link to earn {ref?.rules?.referrerReward ?? 200} axyio per friend.</Text>
           ) : (
             invited.slice(0, 5).map(f => (
               <View key={f.id} style={styles.invitedRow}>

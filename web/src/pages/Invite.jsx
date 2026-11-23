@@ -91,7 +91,7 @@ export default function Invite() {
           {who} invited you to axyio
         </Reveal>
         <Reveal as="p" className="lead" delay={0.12}>
-          Earn FIT for walking, sleeping well, drinking water and more. Join with this code and get <b>{reward} FIT</b> the moment you
+          Earn axyio for walking, sleeping well, drinking water and more. Join with this code and get <b>{reward} axyio</b> the moment you
           sign up.
         </Reveal>
 
@@ -131,7 +131,7 @@ export default function Invite() {
             Create your account. The code <b>{code}</b> is filled in for you (or type it in).
           </li>
           <li>
-            You get {reward} FIT and {who === 'A friend' ? 'your friend' : who} gets {REFERRAL.inviterReward} FIT straight away.
+            You get {reward} axyio and {who === 'A friend' ? 'your friend' : who} gets {REFERRAL.inviterReward} axyio straight away.
           </li>
         </Reveal>
       </div>

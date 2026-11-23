@@ -83,7 +83,7 @@ export default function RewardDetailScreen({ route, navigation }) {
             </View>
           </View>
           <GradientButton
-            title={!r.inStock ? 'Out of stock' : affordable ? 'Redeem now' : 'Not enough FIT'}
+            title={!r.inStock ? 'Out of stock' : affordable ? 'Redeem now' : 'Not enough axyio'}
             disabled={!affordable}
             style={styles.flex}
             onPress={() => setSheet(true)}
@@ -132,7 +132,7 @@ export default function RewardDetailScreen({ route, navigation }) {
         <Card style={styles.section}>
           <Text style={type.h3}>How it works</Text>
           {[
-            'Redeem with FIT — your balance updates instantly.',
+            'Redeem with axyio — your balance updates instantly.',
             'Your voucher code appears right away and is saved in your notifications.',
             'Redemptions are final and can’t be exchanged for cash.',
           ].map((t, i) => (

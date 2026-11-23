@@ -99,7 +99,7 @@ export default function MarketplaceScreen({ navigation }) {
           <View style={styles.flex}>
             <Text style={styles.bannerLabel}>LIMITED DROP</Text>
             <Text style={styles.bannerTitle}>Double value on{'\n'}fitness passes</Text>
-            <Text style={styles.bannerSub}>Ends Sunday · 2× FIT value</Text>
+            <Text style={styles.bannerSub}>Ends Sunday · 2× axyio value</Text>
           </View>
           <View style={styles.bannerIcon}>
             <Icon name="Dumbbell" size={44} color="#fff" />

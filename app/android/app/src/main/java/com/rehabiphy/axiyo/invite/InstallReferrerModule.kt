@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Reads the Google Play install referrer: the `referrer` query of the Play
  * Store link the app was installed from. Invite pages link to
- * play.google.com/...&referrer=invite_code%3DFIT-XXXX, so a friend who installs
+ * play.google.com/...&referrer=invite_code%3DAXYIO-XXXX, so a friend who installs
  * from an invite gets the code filled in on the sign-up screen.
  *
  * Resolves the raw referrer string, or null when there is none (sideloaded

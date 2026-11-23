@@ -25,7 +25,7 @@ const FILTERS_WITH_EVENTS = ['All', 'Event', 'Daily', 'Weekly', 'Joined'];
 function RankCard({ onPress, board }) {
   const top = (board?.entries || []).slice(0, 3);
   const me = board?.me;
-  let caption = 'Earn FIT this week to get ranked';
+  let caption = 'Earn axyio this week to get ranked';
   if (me?.rank) {
     caption = me.rank === 1 ? `${formatNumber(me.points)} pts · you’re on top!` : `${formatNumber(me.points)} pts · ${formatNumber(me.pointsToNext)} pts to move up`;
   }

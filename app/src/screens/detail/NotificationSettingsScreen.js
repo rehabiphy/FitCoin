@@ -29,7 +29,7 @@ const OPTIONS = [
   {
     key: 'rewards',
     title: 'Rewards & progress',
-    body: 'FIT earned, streak bonuses, badges, challenges and referrals.',
+    body: 'axyio earned, streak bonuses, badges, challenges and referrals.',
     icon: 'Coins',
     color: colors.gold,
   },

@@ -132,7 +132,7 @@ export default function RegisterScreen({ navigation, route }) {
       key: 'referralCode',
       label: 'Friend’s referral code (optional)',
       icon: 'Gift',
-      placeholder: 'e.g. FIT-AISHA21',
+      placeholder: 'e.g. AXYIO-AISHA21',
       autoCapitalize: 'characters',
     },
   ];
@@ -145,7 +145,7 @@ export default function RegisterScreen({ navigation, route }) {
       contentContainerStyle={styles.content}>
       <Animated.View entering={FadeInDown.duration(500)} style={styles.intro}>
         <Text style={type.h1}>Start earning today</Text>
-        <Text style={type.body}>Joining with a friend’s code? Add it below and get a FIT welcome bonus right away.</Text>
+        <Text style={type.body}>Joining with a friend’s code? Add it below and get an axyio welcome bonus right away.</Text>
       </Animated.View>
 
       {fields.map(({ key, ...f }, i) => (
