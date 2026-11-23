@@ -19,22 +19,29 @@ async function liveRewards() {
   };
 }
 
-/** Codes are shown upper case; links and typing may not be. */
+/** Codes are shown upper case; links and typing may not be. Old "FIT-" codes now start with "AXYIO-". */
 export const normalizeCode = code =>
   String(code || '')
     .trim()
-    .toUpperCase();
+    .toUpperCase()
+    .replace(/^FIT-/, 'AXYIO-');
+
+/** The code as stored. A few old codes kept "FIT-" because the AXYIO- version was taken. */
+const codeQuery = code => {
+  const normalized = normalizeCode(code);
+  return { referralCode: trusted({ $in: [normalized, normalized.replace(/^AXYIO-/, 'FIT-')] }) };
+};
 
 const firstName = name => String(name || '').trim().split(/\s+/)[0] || 'A friend';
 
 /** Who owns a code, for the invite page and the sign-up form. Only the first name is shared. */
 export async function lookupCode(code) {
-  const owner = await User.findOne({ referralCode: normalizeCode(code) }).select('name').lean();
+  const owner = await User.findOne(codeQuery(code)).select('name referralCode').lean();
   if (!owner) {
     throw ApiError.notFound('This invite code doesn’t exist', 'INVALID_REFERRAL');
   }
   const { refereeReward } = await liveRewards();
-  return { code: normalizeCode(code), name: firstName(owner.name), reward: refereeReward };
+  return { code: owner.referralCode, name: firstName(owner.name), reward: refereeReward };
 }
 
 /** The member's own referrer, for "You joined with X's code". */
@@ -55,8 +62,7 @@ async function referrerSummary(user) {
  * unknown code, the member's own code, or a code from someone they invited.
  */
 export async function resolveReferrer(code, user = null) {
-  const normalized = normalizeCode(code);
-  const referrer = await User.findOne({ referralCode: normalized }).select('_id name referredBy');
+  const referrer = await User.findOne(codeQuery(code)).select('_id name referredBy');
   if (!referrer) {
     throw ApiError.badRequest('This referral code isn’t valid. Check it and try again.', 'INVALID_REFERRAL');
   }
