@@ -113,7 +113,7 @@ export default function Support() {
           <Reveal className="card support-card" variant="up" delay={0.08}>
             <IconBubble name="LifeBuoy" color="mint" size={48} />
             <h3>Contact form</h3>
-            <p>Report a missing reward, a redemption problem or a bug.</p>
+            <p>Report a missing reward or a bug.</p>
             <Link className="btn btn-ghost btn-sm" to="/contact?topic=Support">
               Open the form
             </Link>

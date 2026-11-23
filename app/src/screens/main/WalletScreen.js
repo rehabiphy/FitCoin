@@ -20,7 +20,8 @@ import { txView } from '../../utils/format';
 import { colors, gradients, radius, type, TOKEN } from '../../theme';
 import { MARKETPLACE_ENABLED } from '../../config';
 
-const FILTERS = ['All', 'Earned', 'Redeemed', 'Other'];
+// "Redeemed" only matters while the marketplace is on
+const FILTERS = MARKETPLACE_ENABLED ? ['All', 'Earned', 'Redeemed', 'Other'] : ['All', 'Earned', 'Other'];
 // Chip label -> server filter group
 export const TX_GROUPS = { All: undefined, Earned: 'earned', Redeemed: 'redeemed', Other: 'other' };
 

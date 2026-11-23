@@ -17,9 +17,9 @@ export const onboardingSlides = [
   },
   {
     key: 's3',
-    title: 'Redeem real\nrewards.',
-    body: 'Spend axyio on vouchers, fitness passes and partner offers in the marketplace.',
-    icon: 'Gift',
+    title: 'Compete and\nlevel up.',
+    body: 'Join challenges, climb the leaderboard and invite friends to earn together.',
+    icon: 'Trophy',
     gradient: ['#7C5CFF', '#22D3EE'],
   },
 ];

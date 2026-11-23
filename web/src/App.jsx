@@ -17,7 +17,7 @@ import NotFound from './pages/NotFound.jsx';
 import Invite from './pages/Invite.jsx';
 
 const TITLES = {
-  '/': 'axyio: Move. Earn. Redeem.',
+  '/': 'axyio: Move. Earn. Level up.',
   '/features': 'Features · axyio',
   '/rewards': 'Rewards · axyio',
   '/premium': 'Premium · axyio',

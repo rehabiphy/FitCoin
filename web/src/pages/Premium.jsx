@@ -12,7 +12,7 @@ const ROWS = [
   ['axyio per habit', 'Standard rate', `${PREMIUM.multiplier}x rate`],
   ['Daily habit cap', `${CAPS.free} axyio`, `${CAPS.premium} axyio`],
   ['Streaks, challenges & referrals', true, true],
-  ['Marketplace & badges', true, true],
+  ['Badges & levels', true, true],
   ['Premium badge on your profile', false, true],
 ];
 
@@ -47,9 +47,6 @@ export default function Premium() {
               </li>
               <li>
                 <Icon name="Check" size={18} /> Streaks, challenges, referrals & badges
-              </li>
-              <li>
-                <Icon name="Check" size={18} /> Full marketplace access
               </li>
             </ul>
             <DownloadButton />

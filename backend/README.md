@@ -130,7 +130,7 @@ while `PREMIUM_TEST_PURCHASES=true` (the default outside production). Admins can
   target is reached. Paused and archived challenges are hidden from the app.
 - **Referrals:** a member adds one friend's code (at sign-up, after a Google sign-up, or later from their profile;
   never changeable). Both are paid at once: the code's owner 200 FIT (max 20 friends/month), the new member 100 FIT.
-  Own codes and mutual referrals are rejected. Invite links are `https://fit-coin-lszq.vercel.app/invite/<code>`
+  Own codes and mutual referrals are rejected. Invite links are `https://axyio.vercel.app/invite/<code>`
   (Android App Links via `web/public/.well-known/assetlinks.json`; the Play install referrer carries the code through installs).
 - **Marketplace** (`src/seed/rewards.js`): 2% fee; a per-user wallet lock stops two redemptions spending the same FIT.
   Voucher codes are generated locally for now (`fulfil()` in `marketplace.service.js` is where a partner API goes).

@@ -11,7 +11,8 @@ import { WEB_URL } from '../config';
  */
 
 const CODE_RE = /^[A-Za-z0-9-]{3,32}$/;
-const HOST = WEB_URL.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+// Invite links from the current website, plus the old URL so links shared before the move still work
+const HOSTS = [WEB_URL.replace(/^https?:\/\//, '').replace(/\/+$/, ''), 'fit-coin-lszq.vercel.app'].map(h => h.toLowerCase());
 
 let pending = null; // { code, source: 'link' | 'install' }
 const listeners = new Set();
@@ -24,7 +25,7 @@ export function codeFromUrl(url) {
     return null;
   }
   const https = url.match(/^https?:\/\/([^/?#]+)\/invite\/([^/?#]+)/i);
-  if (https && https[1].toLowerCase() === HOST.toLowerCase()) {
+  if (https && HOSTS.includes(https[1].toLowerCase())) {
     return normalize(decodeURIComponent(https[2]));
   }
   const custom = url.match(/^axyio:\/\/invite\/([^/?#]+)/i);

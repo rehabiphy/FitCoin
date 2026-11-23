@@ -1,4 +1,3 @@
-import { Link } from 'react-router';
 import Reveal from '../components/Reveal.jsx';
 import Icon, { IconBubble } from '../components/Icon.jsx';
 import PageHero from '../components/PageHero.jsx';
@@ -39,15 +38,14 @@ export default function About() {
               more of them.
             </p>
             <p>
-              So we turned six everyday habits into axyio points that you can spend on vouchers, fitness passes, food, lifestyle deals and
-              charity. We check every reward on our servers so the system stays fair, and we added streaks, challenges, badges and
+              So we turned six everyday habits into axyio points. We check every reward on our servers so the system stays fair, and we added streaks, challenges, badges and
               leaderboards to keep the momentum going.
             </p>
           </Reveal>
           <Reveal variant="zoom" className="about-logo">
             <div className="about-logo-card">
               <img src={logo} alt="axyio" />
-              <p>Move. Earn. Redeem.</p>
+              <p>Move. Earn. Level up.</p>
             </div>
           </Reveal>
         </div>
@@ -88,23 +86,6 @@ export default function About() {
               </Reveal>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <Reveal className="card partner-card" variant="zoom">
-            <div>
-              <p className="eyebrow">For brands</p>
-              <h2 className="h2">Put your brand in front of people who move</h2>
-              <p className="lead">
-                Offer vouchers, passes or deals in the axyio marketplace and reach an audience that’s actively building healthier habits.
-              </p>
-            </div>
-            <Link to="/contact?topic=Partnership" className="btn btn-primary">
-              <Icon name="Handshake" size={18} /> Partner with us
-            </Link>
-          </Reveal>
         </div>
       </section>
 

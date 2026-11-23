@@ -66,7 +66,7 @@ export default function DeleteAccount() {
           <Reveal className="note-card">
             <Icon name="Gift" size={20} />
             <p>
-              <b>Before you go:</b> spend your axyio in the marketplace, and save any voucher codes you haven’t used. Uninstalling the app does
+              <b>Before you go:</b> your axyio balance can’t be restored once your account is deleted. Uninstalling the app does
               not delete your account. If you have Premium, deleting your account ends it without a refund for the remaining days unless the
               law requires one.
             </p>

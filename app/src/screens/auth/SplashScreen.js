@@ -58,7 +58,7 @@ export default function SplashScreen({ onFinish }) {
         </Animated.View>
       </View>
       <Animated.View entering={FadeInDown.delay(500).duration(700)} style={styles.textWrap}>
-        <Text style={type.body}>Move. Earn. Redeem.</Text>
+        <Text style={type.body}>Move. Earn. Level up.</Text>
       </Animated.View>
       <Animated.Text entering={FadeIn.delay(1200)} style={styles.footer}>
         Rewards for a healthier you

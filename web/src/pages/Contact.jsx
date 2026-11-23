@@ -5,7 +5,7 @@ import Icon, { IconBubble } from '../components/Icon.jsx';
 import PageHero from '../components/PageHero.jsx';
 import { SITE } from '../site.js';
 
-const TOPICS = ['Support', 'Missing reward', 'Redemption problem', 'Premium & billing', 'Partnership', 'Privacy request', 'Launch updates', 'Other'];
+const TOPICS = ['Support', 'Missing reward', 'Premium & billing', 'Partnership', 'Privacy request', 'Launch updates', 'Other'];
 
 const emailFor = topic => (topic === 'Partnership' ? SITE.partnersEmail : topic === 'Privacy request' ? SITE.privacyEmail : SITE.supportEmail);
 
@@ -27,8 +27,8 @@ export default function Contact() {
   };
 
   const cards = [
-    { icon: 'LifeBuoy', color: 'mint', t: 'Support', d: 'Help with steps, rewards, redemptions or your account.', email: SITE.supportEmail },
-    { icon: 'Handshake', color: 'gold', t: 'Partnerships', d: 'Offer your rewards in the axyio marketplace.', email: SITE.partnersEmail },
+    { icon: 'LifeBuoy', color: 'mint', t: 'Support', d: 'Help with steps, rewards or your account.', email: SITE.supportEmail },
+    { icon: 'Handshake', color: 'gold', t: 'Partnerships', d: 'Brand partnerships and collaborations.', email: SITE.partnersEmail },
     { icon: 'Lock', color: 'primary', t: 'Privacy', d: 'Data access, correction or deletion requests.', email: SITE.privacyEmail },
   ];
 

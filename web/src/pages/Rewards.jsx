@@ -21,9 +21,9 @@ function Block({ id, icon, color, title, children }) {
 export default function Rewards() {
   return (
     <>
-      <PageHero eyebrow="axyio & rewards" title={<>How you earn and spend <span className="grad-text">axyio</span></>}>
+      <PageHero eyebrow="axyio & rewards" title={<>How you earn <span className="grad-text">axyio</span></>}>
         <p>
-          axyio points are in-app rewards you earn for healthy habits and spend in the marketplace. Here is exactly how they work, with no
+          axyio points are in-app rewards you earn for healthy habits. Here is exactly how they work, with no
           small print.
         </p>
       </PageHero>
@@ -158,12 +158,9 @@ export default function Rewards() {
             </ul>
           </Block>
 
-          <Block id="redeeming" icon="Gift" color="mint" title="Redeeming & expiry">
+          <Block id="expiry" icon="Hourglass" color="mint" title="Expiry">
             <ul className="dot-list">
-              <li>Redeem axyio for partner vouchers, passes and offers in the marketplace.</li>
-              <li>A 2% platform fee is added to marketplace redemptions.</li>
               <li>axyio points expire 6 months after they’re earned. We notify you 14 days before, and your oldest axyio points are always spent first.</li>
-              <li>Some rewards have limited stock. Availability is shown before you redeem.</li>
             </ul>
           </Block>
 

@@ -6,7 +6,7 @@
 
 export const SITE = {
   name: 'axyio',
-  tagline: 'Move. Earn. Redeem.',
+  tagline: 'Move. Earn. Level up.',
   // Legal operator shown on the Privacy and Terms pages. Change before publishing.
   legalName: 'Rehabiphy',
   jurisdiction: 'India',
@@ -165,7 +165,7 @@ export const FAQ = [
     items: [
       {
         q: 'What is axyio?',
-        a: 'axyio is a wellness rewards app. You earn axyio points for healthy habits such as walking, cycling, drinking water, sleeping well, reading and mindful breathing, then spend those points on vouchers, passes and offers in the in-app marketplace.',
+        a: 'axyio is a wellness rewards app. You earn axyio points for healthy habits such as walking, cycling, drinking water, sleeping well, reading and mindful breathing, and climb levels, keep streaks and win challenges along the way.',
       },
       {
         q: 'Is axyio free?',
@@ -207,7 +207,7 @@ export const FAQ = [
     items: [
       {
         q: 'What is axyio?',
-        a: 'axyio points are in-app rewards. They have no cash value, are not a cryptocurrency, and can’t be bought, sold or transferred between users. You earn them for healthy habits and spend them in the marketplace.',
+        a: 'axyio points are in-app rewards. They have no cash value, are not a cryptocurrency, and can’t be bought, sold or transferred between users. You earn them for healthy habits.',
       },
       {
         q: 'Is there a daily limit?',
@@ -216,10 +216,6 @@ export const FAQ = [
       {
         q: 'Do axyio points expire?',
         a: 'axyio points expire 6 months after they are earned. We notify you 14 days before any axyio points expire, and your oldest axyio points are always spent first.',
-      },
-      {
-        q: 'How do I redeem a reward?',
-        a: 'Open the marketplace, choose a reward and tap Redeem. The axyio points are deducted from your wallet (plus a 2% platform fee) and your voucher appears in your redemptions.',
       },
       {
         q: 'How do streaks work?',

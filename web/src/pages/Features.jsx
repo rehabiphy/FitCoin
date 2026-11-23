@@ -33,7 +33,7 @@ const ROWS = [
   {
     eyebrow: 'Wallet',
     title: 'A wallet that shows every axyio in and out',
-    text: 'Your balance is calculated from a full transaction history: habit rewards, streak bonuses, challenge prizes, referrals and redemptions. Tap any entry to see its details.',
+    text: 'Your balance is calculated from a full transaction history: habit rewards, streak bonuses, challenge prizes and referrals. Tap any entry to see its details.',
     points: ['Full transaction history with filters', 'Level and XP progress on your wallet card', 'Daily cap tracker so you know what’s left today'],
     visual: 'wallet',
   },
@@ -43,13 +43,6 @@ const ROWS = [
     text: 'Join daily and weekly challenges that track your real activity, and see where you rank on weekly, monthly and all-time leaderboards.',
     points: ['Daily and weekly challenges (weeks run Monday to Sunday)', 'Prizes paid automatically when you hit the target', 'See your percentile and the top participants'],
     visual: 'challenges',
-  },
-  {
-    eyebrow: 'Marketplace',
-    title: 'Redeem for vouchers, passes and good causes',
-    text: 'Browse rewards by category or search for what you want. Redeem in a tap and your voucher code is ready in your redemptions.',
-    points: ['Vouchers, Fitness, Food, Lifestyle and Charity', 'Your balance can’t be spent twice, even on two phones at once', 'Stock and price shown before you redeem'],
-    visual: 'market',
   },
 ];
 
@@ -105,7 +98,7 @@ export default function Features() {
   return (
     <>
       <PageHero eyebrow="Features" title={<>Everything you need to build habits that stick</>}>
-        <p>Automatic step tracking, simple habit logging, challenges, a transparent wallet and a marketplace full of rewards, all in one app.</p>
+        <p>Automatic step tracking, simple habit logging, challenges, a transparent wallet and leaderboards, all in one app.</p>
       </PageHero>
 
       {ROWS.map((r, i) => (

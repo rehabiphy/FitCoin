@@ -7,7 +7,7 @@ import PhoneMockup from '../components/PhoneMockup.jsx';
 import DownloadButton from '../components/DownloadButton.jsx';
 import Accordion from '../components/Accordion.jsx';
 import CtaBand from '../components/CtaBand.jsx';
-import { BADGES, CAPS, CHALLENGES, FAQ, HABITS, PREMIUM, REFERRAL, REWARD_CATEGORIES, SAMPLE_REWARDS, STREAK } from '../site.js';
+import { BADGES, CAPS, CHALLENGES, FAQ, HABITS, PREMIUM, REFERRAL, STREAK } from '../site.js';
 
 function Hero() {
   return (
@@ -21,11 +21,11 @@ function Hero() {
             <Icon name="Sparkles" size={14} /> Wellness rewards, made simple
           </Reveal>
           <Reveal as="h1" className="display hero-title" delay={0.08}>
-            Move. Earn. <span className="grad-text">Redeem.</span>
+            Move. Earn. <span className="grad-text">Level up.</span>
           </Reveal>
           <Reveal as="p" className="lead" delay={0.16}>
             axyio pays you for healthy habits. Walk, cycle, drink water, sleep well, read and breathe to earn <b>axyio</b> points, then
-            spend them on vouchers, gym passes, food and more.
+            keep your streak, climb levels and win challenges.
           </Reveal>
           <Reveal className="hero-actions" delay={0.24}>
             <DownloadButton />
@@ -123,12 +123,6 @@ const STEPS = [
     text: 'Every reward is checked on our servers before it lands in your wallet. Stack streak bonuses, challenge prizes and referral rewards on top.',
     screen: 'wallet',
   },
-  {
-    icon: 'Gift',
-    title: 'Redeem real rewards',
-    text: 'Spend axyio in the marketplace on vouchers, fitness passes, food, lifestyle deals and charity. Your voucher shows up instantly.',
-    screen: 'market',
-  },
 ];
 
 function HowItWorks() {
@@ -153,7 +147,7 @@ function HowItWorks() {
       <div className="container">
         <Reveal className="section-head center">
           <p className="eyebrow">How it works</p>
-          <h2 className="h2">Four steps from healthy habit to real reward</h2>
+          <h2 className="h2">Three steps from healthy habit to real reward</h2>
         </Reveal>
         <div className="how-grid">
           <div className="how-steps">
@@ -328,42 +322,6 @@ function Challenges() {
   );
 }
 
-function Marketplace() {
-  const loop = [...SAMPLE_REWARDS, ...SAMPLE_REWARDS];
-  return (
-    <section className="section">
-      <div className="container">
-        <Reveal className="section-head center">
-          <p className="eyebrow">Marketplace</p>
-          <h2 className="h2">Spend your axyio on things you’ll actually use</h2>
-          <p className="lead">Partner vouchers, passes and offers across five categories.</p>
-        </Reveal>
-        <div className="cat-row">
-          {REWARD_CATEGORIES.map((c, i) => (
-            <Reveal key={c.name} className="cat" variant="zoom" delay={i * 0.06}>
-              <IconBubble name={c.icon} color={c.color} size={50} />
-              <b>{c.name}</b>
-              <small>{c.examples}</small>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-      <div className="marquee" aria-label="Example rewards">
-        <div className="marquee-track">
-          {loop.map((r, i) => (
-            <div key={i} className="reward-pill" aria-hidden={i >= SAMPLE_REWARDS.length}>
-              <IconBubble name={r.icon} color={r.color} size={36} />
-              <span>{r.title}</span>
-              <b>{r.cost} axyio</b>
-            </div>
-          ))}
-        </div>
-      </div>
-      <p className="container center muted small mt-md">Example rewards. Available rewards and prices change over time and are shown in the app.</p>
-    </section>
-  );
-}
-
 function PremiumTeaser() {
   return (
     <section className="section">
@@ -515,7 +473,6 @@ export default function Home() {
       <Habits />
       <Motivation />
       <Challenges />
-      <Marketplace />
       <PremiumTeaser />
       <Referral />
       <Trust />

@@ -16,7 +16,8 @@ const list = value =>
 // Browser apps that may always call the API (plus anything in CORS_ORIGINS)
 const BUILT_IN_ORIGINS = [
   'https://admin-axyio.vercel.app', // admin panel
-  'https://fit-coin-lszq.vercel.app', // website (invite pages look up codes)
+  'https://axyio.vercel.app', // website (invite pages look up codes)
+  'https://fit-coin-lszq.vercel.app', // website (previous URL)
   'https://fit-coin-beryl.vercel.app', // admin panel (previous URL)
 ];
 

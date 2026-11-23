@@ -13,8 +13,10 @@ import { useSteps } from '../../context/StepsContext';
 import { transactionsApi } from '../../api/engagementApi';
 import { txView } from '../../utils/format';
 import { colors, type, TOKEN } from '../../theme';
+import { MARKETPLACE_ENABLED } from '../../config';
 
-const FILTERS = ['All', 'Earned', 'Redeemed', 'Other'];
+// "Redeemed" only matters while the marketplace is on
+const FILTERS = MARKETPLACE_ENABLED ? ['All', 'Earned', 'Redeemed', 'Other'] : ['All', 'Earned', 'Other'];
 const PAGE_SIZE = 20;
 
 export default function TransactionsScreen({ navigation }) {
@@ -59,11 +61,13 @@ export default function TransactionsScreen({ navigation }) {
           <Text style={[styles.sumValue, { color: colors.mint }]}>+{wallet.lifetime.toLocaleString('en-US')}</Text>
           <Text style={type.caption}>{TOKEN}</Text>
         </Card>
-        <Card style={styles.sumCard}>
-          <Text style={type.caption}>Total redeemed</Text>
-          <Text style={styles.sumValue}>−{wallet.redeemed.toLocaleString('en-US')}</Text>
-          <Text style={type.caption}>{TOKEN}</Text>
-        </Card>
+        {MARKETPLACE_ENABLED ? (
+          <Card style={styles.sumCard}>
+            <Text style={type.caption}>Total redeemed</Text>
+            <Text style={styles.sumValue}>−{wallet.redeemed.toLocaleString('en-US')}</Text>
+            <Text style={type.caption}>{TOKEN}</Text>
+          </Card>
+        ) : null}
       </Animated.View>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bleed} contentContainerStyle={styles.chips}>
