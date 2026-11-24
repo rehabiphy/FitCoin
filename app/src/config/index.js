@@ -11,7 +11,7 @@ const DEV_API_URL = Platform.select({
   default: 'http://localhost:5000/api/v1',
 });
 
-const PROD_API_URL = 'https://fitcoin-7jq7.onrender.com/api/v1';
+const PROD_API_URL = 'https://api.axyio.rehabiphy.com/api/v1';
 
 export const API_BASE_URL = __DEV__ ? DEV_API_URL : PROD_API_URL;
 
@@ -19,7 +19,7 @@ export const API_TIMEOUT_MS = 15000;
 
 // The website. Invite links are WEB_URL/invite/<code>; Android opens them in the app
 // (App Links, verified by web/public/.well-known/assetlinks.json).
-export const WEB_URL = 'https://axyio.vercel.app';
+export const WEB_URL = 'https://axyio.rehabiphy.com';
 export const inviteLink = code => `${WEB_URL}/invite/${encodeURIComponent(code)}`;
 
 /**

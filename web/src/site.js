@@ -19,7 +19,7 @@ export const SITE = {
   playStoreUrl: '',
   packageName: 'com.rehabiphy.axiyo',
   // The live API, used by invite pages to show who sent the invite
-  apiUrl: 'https://fitcoin-7jq7.onrender.com/api/v1',
+  apiUrl: 'https://api.axyio.rehabiphy.com/api/v1',
   legalUpdated: '27 October 2026',
 };
 

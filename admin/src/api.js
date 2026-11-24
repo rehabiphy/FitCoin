@@ -1,5 +1,5 @@
 // Same live API the app's release build uses
-export const LIVE_API_URL = 'https://fitcoin-7jq7.onrender.com/api/v1';
+export const LIVE_API_URL = 'https://api.axyio.rehabiphy.com/api/v1';
 
 // `npm run dev` / `dev:live`: same-origin /api/v1, forwarded by Vite to the local or live backend.
 // `npm run build`: the live API (override with VITE_API_URL).

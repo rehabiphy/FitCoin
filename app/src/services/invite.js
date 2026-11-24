@@ -11,8 +11,8 @@ import { WEB_URL } from '../config';
  */
 
 const CODE_RE = /^[A-Za-z0-9-]{3,32}$/;
-// Invite links from the current website, plus the old URL so links shared before the move still work
-const HOSTS = [WEB_URL.replace(/^https?:\/\//, '').replace(/\/+$/, ''), 'fit-coin-lszq.vercel.app'].map(h => h.toLowerCase());
+// Invite links from the current website, plus older URLs so links shared before each move still work
+const HOSTS = [WEB_URL.replace(/^https?:\/\//, '').replace(/\/+$/, ''), 'axyio.vercel.app', 'fit-coin-lszq.vercel.app'].map(h => h.toLowerCase());
 
 let pending = null; // { code, source: 'link' | 'install' }
 const listeners = new Set();

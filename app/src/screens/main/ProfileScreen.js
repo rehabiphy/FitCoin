@@ -117,7 +117,7 @@ export default function ProfileScreen({ navigation }) {
             icon="Share2"
             color={colors.mint}
             label="Refer & earn"
-            value={account?.referralCode || ref?.code || ''}
+            value={ref?.code || account?.referralCode || ''}
             onPress={go('Referral')}
           />
           {ref?.referredBy ? (
