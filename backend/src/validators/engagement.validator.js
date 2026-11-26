@@ -54,7 +54,7 @@ export const notificationPrefsSchema = z
   })
   .refine(p => Object.keys(p).length > 0, { error: 'Nothing to update' });
 
-// Referral codes look like AXYIO-AISHA21A; links and typing may use lower case
+// Referral codes look like AISH2104 (older ones AXYIO-AISHA21A); links and typing may use lower case
 export const referralCodeParam = z.string().trim().min(3).max(32).regex(/^[A-Za-z0-9-]+$/, { error: 'Invite code not found' });
 
 export const applyReferralSchema = z.object({

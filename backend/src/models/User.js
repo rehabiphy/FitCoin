@@ -21,7 +21,10 @@ const userSchema = new mongoose.Schema(
     authProviders: { type: [String], enum: ['local', 'google'], default: [] },
     avatar: { type: String },
     emailVerified: { type: Boolean, default: false },
+    // Four letters of the name + four digits, e.g. PART9801
     referralCode: { type: String, unique: true, sparse: true },
+    // Codes this member had before (AXYIO-PARTH34CE); links shared with them still work
+    legacyReferralCodes: { type: [String], default: undefined },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     // When the friend's code was added (set once, never changed)
     referredAt: { type: Date },
@@ -69,19 +72,37 @@ export const notificationPrefsOf = user => ({
   rewards: user?.notificationPrefs?.rewards !== false,
 });
 
+/** "Parth Panchal" -> "PART" + 4 random digits, e.g. PART9801. Short names are padded with X (AL -> ALXX); no Latin letters -> AXYO. */
+export function makeReferralCode(name) {
+  const letters = (String(name || '').replace(/[^a-z]/gi, '').slice(0, 4).toUpperCase() || 'AXYO').padEnd(4, 'X');
+  return `${letters}${String(crypto.randomInt(0, 10000)).padStart(4, '0')}`;
+}
+
+/** A code no member has now or had before. The unique index still guards against a race. */
+export async function uniqueReferralCode(Model, name) {
+  for (let i = 0; i < 20; i += 1) {
+    const code = makeReferralCode(name);
+    if (!(await Model.exists({ $or: [{ referralCode: code }, { legacyReferralCodes: code }] }))) {
+      return code;
+    }
+  }
+  // Very common name prefix: fall back to an extra digit rather than fail the sign-up
+  return `${makeReferralCode(name)}${crypto.randomInt(0, 10)}`;
+}
+
 userSchema.pre('save', async function hashPassword() {
   if (this.isModified('password') && this.password) {
     this.password = await bcrypt.hash(this.password, env.bcryptRounds);
   }
   if (!this.referralCode) {
-    const base = (this.name || 'AXYIO').replace(/[^a-z]/gi, '').slice(0, 5).toUpperCase() || 'AXYIO';
-    this.referralCode = `AXYIO-${base}${crypto.randomInt(10, 99)}${crypto.randomBytes(1).toString('hex').toUpperCase()}`;
+    this.referralCode = await uniqueReferralCode(this.constructor, this.name);
   }
 });
 
 userSchema.index({ premiumUntil: 1 }, { sparse: true });
 // "People who used your code" and badge counts look users up by their referrer
 userSchema.index({ referredBy: 1 }, { sparse: true });
+userSchema.index({ legacyReferralCodes: 1 }, { sparse: true });
 
 userSchema.virtual('isPremium').get(function isPremium() {
   return !!this.premiumUntil && this.premiumUntil.getTime() > Date.now();

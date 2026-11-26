@@ -32,7 +32,7 @@ export function codeFromUrl(url) {
   return custom ? normalize(decodeURIComponent(custom[1])) : null;
 }
 
-/** "invite_code=AXYIO-AISHA21&utm_source=..." -> "AXYIO-AISHA21" */
+/** "invite_code=AISH2104&utm_source=..." -> "AISH2104" */
 function codeFromReferrer(referrer) {
   if (!referrer) {
     return null;

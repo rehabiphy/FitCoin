@@ -48,7 +48,7 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
-        <!-- Invite links: https://axyio.rehabiphy.com/invite/AXYIO-XXXX opens the app directly.
+        <!-- Invite links: https://axyio.rehabiphy.com/invite/PART9801 opens the app directly.
              autoVerify checks web/public/.well-known/assetlinks.json on each domain.
              axyio.vercel.app and fit-coin-lszq.vercel.app are older website URLs, kept so links shared before each move still open the app. -->
         <intent-filter android:autoVerify="true">
@@ -59,7 +59,7 @@
             <data android:scheme="https" android:host="axyio.vercel.app" android:pathPrefix="/invite/" />
             <data android:scheme="https" android:host="fit-coin-lszq.vercel.app" android:pathPrefix="/invite/" />
         </intent-filter>
-        <!-- axyio://invite/AXYIO-XXXX: used by the invite page's "open the app" button -->
+        <!-- axyio://invite/PART9801: used by the invite page's "open the app" button -->
         <intent-filter>
             <action android:name="android.intent.action.VIEW" />
             <category android:name="android.intent.category.DEFAULT" />

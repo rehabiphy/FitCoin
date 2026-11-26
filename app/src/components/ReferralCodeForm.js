@@ -85,7 +85,7 @@ export default function ReferralCodeForm({ initialCode = '', onApplied, buttonTi
   const submit = async () => {
     const trimmed = code.trim();
     if (!CODE_RE.test(trimmed)) {
-      setError('Enter your friend’s code, e.g. AXYIO-AISHA21');
+      setError('Enter your friend’s code, e.g. AISH2104');
       return;
     }
     setSaving(true);
@@ -111,7 +111,7 @@ export default function ReferralCodeForm({ initialCode = '', onApplied, buttonTi
       <TextField
         label="Friend’s referral code"
         icon="Gift"
-        placeholder="e.g. AXYIO-AISHA21"
+        placeholder="e.g. AISH2104"
         autoCapitalize="characters"
         autoCorrect={false}
         value={code}

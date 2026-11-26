@@ -388,7 +388,7 @@ function Referral() {
         <Reveal variant="right" className="ref-visual">
           <div className="ref-card">
             <small>Your code</small>
-            <strong>AXYIO-AARAV42</strong>
+            <strong>AARA4207</strong>
             <span className="btn btn-sm btn-primary">
               <Icon name="Send" size={16} /> Share invite
             </span>

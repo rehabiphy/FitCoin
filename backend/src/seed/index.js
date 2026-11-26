@@ -1,6 +1,6 @@
 import Challenge from '../models/Challenge.js';
 import Reward from '../models/Reward.js';
-import User from '../models/User.js';
+import User, { uniqueReferralCode } from '../models/User.js';
 import AppSetting from '../models/AppSetting.js';
 import { LEGACY_METRICS } from '../config/challenges.js';
 import { CHALLENGES } from './challenges.js';
@@ -26,23 +26,30 @@ async function migrateLegacyChallenges() {
 }
 
 /**
- * Referral codes used to start with "FIT-"; they now start with "AXYIO-". Renames
- * the old ones (FIT-PARTH34CE -> AXYIO-PARTH34CE). Runs on every start but only
- * touches codes that still have the old prefix. Old links keep working because
- * lookups read a FIT- code as its AXYIO- version (see normalizeCode).
+ * Referral codes are now four letters of the name + four digits (PART9801). Gives
+ * every member with an older code (AXYIO-PARTH34CE, FIT-PARTH34CE) a new one and
+ * keeps the old one in legacyReferralCodes, so links already shared still work.
+ * Runs on every start but only touches codes in the old format.
  */
 async function migrateLegacyReferralCodes() {
-  const old = await User.collection.find({ referralCode: /^FIT-/ }).project({ referralCode: 1 }).toArray();
+  const old = await User.collection
+    .find({ referralCode: { $exists: true, $not: /^[A-Z]{4}\d{4,5}$/ } })
+    .project({ name: 1, referralCode: 1 })
+    .toArray();
   for (const doc of old) {
-    try {
-      await User.collection.updateOne(
-        { _id: doc._id, referralCode: doc.referralCode },
-        { $set: { referralCode: doc.referralCode.replace(/^FIT-/, 'AXYIO-') } },
-      );
-    } catch (err) {
-      // Another member already has that AXYIO- code; keep the old one (it still works)
-      if (err?.code !== 11000) {
-        throw err;
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      try {
+        const code = await uniqueReferralCode(User, doc.name);
+        await User.collection.updateOne(
+          { _id: doc._id, referralCode: doc.referralCode },
+          { $set: { referralCode: code }, $addToSet: { legacyReferralCodes: doc.referralCode } },
+        );
+        break;
+      } catch (err) {
+        // Someone took that code in the meantime; try another
+        if (err?.code !== 11000) {
+          throw err;
+        }
       }
     }
   }

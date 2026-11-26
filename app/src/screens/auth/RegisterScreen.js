@@ -132,7 +132,7 @@ export default function RegisterScreen({ navigation, route }) {
       key: 'referralCode',
       label: 'Friend’s referral code (optional)',
       icon: 'Gift',
-      placeholder: 'e.g. AXYIO-AISHA21',
+      placeholder: 'e.g. AISH2104',
       autoCapitalize: 'characters',
     },
   ];

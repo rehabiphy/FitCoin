@@ -26,10 +26,14 @@ export const normalizeCode = code =>
     .toUpperCase()
     .replace(/^FIT-/, 'AXYIO-');
 
-/** The code as stored. A few old codes kept "FIT-" because the AXYIO- version was taken. */
+/**
+ * Finds a member by their current code (PART9801) or one they had before
+ * (AXYIO-PARTH34CE, or FIT-PARTH34CE for a few that were never renamed).
+ */
 const codeQuery = code => {
   const normalized = normalizeCode(code);
-  return { referralCode: trusted({ $in: [normalized, normalized.replace(/^AXYIO-/, 'FIT-')] }) };
+  const variants = [normalized, normalized.replace(/^AXYIO-/, 'FIT-')];
+  return { $or: [{ referralCode: trusted({ $in: variants }) }, { legacyReferralCodes: trusted({ $in: variants }) }] };
 };
 
 const firstName = name => String(name || '').trim().split(/\s+/)[0] || 'A friend';
